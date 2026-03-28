@@ -1,0 +1,10 @@
+﻿{
+	"Name": "Seed Info",
+	"Author": "<author>",
+	"Version": "1.0.0",
+	"Description": "<One or two sentences about the mod>STUFF",
+	"UniqueID": "SeedInfo",
+	"EntryDll": "SeedInfo.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [ "Nexus:<add-your-mod-id-here>" ]
+}
