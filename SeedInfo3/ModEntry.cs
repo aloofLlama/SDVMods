@@ -8,11 +8,16 @@ namespace SeedInfo
     public class ModEntry : Mod
     {
         public static ModEntry Instance { get; private set; } = null!;
-        public static ICustomBushApi? CustomBushApi { get; private set; }
+        //public static ICustomBushApi? CustomBushApi { get; private set; }
+        public static IModHelper SHelper;
+        public static IMonitor SMonitor;
 
         public override void Entry(IModHelper helper)
         {
             Instance = this;
+            SHelper = helper;
+            SMonitor = Monitor;
+
 
             // Load API + database once the save is ready
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
@@ -22,11 +27,35 @@ namespace SeedInfo
             //helper.Events.Display.RenderedHud += OnRenderedHud;
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
+
+            //Helper.Events.Content.AssetRequested += OnAssetRequested;
         }
+
+        //private void OnAssetRequested(object sender, StardewModdingAPI.Events.AssetRequestedEventArgs e)
+        //{
+        //    string name = e.Name.ToString();
+
+        //    if (name.StartsWith("furyx639", StringComparison.OrdinalIgnoreCase))
+        //    {
+        //        Monitor.Log($"Asset requested: {name}", LogLevel.Warn);
+        //    }
+        //}
 
 
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
+            ModEntry.Instance.Monitor.Log("RUN BUTTON PRESS", LogLevel.Info);
+
+
+
+
+            if (ModEntry.Instance == null)
+            {
+                Monitor.Log("[Seed Info] ERROR: ModEntry.Instance is NULL!", LogLevel.Error);
+                return;
+            }
+
+
             if (!Context.IsWorldReady)
                 return;
 
@@ -34,74 +63,99 @@ namespace SeedInfo
             if (item == null)
                 return;
 
-            Monitor.Log($"Held item type: {item.GetType().FullName}", LogLevel.Warn);
+            Monitor.Log($"[Seed Info] Held item type: {item.GetType().FullName}", LogLevel.Warn);
 
             if (item is not StardewValley.Object obj)
             {
-                Monitor.Log("Item is not a StardewValley.Object — cannot inspect modData or ObjectData.", LogLevel.Warn);
+                Monitor.Log("[Seed Info] Item is not a StardewValley.Object — skipping bush test.", LogLevel.Warn);
                 return;
             }
 
-            string saplingId = obj.QualifiedItemId;
-            Monitor.Log($"=== Testing sapling: {saplingId} ===", LogLevel.Warn);
+            Monitor.Log($"[Seed Info] Running TryGetCornucopiaBushInfo on {obj.QualifiedItemId}", LogLevel.Warn);
 
-            // -------------------------
-            // TEST 1: Load Custom Bush Data
-            // -------------------------
-            Monitor.Log("=== Test 1: Loading furyx639.CustomBush/Data ===", LogLevel.Warn);
-
-            Dictionary<string, object>? bushDb = null;
-
-            try
+            // Call your method
+            if (PlantDatabase.TryGetCornucopiaBushInfo(obj, out PlantInfo? info))
             {
-                bushDb = Helper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
-                Monitor.Log($"Loaded bush database with {bushDb.Count} entries.", LogLevel.Warn);
-            }
-            catch (Exception ex)
-            {
-                Monitor.Log($"Failed to load bush data: {ex}", LogLevel.Error);
-                return;
-            }
+                Monitor.Log("[Seed Info] TryGetCornucopiaBushInfo returned TRUE.", LogLevel.Warn);
 
-            // -------------------------
-            // TEST 2: Does this sapling map to a bush?
-            // -------------------------
-            Monitor.Log("=== Test 2: Checking sapling → bush mapping ===", LogLevel.Warn);
-
-            if (bushDb.TryGetValue(saplingId, out var rawEntry))
-            {
-                Monitor.Log($"Bush entry FOUND for {saplingId}.", LogLevel.Warn);
-
-                // Dump the raw JSON object (it will appear as a JsonElement or Dictionary)
-                Monitor.Log($"Raw bush entry: {rawEntry}", LogLevel.Warn);
-            }
-            else
-            {
-                Monitor.Log($"No bush entry found for {saplingId}.", LogLevel.Warn);
-            }
-
-            // -------------------------
-            // TEST 3: Check ObjectData.CustomFields
-            // -------------------------
-            Monitor.Log("=== Test 3: ObjectData.CustomFields ===", LogLevel.Warn);
-
-            if (Game1.objectData.TryGetValue(obj.ItemId, out var od))
-            {
-                if (od.CustomFields == null || od.CustomFields.Count == 0)
+                if (info == null)
                 {
-                    Monitor.Log("No CustomFields found.", LogLevel.Warn);
+                    Monitor.Log("[Seed Info] But PlantInfo is NULL (unexpected).", LogLevel.Warn);
                 }
                 else
                 {
-                    foreach (var kvp in od.CustomFields)
-                        Monitor.Log($"{kvp.Key} = {kvp.Value}", LogLevel.Warn);
+                    Monitor.Log($"[Seed Info] PlantInfo created:", LogLevel.Warn);
+                    //Monitor.Log($"  Name: {info.Name}", LogLevel.Warn);
+                    //Monitor.Log($"  Type: {info.Type}", LogLevel.Warn);
+                    //Monitor.Log($"  Seasons: {string.Join(", ", info.Seasons ?? new())}", LogLevel.Warn);
+                    //Monitor.Log($"  AgeToProduce: {info.AgeToProduce}", LogLevel.Warn);
+                    //Monitor.Log($"  Texture: {info.TexturePath}", LogLevel.Warn);
+                    //Monitor.Log($"  SpriteRow: {info.TextureSpriteRow}", LogLevel.Warn);
                 }
             }
             else
             {
-                Monitor.Log("ObjectData entry not found.", LogLevel.Warn);
+                Monitor.Log("[Seed Info] TryGetCornucopiaBushInfo returned FALSE.", LogLevel.Warn);
             }
         }
+
+        // -------------------------
+        // TEST 1: Load Custom Bush Data
+        // -------------------------
+        //Monitor.Log("=== Test 1: Loading furyx639.CustomBush/Data ===", LogLevel.Warn);
+
+        //Dictionary<string, object>? bushDb = null;
+
+        //try
+        //{
+        //    bushDb = Helper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
+        //    Monitor.Log($"Loaded bush database with {bushDb.Count} entries.", LogLevel.Warn);
+        //}
+        //catch (Exception ex)
+        //{
+        //    Monitor.Log($"Failed to load bush data: {ex}", LogLevel.Error);
+        //    return;
+        //}
+
+        // -------------------------
+        // TEST 2: Does this sapling map to a bush?
+        // -------------------------
+        //Monitor.Log("=== Test 2: Checking sapling → bush mapping ===", LogLevel.Warn);
+
+        //    if (bushDb.TryGetValue(saplingId, out var rawEntry))
+        //    {
+        //        Monitor.Log($"Bush entry FOUND for {saplingId}.", LogLevel.Warn);
+
+        //        // Dump the raw JSON object (it will appear as a JsonElement or Dictionary)
+        //        Monitor.Log($"Raw bush entry: {rawEntry}", LogLevel.Warn);
+        //    }
+        //    else
+        //    {
+        //        Monitor.Log($"No bush entry found for {saplingId}.", LogLevel.Warn);
+        //    }
+
+        //    // -------------------------
+        //    // TEST 3: Check ObjectData.CustomFields
+        //    // -------------------------
+        //    Monitor.Log("=== Test 3: ObjectData.CustomFields ===", LogLevel.Warn);
+
+        //    if (Game1.objectData.TryGetValue(obj.ItemId, out var od))
+        //    {
+        //        if (od.CustomFields == null || od.CustomFields.Count == 0)
+        //        {
+        //            Monitor.Log("No CustomFields found.", LogLevel.Warn);
+        //        }
+        //        else
+        //        {
+        //            foreach (var kvp in od.CustomFields)
+        //                Monitor.Log($"{kvp.Key} = {kvp.Value}", LogLevel.Warn);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Monitor.Log("ObjectData entry not found.", LogLevel.Warn);
+        //    }
+        //}
 
 
 
@@ -129,6 +183,8 @@ namespace SeedInfo
             PlantDatabase.Initialize();
 
             Monitor.Log("Plant database initialized.", LogLevel.Info);
+
+
         }
 
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)

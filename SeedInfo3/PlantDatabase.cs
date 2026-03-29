@@ -1,4 +1,6 @@
-﻿using SeedInfo.Compatibility;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using SeedInfo.Compatibility;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
@@ -8,7 +10,7 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Objects;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using LeFauxMods.CustomBush.Models;
 //using System.Linq;
 //using System.Text.Json;
 
@@ -82,29 +84,28 @@ namespace SeedInfo
             }
         }
 
-        private static Dictionary<string, ICustomBushData> _customBushes = new();
+        //private static Dictionary<string, ICustomBushData> _customBushes = new();
+
+        private static IModHelper Helper;
+
+
 
         private static void LoadBushes()
         {
             try
             {
-                var helper = ModEntry.Instance.Helper;
+                var data = ModEntry.SHelper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
 
-                // Load the bush definitions from Custom Bush 1.5.2
-                var raw = helper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
-
-                if (raw == null)
+                foreach (var key in data.Keys)
                 {
-                    ModEntry.Instance.Monitor.Log("[Seed Info] Custom Bush data returned null.", LogLevel.Warn);
-                    return;
+                    ModEntry.Instance.Monitor.Log($"Bush key: {key}", LogLevel.Warn);
                 }
-
-                ModEntry.Instance.Monitor.Log($"[Seed Info] Loaded {raw.Count} custom bushes.", LogLevel.Info);
             }
             catch (Exception ex)
             {
-                ModEntry.Instance.Monitor.Log($"[Seed Info] Failed to load Custom Bush data: {ex}", LogLevel.Error);
+                ModEntry.Instance.Monitor.Log($"Failed to load Custom Bush data: {ex}", LogLevel.Error);
             }
+
         }
 
         // -------------------------
@@ -227,7 +228,58 @@ namespace SeedInfo
         {
             info = null;
 
+            //pasting in
+            // The bush ID is literally the sapling's QualifiedItemId
+            string bushId = obj.QualifiedItemId;
+
+            // Get the Cornucopia Data from the json
+            string path = Path.Combine(
+                ModEntry.Instance.Helper.DirectoryPath,
+                "..",
+                "[CP] Cornucopia More Crops",
+                "data",
+                "teabushes.json"
+            );
+
+            path = Path.GetFullPath(path);
+
+            var json = File.ReadAllText(path);
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+            //foreach (var key in dict.Keys)
+            //{
+            //    ModEntry.Instance.Monitor.Log($"Bush key: {key}", LogLevel.Warn);
+            //}
+
+            if (dict.TryGetValue("(O)Cornucopia_RaspberrySeeds", out var raw))
+            {
+                var jo = raw as JObject;
+                if (jo != null)
+                {
+                    int temp = jo["AgeToProduce"]?.Value<int>() ?? -1;
+                    ModEntry.Instance.Monitor.Log($"TEST AgeToProduce = {temp}", LogLevel.Warn);
+                }
+                else
+                {
+                    ModEntry.Instance.Monitor.Log("TEST: raw is not a JObject", LogLevel.Warn);
+                }
+            }
+            else
+            {
+                ModEntry.Instance.Monitor.Log("TEST: key not found in _bushes", LogLevel.Warn);
+            }
+
+
+            ModEntry.Instance.Monitor.Log($"QualifiedItemId: {bushId}", LogLevel.Warn);
+            //ModEntry.Instance.Monitor.Log($"Otherfield: {dict.DisplayName}", LogLevel.Warn);
+
+           
+
+
+
             var md = obj.modData;
+            ModEntry.Instance.Monitor.Log($"ModData: {md}", LogLevel.Warn);
+
 
             if (!md.ContainsKey("Cornucopia.MoreCrops/AgeToProduce"))
                 return false; // not a Cornucopia bush sapling
@@ -279,33 +331,33 @@ namespace SeedInfo
 
 
 
-        private static PlantInfo FromCustomBushSapling(string id, IList<ICustomBushDrop> drops)
-        {
-            var convertedDrops = drops.Select(d => new PlantInfo.DropInfo
-            {
-                ItemId = d.ItemId.Replace("(O)", "O:"),
-                Chance = d.Chance,
-                MinStack = d.MinStack,
-                MaxStack = d.MaxStack
-            }).ToList();
+        //private static PlantInfo FromCustomBushSapling(string id, IList<ICustomBushDrop> drops)
+        //{
+        //    var convertedDrops = drops.Select(d => new PlantInfo.DropInfo
+        //    {
+        //        ItemId = d.ItemId.Replace("(O)", "O:"),
+        //        Chance = d.Chance,
+        //        MinStack = d.MinStack,
+        //        MaxStack = d.MaxStack
+        //    }).ToList();
 
-            return new PlantInfo
-            {
-                Id = id,
-                SeedName = Game1.objectData[id].DisplayName,
-                SeedDescription = Game1.objectData[id].Description,
+        //    return new PlantInfo
+        //    {
+        //        Id = id,
+        //        SeedName = Game1.objectData[id].DisplayName,
+        //        SeedDescription = Game1.objectData[id].Description,
 
-                Seasons = drops
-                    .Select(d => d.Season?.ToString().ToLower())
-                    .Where(s => s != null)
-                    .Distinct()
-                    .ToList()!,
+        //        Seasons = drops
+        //            .Select(d => d.Season?.ToString().ToLower())
+        //            .Where(s => s != null)
+        //            .Distinct()
+        //            .ToList()!,
 
-                RegrowDays = null, // TBD — custom bushes vary
+        //        RegrowDays = null, // TBD — custom bushes vary
 
-                Drops = convertedDrops
-            };
-        }
+        //        Drops = convertedDrops
+        //    };
+        //}
     }
 }
 //    public static class PlantDatabase
