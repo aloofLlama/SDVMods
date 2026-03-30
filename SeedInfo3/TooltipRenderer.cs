@@ -49,12 +49,39 @@ namespace SeedInfo
 
             PlaceTooltip(spriteBatch, elements);
 
-            ModEntry.ModMonitor.Log(
-                ModEntry.ModHelper.Translation.Get("debug.version").ToString(),
-                LogLevel.Alert
-            );
+        }
+        private static string TranslateSeason(string season)
+        {
+            string key = season.ToLower() switch
+            {
+                "spring" => "season.spring",
+                "summer" => "season.summer",
+                "fall" => "season.fall",
+                "winter" => "season.winter",
+                _ => season // fallback: return raw string
+            };
 
+            return ModEntry.ModHelper.Translation.Get(key);
+        }
+        private static (Color color, bool bold) GetSeasonStyle(string season)
+        {
+            bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
 
+            Color color = season.ToLower() switch
+            {
+                "spring" => TooltipColors.SpringColor,
+                "summer" => TooltipColors.SummerColor,
+                "fall" => TooltipColors.FallColor,
+                "winter" => TooltipColors.WinterColor,
+                _ => TooltipColors.Normal
+            };
+
+            // If it's the current season → bold + colored
+            if (isCurrent)
+                return (color, true);
+
+            // Otherwise → normal color + not bold
+            return (TooltipColors.Normal, false);
         }
 
 
@@ -64,12 +91,29 @@ namespace SeedInfo
 
             if (info.Seasons.Count > 0)
             {
-                var normalized = info.Seasons
-                    .Select(s => Capitalize(s))
-                    .ToList();
+                var segments = BuildInlineSegments(
+                    info.Seasons,
+                    season =>
+                    {
+                        string translated = TranslateSeason(season);
+                        var (color, bold) = GetSeasonStyle(season);
 
-                list.Add(new TooltipElement { Seasons = normalized });
+                        return new InlineSegment
+                        {
+                            Text = translated,
+                            Color = color,
+                            Bold = bold
+                        };
+                    }
+                );
+
+                list.Add(new TooltipElement
+                {
+                    InlineSegments = segments
+                });
             }
+
+
 
             if (info.Trellis)
                 list.Add(new TooltipElement { Text = "Requires a trellis", TextColor = Color.Orange });
@@ -95,15 +139,36 @@ namespace SeedInfo
 
             return list;
         }
-        private static string Capitalize(string s)
-        {
-            if (string.IsNullOrEmpty(s))
-                return s;
 
-            return char.ToUpper(s[0]) + s.Substring(1);
+        public static List<InlineSegment> BuildInlineSegments<T>(
+            IEnumerable<T> items,
+            Func<T, InlineSegment> buildSegment,
+            string separator = " • ")
+        {
+            var result = new List<InlineSegment>();
+            var list = items.ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                // Add the main segment
+                result.Add(buildSegment(list[i]));
+
+                // Add separator if not last
+                if (i < list.Count - 1)
+                {
+                    result.Add(new InlineSegment
+                    {
+                        Text = separator,
+                        Color = TooltipColors.Muted,
+                        Bold = false
+                    });
+                }
+            }
+
+            return result;
         }
 
-        
+
 
         private static Item? GetHoveredItemFromAnyMenu()
         {
@@ -151,29 +216,30 @@ namespace SeedInfo
         private static List<TooltipElement> GetGrowthTooltip(PlantInfo info)
         {
             var list = new List<TooltipElement>();
-
             if (info.DaysToProduce <= 0)
                 return list;
 
-            int today = Game1.dayOfMonth;
-            int days = info.DaysToProduce ?? 0;
-            int readyDay = today + days;
+            // Line: How many days + when is it ready
+            // Line: Planting warning
+            int today = Game1.dayOfMonth; // current day in the game
+            int days = info.DaysToProduce ?? 0; // how long for the crop to grow
+            int readyDay = today + days; // what day is the crop ready
 
-            Season currentSeason = Game1.season;
-            List<Season> seasons = info.Seasons
+            Season currentSeason = Game1.season; //current season in the game
+
+            List<Season> seasons = info.Seasons //list of seasons of the seed
                 .Select(s => Enum.Parse<Season>(s, ignoreCase: true))
                 .ToList();
 
-            // Days to produce
+
+
+            // PRINT How many days until ready
             list.Add(new TooltipElement
             {
-                Text = ModEntry.ModHelper.Translation
-                    .Get(TooltipKeys.DaysToProduce)
-                    .Tokens(new Dictionary<string, object>
-                    {
-                        ["days"] = info.DaysToProduce
-                    })
-                    .ToString(),
+                Text = string.Format(ModEntry.ModHelper.Translation
+                    .Get(TooltipKeys.DaysToProduce),
+                    info.DaysToProduce
+                ),
                 TextColor = TooltipColors.Normal
             });
 
@@ -185,8 +251,14 @@ namespace SeedInfo
                 {
                     list.Add(new TooltipElement
                     {
-                        Text = $"Ready on: {Ordinal(readyDay)} {currentSeason}",
-                        TextColor = Color.Black
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.ReadyOn),
+                            Ordinal(readyDay),
+                            currentSeason
+                        ),
+
+                        //Text = $"Ready on: {Ordinal(readyDay)} {currentSeason}",
+                        TextColor = TooltipColors.Normal
                     });
                 }
                 else
@@ -288,7 +360,17 @@ namespace SeedInfo
                 if (el.Icon.HasValue)
                     lineWidth += el.Icon.Value.Size + 4;
 
-                // Text width
+                // Inline segments width
+                if (el.InlineSegments != null)
+                {
+                    foreach (var seg in el.InlineSegments)
+                        lineWidth += (int)font.MeasureString(seg.Text).X;
+
+                    width = Math.Max(width, lineWidth);
+                    continue;
+                }
+
+                // Normal text width
                 if (!string.IsNullOrEmpty(el.Text))
                     lineWidth += (int)font.MeasureString(el.Text).X;
 
@@ -341,6 +423,30 @@ namespace SeedInfo
                     drawX += icon.Size + 4;
                 }
 
+                // Inline segments
+                if (el.InlineSegments != null)
+                {
+                    int xCursor = drawX;
+
+                    foreach (var seg in el.InlineSegments)
+                    {
+                        if (seg.Bold)
+                        {
+                            b.DrawString(font, seg.Text, new Vector2(xCursor + 1, drawY), seg.Color);
+                            b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
+                        }
+                        else
+                        {
+                            b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
+                        }
+
+                        xCursor += (int)font.MeasureString(seg.Text).X;
+                    }
+
+                    drawY += (int)font.LineSpacing + el.PaddingBottom;
+                    continue;
+                }
+
                 // Text
                 if (!string.IsNullOrEmpty(el.Text))
                 {
@@ -359,60 +465,66 @@ namespace SeedInfo
             }
         }
     }
-
-
-        /* HUD may not work. Nothing below this.
-               //public static void DrawHud(SpriteBatch spriteBatch)
-               //{
-               //    if (!Context.IsWorldReady)
-               //        return;
-               //    //ModEntry.Instance.Monitor.Log("HERE1", LogLevel.Info);
-               //    Item? hovered = GetHudHoveredItem();
-               //    if (hovered is not StardewValley.Object obj)
-               //        return;
-
-               //    ModEntry.Instance.Monitor.Log("HERE2", LogLevel.Info);
-
-
-               //    var info = PlantDatabase.FromItem(obj);
-               //    if (info is null)
-               //        return;
-
-               //    DrawTooltip(spriteBatch, info);
-               //}
-
-               //private static Item? GetHudHoveredItem()
-               //{
-               //    // 1. Toolbar hover (most common)
-               //    if (Game1.player.CurrentItem != null)
-               //    return Game1.player.CurrentItem;
-
-               //    // 2. On-screen menus (buffs, etc.)
-               //    foreach (var menu in Game1.onScreenMenus)
-               //    {
-               //        switch (menu)
-               //        {
-               //            case ItemGrabMenu grab when grab.hoveredItem is Item item1:
-               //                //ModEntry.Instance.Monitor.Log("HERE5", LogLevel.Info);
-
-               //                return item1;
-
-               //            case InventoryPage inv when inv.hoveredItem is Item item2:
-               //                ModEntry.Instance.Monitor.Log("HERE6", LogLevel.Info);
-
-               //                return item2;
-               //        }
-               //    }
-
-               //    return null;
-               //}
-               */
-
-
-
-
-
+    public struct InlineSegment
+    {
+        public string Text;
+        public Color Color;
+        public bool Bold;
     }
+
+
+    /* HUD may not work. Nothing below this.
+           //public static void DrawHud(SpriteBatch spriteBatch)
+           //{
+           //    if (!Context.IsWorldReady)
+           //        return;
+           //    //ModEntry.Instance.Monitor.Log("HERE1", LogLevel.Info);
+           //    Item? hovered = GetHudHoveredItem();
+           //    if (hovered is not StardewValley.Object obj)
+           //        return;
+
+           //    ModEntry.Instance.Monitor.Log("HERE2", LogLevel.Info);
+
+
+           //    var info = PlantDatabase.FromItem(obj);
+           //    if (info is null)
+           //        return;
+
+           //    DrawTooltip(spriteBatch, info);
+           //}
+
+           //private static Item? GetHudHoveredItem()
+           //{
+           //    // 1. Toolbar hover (most common)
+           //    if (Game1.player.CurrentItem != null)
+           //    return Game1.player.CurrentItem;
+
+           //    // 2. On-screen menus (buffs, etc.)
+           //    foreach (var menu in Game1.onScreenMenus)
+           //    {
+           //        switch (menu)
+           //        {
+           //            case ItemGrabMenu grab when grab.hoveredItem is Item item1:
+           //                //ModEntry.Instance.Monitor.Log("HERE5", LogLevel.Info);
+
+           //                return item1;
+
+           //            case InventoryPage inv when inv.hoveredItem is Item item2:
+           //                ModEntry.Instance.Monitor.Log("HERE6", LogLevel.Info);
+
+           //                return item2;
+           //        }
+           //    }
+
+           //    return null;
+           //}
+           */
+
+
+
+
+
+}
 
 //// Set the season color and bold if it matches the season
 //private static (Color color, bool bold) GetSeasonStyle(string season)

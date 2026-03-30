@@ -10,6 +10,7 @@ namespace SeedInfo
     internal class TooltipColors
     {
         public static readonly Color Normal = Color.Black;
+        public static readonly Color Muted = Color.Gray;
         public static readonly Color Warning = Color.DarkRed;
         public static readonly Color Trellis = Color.Orange;
         public static readonly Color Paddy = Color.CornflowerBlue;

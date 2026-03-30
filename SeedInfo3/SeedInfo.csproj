@@ -11,11 +11,9 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
-   <ItemGroup>
-     <None Update="i18n\en.json">
-       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-     </None>
-   </ItemGroup>
+	<ItemGroup>
+		<None Include="i18n\**\*.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
 
 </Project>
 

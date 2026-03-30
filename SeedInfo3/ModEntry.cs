@@ -12,7 +12,6 @@ namespace SeedInfo
         public static ICustomBushApi? CustomBushApi { get; private set; }
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
-        private static bool ForceTranslationReload = false;
 
         public override void Entry(IModHelper helper)
         {

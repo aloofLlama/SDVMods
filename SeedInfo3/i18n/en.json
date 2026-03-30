@@ -1,6 +1,4 @@
 ﻿{
-	"debug.version": "v1",
-
 	// Seasons
 	"season.spring": "Spring",
 	"season.summer": "Summer",
@@ -12,7 +10,7 @@
 	"tooltip.grows_faster_water": "Grows faster near water",
 
 	// Growth info
-	"tooltip.days_to_produce": "Harvestssss in {{days}} days",
+	"tooltip.days_to_produce": "Harvest in {0} days",
 	"tooltip.ready_on": "Ready on: {0} {1}",
 	"tooltip.ready_next_season": "Ready on: {0} next season",
 

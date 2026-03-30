@@ -24,8 +24,8 @@ namespace SeedInfo
     // Loads spritesheets and exposes ready-to-use icons
     public static class TooltipIcons
     {
-        public static Texture2D Cursors { get; private set; }
-        public static Texture2D Objects { get; private set; }
+        public static Texture2D? Cursors { get; private set; }
+        public static Texture2D? Objects { get; private set; }
 
         // Example icons
         public static IconRef Warning { get; private set; }
