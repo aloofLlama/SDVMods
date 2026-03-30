@@ -1,0 +1,34 @@
+﻿{
+	"debug.version": "v1",
+
+	// Seasons
+	"season.spring": "Spring",
+	"season.summer": "Summer",
+	"season.fall": "Fall",
+	"season.winter": "Winter",
+
+	// Basic crop info
+	"tooltip.requires_trellis": "Requires a trellis",
+	"tooltip.grows_faster_water": "Grows faster near water",
+
+	// Growth info
+	"tooltip.days_to_produce": "Harvestssss in {{days}} days",
+	"tooltip.ready_on": "Ready on: {0} {1}",
+	"tooltip.ready_next_season": "Ready on: {0} next season",
+
+	// Warnings
+	"tooltip.too_late": "Too late to plant this season",
+	"tooltip.will_not_mature": "Will not mature in time",
+
+	// Regrowth (if you add later)
+	"tooltip.regrows_in": "Regrows in: {0} days",
+	"tooltip.harvest_every": "Harvest every {0} days",
+
+	// Bushes (future expansion)
+	"tooltip.bush.produces_in": "Produces in: {0} days",
+	"tooltip.bush.ready_on": "Bush ready on: {0} {1}",
+
+	// Trees (future expansion)
+	"tooltip.tree.matures_in": "Matures in: {0} days",
+	"tooltip.tree.ready_on": "Ready on: {0} {1}"
+}

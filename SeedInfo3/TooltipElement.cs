@@ -7,18 +7,27 @@ namespace SeedInfo
 
     public class TooltipElement
         {
+        // Text
         public string? Text { get; set; }
-        public Color TextColor { get; set; } = Color.White;
-        public bool Bold { get; set; } = false;
+        public Color TextColor { get; set; } = TooltipColors.Normal;
+        public bool Bold { get; set; }
 
-        public IReadOnlyList<string> Seasons { get; set; } = Array.Empty<string>();
+        // Seasons (optional)
+        public List<string> Seasons { get; set; } = new();
+        public List<Color> SeasonColors { get; set; } = new();
+        public List<bool> SeasonBold { get; set; } = new();
 
-        public Texture2D? Icon { get; set; }
-        public Rectangle? IconSource { get; set; }
-        public int IconSize { get; set; } = 16;
 
+        // Icon (optional)
+        public IconRef? Icon { get; set; }
+
+
+
+
+        // Layout
         public int PaddingTop { get; set; } = 2;
         public int PaddingBottom { get; set; } = 2;
+
 
 
     }

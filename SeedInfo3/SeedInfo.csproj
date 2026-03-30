@@ -12,9 +12,9 @@
   </ItemGroup>
 
    <ItemGroup>
-     <Reference Include="CustomBush">
-       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\CustomBush\CustomBush.dll</HintPath>
-     </Reference>
+     <None Update="i18n\en.json">
+       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+     </None>
    </ItemGroup>
 
 </Project>

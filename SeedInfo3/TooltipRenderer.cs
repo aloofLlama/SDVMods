@@ -4,13 +4,16 @@ using SeedInfo;
 using SeedInfo.Compatibility;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.GameData.HomeRenovations;
 using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SeedInfo
 {
@@ -26,80 +29,34 @@ namespace SeedInfo
             if (hovered is not StardewValley.Object obj)
                 return;
 
-
-            // Qualified ID of the hovered item
-            string qid = obj.QualifiedItemId;
-
-            // 1. Check if this is a custom bush sapling
-            if (PlantDatabase.TryGetCornucopiaBushInfo(obj, out var bushInfo))
-            {
-                ModEntry.Instance.Monitor.Log("NOT HERE", LogLevel.Info);
-                DrawTooltip(spriteBatch, bushInfo);
-                return;
-            }
-
-
-
-            // 2. Otherwise, treat it as a normal seed/fruit tree/etc.
+            // Use the correct key format O:#### to see if the item is in the plant library
             string lookupKey = "O:" + obj.ItemId;
 
-            var info = PlantDatabase.FromKey(lookupKey);
+            var info = PlantDatabase.LookupFromKey(lookupKey);
             if (info is null)
                 return;
+
+
 
             DrawTooltip(spriteBatch, info);
         }
 
-        //public static void DrawHud(SpriteBatch spriteBatch)
-        //{
-        //    if (!Context.IsWorldReady)
-        //        return;
-        //    //ModEntry.Instance.Monitor.Log("HERE1", LogLevel.Info);
-        //    Item? hovered = GetHudHoveredItem();
-        //    if (hovered is not StardewValley.Object obj)
-        //        return;
 
-        //    ModEntry.Instance.Monitor.Log("HERE2", LogLevel.Info);
-
-
-        //    var info = PlantDatabase.FromItem(obj);
-        //    if (info is null)
-        //        return;
-
-        //    DrawTooltip(spriteBatch, info);
-        //}
-
-        //private static Item? GetHudHoveredItem()
-        //{
-        //    // 1. Toolbar hover (most common)
-        //    if (Game1.player.CurrentItem != null)
-        //    return Game1.player.CurrentItem;
-
-        //    // 2. On-screen menus (buffs, etc.)
-        //    foreach (var menu in Game1.onScreenMenus)
-        //    {
-        //        switch (menu)
-        //        {
-        //            case ItemGrabMenu grab when grab.hoveredItem is Item item1:
-        //                //ModEntry.Instance.Monitor.Log("HERE5", LogLevel.Info);
-
-        //                return item1;
-
-        //            case InventoryPage inv when inv.hoveredItem is Item item2:
-        //                ModEntry.Instance.Monitor.Log("HERE6", LogLevel.Info);
-
-        //                return item2;
-        //        }
-        //    }
-
-        //    return null;
-        //}
 
         private static void DrawTooltip(SpriteBatch spriteBatch, PlantInfo info)
         {
             var elements = BuildTooltip(info);
+
             PlaceTooltip(spriteBatch, elements);
+
+            ModEntry.ModMonitor.Log(
+                ModEntry.ModHelper.Translation.Get("debug.version").ToString(),
+                LogLevel.Alert
+            );
+
+
         }
+
 
         private static List<TooltipElement> BuildTooltip(PlantInfo info)
         {
@@ -116,9 +73,25 @@ namespace SeedInfo
 
             if (info.Trellis)
                 list.Add(new TooltipElement { Text = "Requires a trellis", TextColor = Color.Orange });
+            
+
 
             if (info.Paddy)
                 list.Add(new TooltipElement { Text = "Grows faster near water", TextColor = Color.CornflowerBlue });
+
+            // Growth info (includes DaysToProduce + ready day + warnings)
+            list.AddRange(GetGrowthTooltip(info));
+
+            //Too late to plant
+            list.Add(new TooltipElement
+            {
+                Icon = TooltipIcons.Warning,
+                Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate),
+                TextColor = TooltipColors.Warning
+            });
+
+
+
 
             return list;
         }
@@ -130,146 +103,7 @@ namespace SeedInfo
             return char.ToUpper(s[0]) + s.Substring(1);
         }
 
-        // Where to draw the tooltip
-        private static void PlaceTooltip(SpriteBatch b, List<TooltipElement> elements)
-        {
-            SpriteFont font = Game1.smallFont;
-
-            // Measure total height + max width
-            int width = 0;
-            int height = 0;
-
-            foreach (var el in elements)
-            {
-                int lineHeight;
-
-                if (el.Seasons != null && el.Seasons.Count > 0)
-                {
-                    // All seasons are on ONE line → measure the tallest season text
-                    lineHeight = (int)font.MeasureString("Summer").Y;
-                }
-                else
-                {
-                    lineHeight = (int)font.MeasureString(el.Text ?? "").Y;
-                }
-
-                height += el.PaddingTop + lineHeight + el.PaddingBottom;
-
-                int lineWidth = 0;
-
-                if (el.Seasons != null && el.Seasons.Count > 0)
-                {
-                    // Sum widths of all seasons + spaces
-                    foreach (var season in el.Seasons)
-                        lineWidth += (int)font.MeasureString(season + " ").X;
-                }
-                else
-                {
-                    lineWidth = (int)font.MeasureString(el.Text ?? "").X;
-                }
-
-                if (el.Icon != null)
-                    lineWidth += el.IconSize + 4;
-
-                width = Math.Max(width, lineWidth);
-            }
-
-            width += 32;  // vanilla padding
-            height += 32;
-
-            // Position to the left of the mouse
-            int x = Game1.getMouseX() - width + 32;
-            int y = Game1.getMouseY() + 32;
-
-            if (x < 0)
-                x = 0;
-
-            if (y + height > Game1.uiViewport.Height)
-                y = Game1.uiViewport.Height - height;
-
-            // Draw background
-            IClickableMenu.drawTextureBox(
-                b,
-                x,
-                y,
-                width,
-                height,
-                Color.White
-            );
-
-            // Draw content
-            int drawY = y + 16;
-
-            foreach (var el in elements)
-            {
-                drawY += el.PaddingTop;
-
-                int drawX = x + 16;
-
-                // Icon
-                if (el.Icon != null)
-                {
-                    b.Draw(el.Icon, new Rectangle(drawX, drawY, el.IconSize, el.IconSize), el.IconSource, Color.White);
-                    drawX += el.IconSize + 4;
-                }
-
-                // Text OR Seasons
-                if (el.Seasons != null && el.Seasons.Count > 0)
-                {
-                    int seasonX = drawX;
-
-                    foreach (var season in el.Seasons)
-                    {
-                        (Color color, bool bold) = GetSeasonStyle(season);
-
-                        // bold simulation
-                        if (bold)
-                        {
-                            b.DrawString(font, season, new Vector2(seasonX + 1, drawY), color);
-                            b.DrawString(font, season, new Vector2(seasonX, drawY), color);
-                        }
-                        else
-                        {
-                            b.DrawString(font, season, new Vector2(seasonX, drawY), color);
-                        }
-
-                        // advance X by width of this season + a space
-                        seasonX += (int)font.MeasureString(season + " ").X;
-                    }
-                }
-                else if (!string.IsNullOrEmpty(el.Text))
-                {
-                    if (el.Bold)
-                    {
-                        b.DrawString(font, el.Text, new Vector2(drawX + 1, drawY), el.TextColor);
-                        b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
-                    }
-                    else
-                    {
-                        b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
-                    }
-                }
-
-                if (el.Seasons != null && el.Seasons.Count > 0)
-                {
-                    // All seasons are on one line → use normal line height
-                    drawY += (int)font.MeasureString("Summer").Y + el.PaddingBottom;
-                }
-                else
-                {
-                    drawY += (int)font.MeasureString(el.Text ?? "").Y + el.PaddingBottom;
-                }
-            }
-        }
-
-
-
-
-
-
-
-
-
+        
 
         private static Item? GetHoveredItemFromAnyMenu()
         {
@@ -307,43 +141,298 @@ namespace SeedInfo
 
             }
         }
-    
+  
 
-            
-      
 
-        private static readonly Color SpringColor = new(80, 200, 120); //green
-        private static readonly Color SummerColor = new(208, 0, 255); //purple
-        private static readonly Color FallColor = new(170, 70, 0); //orange
-        private static readonly Color WinterColor = new(100, 160, 255); //blue
+        //--------------
+        // Days until harvest functions
+        //--------------
 
-        // Set the season color and bold if it matches the season
-        private static (Color color, bool bold) GetSeasonStyle(string season)
+        private static List<TooltipElement> GetGrowthTooltip(PlantInfo info)
         {
-            bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
+            var list = new List<TooltipElement>();
 
-            Color color = season switch
+            if (info.DaysToProduce <= 0)
+                return list;
+
+            int today = Game1.dayOfMonth;
+            int days = info.DaysToProduce ?? 0;
+            int readyDay = today + days;
+
+            Season currentSeason = Game1.season;
+            List<Season> seasons = info.Seasons
+                .Select(s => Enum.Parse<Season>(s, ignoreCase: true))
+                .ToList();
+
+            // Days to produce
+            list.Add(new TooltipElement
             {
-                "Spring" => SpringColor,
-                "Summer" => SummerColor,
-                "Fall" => FallColor,
-                "Winter" => WinterColor,
-                _ => Color.Black
-            };
+                Text = ModEntry.ModHelper.Translation
+                    .Get(TooltipKeys.DaysToProduce)
+                    .Tokens(new Dictionary<string, object>
+                    {
+                        ["days"] = info.DaysToProduce
+                    })
+                    .ToString(),
+                TextColor = TooltipColors.Normal
+            });
 
-            // If it's not the current season, force black + not bold
-            if (!isCurrent)
-                return (Color.Black, false);
 
-            // If it IS the current season, return the season color + bold
-            return (color, true);
+            // Single-season crop
+            if (seasons.Count == 1)
+            {
+                if (readyDay <= 28)
+                {
+                    list.Add(new TooltipElement
+                    {
+                        Text = $"Ready on: {Ordinal(readyDay)} {currentSeason}",
+                        TextColor = Color.Black
+                    });
+                }
+                else
+                {
+                    list.Add(new TooltipElement
+                    {
+                        Text = "⚠ Too late to plant this season",
+                        TextColor = Color.DarkRed
+                    });
+                }
+
+                return list;
+            }
+
+            // Multi-season crop (e.g., corn)
+            Season nextSeason = NextSeason(currentSeason);
+
+            if (readyDay <= 28)
+            {
+                // Ready this season
+                list.Add(new TooltipElement
+                {
+                    Text = $"Ready on: {Ordinal(readyDay)} {currentSeason}",
+                    TextColor = Color.Black
+                });
+            }
+            else
+            {
+                int overflow = readyDay - 28;
+
+                if (seasons.Contains(nextSeason))
+                {
+                    // Ready next season
+                    list.Add(new TooltipElement
+                    {
+                        Text = $"Ready on: {Ordinal(overflow)} {nextSeason}",
+                        TextColor = Color.Black
+                    });
+                }
+                else
+                {
+                    // Too late even with multi-season support
+                    list.Add(new TooltipElement
+                    {
+                        Text = "⚠ Will not mature in time",
+                        TextColor = Color.DarkRed
+                    });
+                }
+            }
+
+            return list;
         }
 
-        
+        private static Season NextSeason(Season s)
+        {
+            return s switch
+            {
+                Season.Spring => Season.Summer,
+                Season.Summer => Season.Fall,
+                Season.Fall => Season.Winter,
+                Season.Winter => Season.Spring,
+                _ => Season.Spring
+            };
+        }
 
-        
+        private static string Ordinal(int n)
+        {
+            if (n % 100 is 11 or 12 or 13)
+                return $"{n}th";
 
-        
+            return (n % 10) switch
+            {
+                1 => $"{n}st",
+                2 => $"{n}nd",
+                3 => $"{n}rd",
+                _ => $"{n}th"
+            };
+        }
+
+
+
+        private static void PlaceTooltip(SpriteBatch b, List<TooltipElement> elements)
+        {
+            SpriteFont font = Game1.smallFont;
+
+            // Measure total height + max width
+            int width = 0;
+            int height = 0;
+
+            foreach (var el in elements)
+            {
+                int lineHeight = (int)font.LineSpacing;
+
+                height += el.PaddingTop + lineHeight + el.PaddingBottom;
+
+                int lineWidth = 0;
+
+                // Icon width
+                if (el.Icon.HasValue)
+                    lineWidth += el.Icon.Value.Size + 4;
+
+                // Text width
+                if (!string.IsNullOrEmpty(el.Text))
+                    lineWidth += (int)font.MeasureString(el.Text).X;
+
+                width = Math.Max(width, lineWidth);
+            }
+
+            width += 32;  // vanilla padding
+            height += 32;
+
+            // Position to the left of the mouse
+            int x = Game1.getMouseX() - width + 32;
+            int y = Game1.getMouseY() + 32;
+
+            if (x < 0)
+                x = 0;
+
+            if (y + height > Game1.uiViewport.Height)
+                y = Game1.uiViewport.Height - height;
+
+            // Draw background
+            IClickableMenu.drawTextureBox(
+                b,
+                x,
+                y,
+                width,
+                height,
+                Color.White
+            );
+
+            // Draw content
+            int drawY = y + 16;
+
+            foreach (var el in elements)
+            {
+                drawY += el.PaddingTop;
+                int drawX = x + 16;
+
+                // Icon
+                if (el.Icon.HasValue)
+                {
+                    var icon = el.Icon.Value;
+
+                    b.Draw(
+                        icon.Texture,
+                        new Rectangle(drawX, drawY, icon.Size, icon.Size),
+                        icon.Source,
+                        Color.White
+                    );
+
+                    drawX += icon.Size + 4;
+                }
+
+                // Text
+                if (!string.IsNullOrEmpty(el.Text))
+                {
+                    if (el.Bold)
+                    {
+                        b.DrawString(font, el.Text, new Vector2(drawX + 1, drawY), el.TextColor);
+                        b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
+                    }
+                    else
+                    {
+                        b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
+                    }
+                }
+
+                drawY += (int)font.LineSpacing + el.PaddingBottom;
+            }
+        }
+    }
+
+
+        /* HUD may not work. Nothing below this.
+               //public static void DrawHud(SpriteBatch spriteBatch)
+               //{
+               //    if (!Context.IsWorldReady)
+               //        return;
+               //    //ModEntry.Instance.Monitor.Log("HERE1", LogLevel.Info);
+               //    Item? hovered = GetHudHoveredItem();
+               //    if (hovered is not StardewValley.Object obj)
+               //        return;
+
+               //    ModEntry.Instance.Monitor.Log("HERE2", LogLevel.Info);
+
+
+               //    var info = PlantDatabase.FromItem(obj);
+               //    if (info is null)
+               //        return;
+
+               //    DrawTooltip(spriteBatch, info);
+               //}
+
+               //private static Item? GetHudHoveredItem()
+               //{
+               //    // 1. Toolbar hover (most common)
+               //    if (Game1.player.CurrentItem != null)
+               //    return Game1.player.CurrentItem;
+
+               //    // 2. On-screen menus (buffs, etc.)
+               //    foreach (var menu in Game1.onScreenMenus)
+               //    {
+               //        switch (menu)
+               //        {
+               //            case ItemGrabMenu grab when grab.hoveredItem is Item item1:
+               //                //ModEntry.Instance.Monitor.Log("HERE5", LogLevel.Info);
+
+               //                return item1;
+
+               //            case InventoryPage inv when inv.hoveredItem is Item item2:
+               //                ModEntry.Instance.Monitor.Log("HERE6", LogLevel.Info);
+
+               //                return item2;
+               //        }
+               //    }
+
+               //    return null;
+               //}
+               */
+
+
+
+
 
     }
-}
+
+//// Set the season color and bold if it matches the season
+//private static (Color color, bool bold) GetSeasonStyle(string season)
+//{
+//    bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
+
+//    Color color = season switch
+//    {
+//        "Spring" => TooltipColors.SpringColor,
+//        "Summer" => TooltipColors.SummerColor,
+//        "Fall" => TooltipColors.FallColor,
+//        "Winter" => TooltipColors.WinterColor,
+//        _ => TooltipColors.Normal
+//    };
+
+//    // If it's not the current season, force black + not bold
+//    if (!isCurrent)
+//        return (TooltipColors.Normal, false);
+
+//    // If it IS the current season, return the season color + bold
+//    return (color, true);
+//}
+

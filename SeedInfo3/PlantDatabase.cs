@@ -10,7 +10,6 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Objects;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
-using LeFauxMods.CustomBush.Models;
 //using System.Linq;
 //using System.Text.Json;
 
@@ -31,8 +30,16 @@ namespace SeedInfo
 
             LoadCrops();
             LoadFruitTrees();
-            LoadBushes();
+            //LoadBushes(); PAUSEBUSHES
         }
+
+        // Lookup by seed item ID (e.g. "O:472" for Parsnip Seeds)
+        public static PlantInfo? LookupFromKey(string key)
+        {
+            return _plants.TryGetValue(key, out var info) ? info : null;
+        }
+
+
         // -------------------------
         //  LOADERS
         // -------------------------
@@ -60,10 +67,8 @@ namespace SeedInfo
             //    //LogLevel.Info
             //);
         }
-        public static PlantInfo? FromKey(string key)
-        {
-            return _plants.TryGetValue(key, out var info) ? info : null;
-        }
+
+
 
         private static void LoadFruitTrees()
         {
@@ -86,10 +91,10 @@ namespace SeedInfo
 
         //private static Dictionary<string, ICustomBushData> _customBushes = new();
 
-        private static IModHelper Helper;
+        //private static IModHelper Helper;
 
 
-
+/* PAUSEBUSHES
         private static void LoadBushes()
         {
             try
@@ -107,19 +112,11 @@ namespace SeedInfo
             }
 
         }
+*/
 
         // -------------------------
-        //  LOOKUP
+        //  LOOKUP - Get all the data
         // -------------------------
-
-        public static PlantInfo? FromItem(StardewValley.Object obj)
-        {
-            string id = obj.QualifiedItemId;
-            return _plants.TryGetValue(id, out var info) ? info : null;
-        }
-
-
-
 
         public static PlantInfo FromCrop(string id, CropData crop)
         {
@@ -178,9 +175,6 @@ namespace SeedInfo
             };
         }
 
-
-
-
         private static PlantInfo FromFruitTree(string saplingId, FruitTreeData data)
         {
             // Extract fruit item
@@ -224,110 +218,121 @@ namespace SeedInfo
             };
         }
 
-        public static bool TryGetCornucopiaBushInfo(StardewValley.Object obj, out PlantInfo? info)
-        {
-            info = null;
 
-            //pasting in
-            // The bush ID is literally the sapling's QualifiedItemId
-            string bushId = obj.QualifiedItemId;
+        //public static PlantInfo? FromItem(StardewValley.Object obj)
+        //{
+        //    string id = obj.QualifiedItemId;
+        //    return _plants.TryGetValue(id, out var info) ? info : null;
+        //}
 
-            // Get the Cornucopia Data from the json
-            string path = Path.Combine(
-                ModEntry.Instance.Helper.DirectoryPath,
-                "..",
-                "[CP] Cornucopia More Crops",
-                "data",
-                "teabushes.json"
-            );
 
-            path = Path.GetFullPath(path);
+        /* PAUSE BUSHES NOTHING BELOW HERE WORKS YET
 
-            var json = File.ReadAllText(path);
-            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-
-            //foreach (var key in dict.Keys)
-            //{
-            //    ModEntry.Instance.Monitor.Log($"Bush key: {key}", LogLevel.Warn);
-            //}
-
-            if (dict.TryGetValue("(O)Cornucopia_RaspberrySeeds", out var raw))
-            {
-                var jo = raw as JObject;
-                if (jo != null)
+                public static bool TryGetCornucopiaBushInfo(StardewValley.Object obj, out PlantInfo? info)
                 {
-                    int temp = jo["AgeToProduce"]?.Value<int>() ?? -1;
-                    ModEntry.Instance.Monitor.Log($"TEST AgeToProduce = {temp}", LogLevel.Warn);
-                }
-                else
-                {
-                    ModEntry.Instance.Monitor.Log("TEST: raw is not a JObject", LogLevel.Warn);
-                }
-            }
-            else
-            {
-                ModEntry.Instance.Monitor.Log("TEST: key not found in _bushes", LogLevel.Warn);
-            }
+                    info = null;
 
+                    //pasting in
+                    // The bush ID is literally the sapling's QualifiedItemId
+                    string bushId = obj.QualifiedItemId;
 
-            ModEntry.Instance.Monitor.Log($"QualifiedItemId: {bushId}", LogLevel.Warn);
-            //ModEntry.Instance.Monitor.Log($"Otherfield: {dict.DisplayName}", LogLevel.Warn);
+                    // Get the Cornucopia Data from the json
+                    string path = Path.Combine(
+                        ModEntry.Instance.Helper.DirectoryPath,
+                        "..",
+                        "[CP] Cornucopia More Crops",
+                        "data",
+                        "teabushes.json"
+                    );
 
-           
+                    path = Path.GetFullPath(path);
 
+                    var json = File.ReadAllText(path);
+                    var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
+                    //foreach (var key in dict.Keys)
+                    //{
+                    //    ModEntry.Instance.Monitor.Log($"Bush key: {key}", LogLevel.Warn);
+                    //}
 
-            var md = obj.modData;
-            ModEntry.Instance.Monitor.Log($"ModData: {md}", LogLevel.Warn);
-
-
-            if (!md.ContainsKey("Cornucopia.MoreCrops/AgeToProduce"))
-                return false; // not a Cornucopia bush sapling
-
-            // Age
-            int regrowDays = int.TryParse(md["Cornucopia.MoreCrops/AgeToProduce"], out var age)
-                ? age
-                : 0;
-
-            // Seasons
-            var seasons = md.TryGetValue("Cornucopia.MoreCrops/Seasons", out var seasonStr)
-                ? seasonStr.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
-                : new List<string>();
-
-            // Drops (JSON)
-            List<PlantInfo.DropInfo> drops = new();
-            if (md.TryGetValue("Cornucopia.MoreCrops/ItemsProduced", out var dropJson))
-            {
-                try
-                {
-                    var parsed = JsonConvert.DeserializeObject<List<dynamic>>(dropJson);
-                    foreach (var d in parsed)
+                    if (dict.TryGetValue("(O)Cornucopia_RaspberrySeeds", out var raw))
                     {
-                        drops.Add(new PlantInfo.DropInfo
+                        var jo = raw as JObject;
+                        if (jo != null)
                         {
-                            ItemId = d.ItemId?.ToString()?.Replace("(O)", "O:") ?? "O:0",
-                            Chance = (float?)d.Chance ?? 1f,
-                            MinStack = (int?)d.MinStack ?? 1,
-                            MaxStack = (int?)d.MaxStack ?? 1
-                        });
+                            int temp = jo["AgeToProduce"]?.Value<int>() ?? -1;
+                            ModEntry.Instance.Monitor.Log($"TEST AgeToProduce = {temp}", LogLevel.Warn);
+                        }
+                        else
+                        {
+                            ModEntry.Instance.Monitor.Log("TEST: raw is not a JObject", LogLevel.Warn);
+                        }
                     }
+                    else
+                    {
+                        ModEntry.Instance.Monitor.Log("TEST: key not found in _bushes", LogLevel.Warn);
+                    }
+
+
+                    ModEntry.Instance.Monitor.Log($"QualifiedItemId: {bushId}", LogLevel.Warn);
+                    //ModEntry.Instance.Monitor.Log($"Otherfield: {dict.DisplayName}", LogLevel.Warn);
+
+
+
+
+
+                    var md = obj.modData;
+                    ModEntry.Instance.Monitor.Log($"ModData: {md}", LogLevel.Warn);
+
+
+                    if (!md.ContainsKey("Cornucopia.MoreCrops/AgeToProduce"))
+                        return false; // not a Cornucopia bush sapling
+
+                    // Age
+                    int regrowDays = int.TryParse(md["Cornucopia.MoreCrops/AgeToProduce"], out var age)
+                        ? age
+                        : 0;
+
+                    // Seasons
+                    var seasons = md.TryGetValue("Cornucopia.MoreCrops/Seasons", out var seasonStr)
+                        ? seasonStr.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
+                        : new List<string>();
+
+                    // Drops (JSON)
+                    List<PlantInfo.DropInfo> drops = new();
+                    if (md.TryGetValue("Cornucopia.MoreCrops/ItemsProduced", out var dropJson))
+                    {
+                        try
+                        {
+                            var parsed = JsonConvert.DeserializeObject<List<dynamic>>(dropJson);
+                            foreach (var d in parsed)
+                            {
+                                drops.Add(new PlantInfo.DropInfo
+                                {
+                                    ItemId = d.ItemId?.ToString()?.Replace("(O)", "O:") ?? "O:0",
+                                    Chance = (float?)d.Chance ?? 1f,
+                                    MinStack = (int?)d.MinStack ?? 1,
+                                    MaxStack = (int?)d.MaxStack ?? 1
+                                });
+                            }
+                        }
+                        catch { }
+                    }
+
+
+                info = new PlantInfo
+                    {
+                        Id = obj.QualifiedItemId,
+                        SeedName = obj.DisplayName,
+                        SeedDescription = obj.getDescription(),
+                        Seasons = seasons,
+                        RegrowDays = regrowDays,
+                        Drops = drops
+                    };
+
+                    return true;
                 }
-                catch { }
-            }
-
-            info = new PlantInfo
-            {
-                Id = obj.QualifiedItemId,
-                SeedName = obj.DisplayName,
-                SeedDescription = obj.getDescription(),
-                Seasons = seasons,
-                RegrowDays = regrowDays,
-                Drops = drops
-            };
-
-            return true;
-        }
-
+        */
 
 
 
