@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SeedInfo
+namespace PlantingDay
 {
         public static class TooltipKeys
         {
@@ -28,7 +28,9 @@ namespace SeedInfo
             // Misc
             public const string HarvestWithScythe = "tooltip.harvest_with_scythe";
             public const string MultiHarvest = "tooltip.multi_harvest";
-        }
+            public const string MultiSprite = "tooltip.multi_sprite";
 
     }
+
+}
 

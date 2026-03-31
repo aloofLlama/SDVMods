@@ -8,14 +8,15 @@
 	// Basic crop info
 	"tooltip.requires_trellis": "Requires a trellis",
 	"tooltip.grows_faster_water": "Grows faster near water",
+	"tooltip.multi_sprite": "{0} colors",
 
 	// Growth info
-	"tooltip.days_to_produce": "Harvest in {0} days",
-	"tooltip.ready_on": "Ready on: {0} {1}",
-	"tooltip.ready_next_season": "Ready on: {0} next season",
+	"tooltip.days_to_produce": "{0} days",
+	"tooltip.ready_on": "{0} days on {1}",
+	//"tooltip.ready_next_season": "Ready on: {0} next season",
 
 	// Warnings
-	"tooltip.too_late": "Too late to plant this season",
+	"tooltip.too_late": "Too late to plant",
 	"tooltip.will_not_mature": "Will not mature in time",
 
 	// Regrowth (if you add later)

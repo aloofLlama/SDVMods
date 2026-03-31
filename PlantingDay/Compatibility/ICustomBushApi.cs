@@ -4,7 +4,7 @@ using StardewValley;
 using StardewValley.GameData;
 using StardewValley.TerrainFeatures;
 
-namespace SeedInfo.Compatibility;
+namespace PlantingDay.Compatibility;
 
 /// <summary>Mod API for Custom Bush (v1.5.2+).</summary>
 public interface ICustomBushApi

@@ -1,10 +1,10 @@
-﻿using SeedInfo.Compatibility;
+﻿using PlantingDay.Compatibility;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System.Runtime.CompilerServices;
 
-namespace SeedInfo
+namespace PlantingDay
 {
     public class ModEntry : Mod
     {

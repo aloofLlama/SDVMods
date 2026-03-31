@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SeedInfo;
-using SeedInfo.Compatibility;
+using Netcode;
+using PlantingDay;
+using PlantingDay.Compatibility;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.HomeRenovations;
 using StardewValley.Menus;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,11 +16,12 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace SeedInfo
+namespace PlantingDay
 {
-    public static class TooltipRenderer
 
+    public static class TooltipRenderer
     {
         public static void DrawMenu(SpriteBatch spriteBatch)
         {
@@ -36,9 +39,13 @@ namespace SeedInfo
             if (info is null)
                 return;
 
+            var elements = BuildTooltip(info);
+
+            PlaceTooltip(spriteBatch, elements);
 
 
-            DrawTooltip(spriteBatch, info);
+
+            //DrawTooltip(spriteBatch, info);
         }
 
 
@@ -50,45 +57,68 @@ namespace SeedInfo
             PlaceTooltip(spriteBatch, elements);
 
         }
-        private static string TranslateSeason(string season)
-        {
-            string key = season.ToLower() switch
-            {
-                "spring" => "season.spring",
-                "summer" => "season.summer",
-                "fall" => "season.fall",
-                "winter" => "season.winter",
-                _ => season // fallback: return raw string
-            };
-
-            return ModEntry.ModHelper.Translation.Get(key);
-        }
-        private static (Color color, bool bold) GetSeasonStyle(string season)
-        {
-            bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
-
-            Color color = season.ToLower() switch
-            {
-                "spring" => TooltipColors.SpringColor,
-                "summer" => TooltipColors.SummerColor,
-                "fall" => TooltipColors.FallColor,
-                "winter" => TooltipColors.WinterColor,
-                _ => TooltipColors.Normal
-            };
-
-            // If it's the current season → bold + colored
-            if (isCurrent)
-                return (color, true);
-
-            // Otherwise → normal color + not bold
-            return (TooltipColors.Normal, false);
-        }
-
 
         private static List<TooltipElement> BuildTooltip(PlantInfo info)
         {
             var list = new List<TooltipElement>();
 
+            list.AddRange(GetSeasonsTooltip(info));
+
+
+            if (info.Trellis)
+                list.Add(new TooltipElement { Text = "Requires a trellis", TextColor = Color.Orange });
+
+
+
+            if (info.Paddy)
+                list.Add(new TooltipElement { Text = "Grows faster near water", TextColor = Color.CornflowerBlue });
+
+            // Growth info (includes DaysToProduce + ready day + warnings)
+            list.AddRange(GetGrowthTooltip(info));
+
+            //Too late to plant
+            list.Add(new TooltipElement
+            {
+                Icon = TooltipIcons.Warning,
+                Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate),
+                TextColor = TooltipColors.Warning
+            });
+
+            //Multicolor sprites
+            if (info.MultiSprite > 0)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Rainbow,
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.MultiSprite),
+                        info.MultiSprite
+                        ),
+                    TextColor = TooltipColors.Normal
+                });
+            }
+
+
+
+
+
+
+
+
+            return list;
+        }
+
+
+        //--------------
+        // Season display
+        //--------------
+
+        private static List<TooltipElement> GetSeasonsTooltip(PlantInfo info)
+        {
+            var list = new List<TooltipElement>();
+            if (info.Seasons == null || info.Seasons.Count == 0)
+                return list;
+
+            // Display the relevant seasons and highlight the current season
             if (info.Seasons.Count > 0)
             {
                 var segments = BuildInlineSegments(
@@ -114,104 +144,49 @@ namespace SeedInfo
             }
 
 
-
-            if (info.Trellis)
-                list.Add(new TooltipElement { Text = "Requires a trellis", TextColor = Color.Orange });
-            
-
-
-            if (info.Paddy)
-                list.Add(new TooltipElement { Text = "Grows faster near water", TextColor = Color.CornflowerBlue });
-
-            // Growth info (includes DaysToProduce + ready day + warnings)
-            list.AddRange(GetGrowthTooltip(info));
-
-            //Too late to plant
-            list.Add(new TooltipElement
-            {
-                Icon = TooltipIcons.Warning,
-                Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate),
-                TextColor = TooltipColors.Warning
-            });
-
-
-
-
             return list;
+
         }
 
-        public static List<InlineSegment> BuildInlineSegments<T>(
-            IEnumerable<T> items,
-            Func<T, InlineSegment> buildSegment,
-            string separator = " • ")
+
+        private static string TranslateSeason(string season)
         {
-            var result = new List<InlineSegment>();
-            var list = items.ToList();
-
-            for (int i = 0; i < list.Count; i++)
+            string key = season.ToLower() switch
             {
-                // Add the main segment
-                result.Add(buildSegment(list[i]));
+                "spring" => "season.spring",
+                "summer" => "season.summer",
+                "fall" => "season.fall",
+                "winter" => "season.winter",
+                _ => season // fallback: return raw string
+            };
 
-                // Add separator if not last
-                if (i < list.Count - 1)
-                {
-                    result.Add(new InlineSegment
-                    {
-                        Text = separator,
-                        Color = TooltipColors.Muted,
-                        Bold = false
-                    });
-                }
-            }
-
-            return result;
+            return ModEntry.ModHelper.Translation.Get(key);
         }
 
-
-
-        private static Item? GetHoveredItemFromAnyMenu()
+        private static (Color color, bool bold) GetSeasonStyle(string season)
         {
-            IClickableMenu menu = Game1.activeClickableMenu;
-            if (menu == null)
-                return null;
+            bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
 
-            switch (menu)
+            Color color = season.ToLower() switch
             {
-                // Inventory (GameMenu → InventoryPage)
-                case GameMenu gm:
-                    var invPage = gm.pages
-                        .OfType<StardewValley.Menus.InventoryPage>()
-                        .FirstOrDefault();
+                "spring" => TooltipColors.SpringColor,
+                "summer" => TooltipColors.SummerColor,
+                "fall" => TooltipColors.FallColor,
+                "winter" => TooltipColors.WinterColor,
+                _ => TooltipColors.Normal
+            };
 
-                    Item? hovered = invPage?.hoveredItem;
-                    //if (hovered is not null)
-                    //{
-                    //    this.Monitor.Log($"Hover item QID: {hovered.QualifiedItemId}", LogLevel.Info);
+            // If it's the current season → bold + colored
+            if (isCurrent)
+                return (color, true);
 
-                    //}
-
-                    return invPage?.hoveredItem;
-
-                // Chests, Fridges, Dressers, Junimo Chests, etc.
-                case StardewValley.Menus.ItemGrabMenu chest:
-                    return chest.hoveredItem;
-
-                // Pierre’s shop, Traveling Cart, Krobus, Qi, etc.
-                case StardewValley.Menus.ShopMenu shop:
-                    return shop.hoveredItem as Item;
-
-                default:
-                    return null;
-
-            }
+            // Otherwise → normal color + not bold
+            return (TooltipColors.Normal, false);
         }
-  
 
-
-        //--------------
-        // Days until harvest functions
-        //--------------
+        //----------------
+        // Days until harvest display
+        //----------------
 
         private static List<TooltipElement> GetGrowthTooltip(PlantInfo info)
         {
@@ -340,6 +315,52 @@ namespace SeedInfo
 
 
 
+        //--------------
+        // Get the item to draw the tooltip about
+        //--------------
+
+        private static Item? GetHoveredItemFromAnyMenu()
+        {
+            IClickableMenu menu = Game1.activeClickableMenu;
+            if (menu == null)
+                return null;
+
+            switch (menu)
+            {
+                // Inventory (GameMenu → InventoryPage)
+                case GameMenu gm:
+                    var invPage = gm.pages
+                        .OfType<StardewValley.Menus.InventoryPage>()
+                        .FirstOrDefault();
+
+                    Item? hovered = invPage?.hoveredItem;
+                    //if (hovered is not null)
+                    //{
+                    //    this.Monitor.Log($"Hover item QID: {hovered.QualifiedItemId}", LogLevel.Info);
+
+                    //}
+
+                    return invPage?.hoveredItem;
+
+                // Chests, Fridges, Dressers, Junimo Chests, etc.
+                case StardewValley.Menus.ItemGrabMenu chest:
+                    return chest.hoveredItem;
+
+                // Pierre’s shop, Traveling Cart, Krobus, Qi, etc.
+                case StardewValley.Menus.ShopMenu shop:
+                    return shop.hoveredItem as Item;
+
+                default:
+                    return null;
+
+            }
+        }
+
+        //--------------
+        // Creating the display
+        //--------------
+
+
         private static void PlaceTooltip(SpriteBatch b, List<TooltipElement> elements)
         {
             SpriteFont font = Game1.smallFont;
@@ -409,18 +430,20 @@ namespace SeedInfo
                 int drawX = x + 16;
 
                 // Icon
+                const int IconRenderSize = 32;
+
                 if (el.Icon.HasValue)
                 {
                     var icon = el.Icon.Value;
 
                     b.Draw(
                         icon.Texture,
-                        new Rectangle(drawX, drawY, icon.Size, icon.Size),
+                        new Rectangle(drawX, drawY, IconRenderSize, IconRenderSize),
                         icon.Source,
                         Color.White
                     );
 
-                    drawX += icon.Size + 4;
+                    drawX += IconRenderSize + 4;
                 }
 
                 // Inline segments
@@ -464,13 +487,44 @@ namespace SeedInfo
                 drawY += (int)font.LineSpacing + el.PaddingBottom;
             }
         }
+        // Put multiple segments on the same line with separators (e.g., seasons)
+        public static List<InlineSegment> BuildInlineSegments<T>(
+            IEnumerable<T> items,
+            Func<T, InlineSegment> buildSegment,
+            string separator = " • ")
+        {
+            var result = new List<InlineSegment>();
+            var list = items.ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                // Add the main segment
+                result.Add(buildSegment(list[i]));
+
+                // Add separator if not last
+                if (i < list.Count - 1)
+                {
+                    result.Add(new InlineSegment
+                    {
+                        Text = separator,
+                        Color = TooltipColors.Muted,
+                        Bold = false
+                    });
+                }
+            }
+
+            return result;
+        }
+
     }
+
     public struct InlineSegment
     {
         public string Text;
         public Color Color;
         public bool Bold;
     }
+
 
 
     /* HUD may not work. Nothing below this.

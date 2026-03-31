@@ -1,7 +1,6 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace SeedInfo
+namespace PlantingDay
 {
 
         public class PlantInfo
@@ -28,8 +27,10 @@ namespace SeedInfo
             // Flags (optional)
             public bool Trellis { get; set; }
             public bool Paddy { get; set; }
+            public int MultiSprite { get; set; } //number of different colors (e.g. poppy)m 0 if just one
 
-            public class DropInfo
+
+        public class DropInfo
             {
                 public string ItemId { get; set; } = "";
                 public float Chance { get; set; } = 1f;

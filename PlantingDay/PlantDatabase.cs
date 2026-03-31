@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using SeedInfo.Compatibility;
+using PlantingDay;
+using PlantingDay.Compatibility;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
@@ -13,7 +14,7 @@ using System.Collections.Generic;
 //using System.Linq;
 //using System.Text.Json;
 
-namespace SeedInfo
+namespace PlantingDay
 {
 
     public static class PlantDatabase
@@ -170,7 +171,7 @@ namespace SeedInfo
                 // Flags
                 Trellis = crop.IsRaised,
                 Paddy = crop.IsPaddyCrop,
-
+                MultiSprite = crop.TintColors?.Count ?? 0,
 
             };
         }

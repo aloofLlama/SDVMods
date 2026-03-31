@@ -4,7 +4,7 @@ using StardewModdingAPI;
 using StardewValley;
 
 
-namespace SeedInfo
+namespace PlantingDay
 {
     // Bundles texture + source rect + size into one object
     public struct IconRef
@@ -27,7 +27,9 @@ namespace SeedInfo
         public static Texture2D? Cursors { get; private set; }
         public static Texture2D? Objects { get; private set; }
 
-        // Example icons
+        // Icons
+        public static IconRef Rainbow { get; private set; } //using prismatic shard
+
         public static IconRef Warning { get; private set; }
         public static IconRef Clock { get; private set; }
 
@@ -38,6 +40,9 @@ namespace SeedInfo
 
             Warning = new IconRef(Cursors, new Rectangle(412, 495, 16, 16));
             Clock = new IconRef(Cursors, new Rectangle(403, 495, 9, 9), size: 12);
+
+            Rainbow = new IconRef(Objects, new Rectangle(32, 48, 16, 16));
+
         }
     }
 
