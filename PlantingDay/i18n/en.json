@@ -12,16 +12,10 @@
 
 	// Growth info
 	"tooltip.days_to_produce": "{0} days",
-	"tooltip.ready_on": "{0} days on {1}",
-	//"tooltip.ready_next_season": "Ready on: {0} next season",
+	"tooltip.ready_on": "{0} days on {1} {2}",
+	"tooltip.too_late": "Too late to plant [TBD fertilizer]",
+	"tooltip.regrow_qty": "{0} total harvests",
 
-	// Warnings
-	"tooltip.too_late": "Too late to plant",
-	"tooltip.will_not_mature": "Will not mature in time",
-
-	// Regrowth (if you add later)
-	"tooltip.regrows_in": "Regrows in: {0} days",
-	"tooltip.harvest_every": "Harvest every {0} days",
 
 	// Bushes (future expansion)
 	"tooltip.bush.produces_in": "Produces in: {0} days",

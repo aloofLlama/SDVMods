@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace PlantingDay
+namespace PlantingDay.Helpers
 {
         public static class TooltipKeys
         {
@@ -12,15 +12,11 @@ namespace PlantingDay
             public const string DaysToProduce = "tooltip.days_to_produce";
             public const string ReadyOn = "tooltip.ready_on";
             public const string TooLate = "tooltip.too_late";
-            public const string WillNotMature = "tooltip.will_not_mature";
+            public const string RegrowQty = "tooltip.regrow_qty";
 
-            // Requirements
+        // Requirements
             public const string RequiresTrellis = "tooltip.requires_trellis";
             public const string RequiresPaddy = "tooltip.requires_paddy";
-
-            // Regrowth
-            public const string RegrowsIn = "tooltip.regrows_in";
-            public const string Regrowth = "tooltip.regrowth";
 
             // Seasons
             public const string Seasons = "tooltip.seasons";

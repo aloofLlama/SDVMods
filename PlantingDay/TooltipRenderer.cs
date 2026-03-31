@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Netcode;
 using PlantingDay;
 using PlantingDay.Compatibility;
+using PlantingDay.Helpers;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.HomeRenovations;
@@ -49,40 +50,34 @@ namespace PlantingDay
         }
 
 
-
-        private static void DrawTooltip(SpriteBatch spriteBatch, PlantInfo info)
-        {
-            var elements = BuildTooltip(info);
-
-            PlaceTooltip(spriteBatch, elements);
-
-        }
-
         private static List<TooltipElement> BuildTooltip(PlantInfo info)
         {
             var list = new List<TooltipElement>();
 
             list.AddRange(GetSeasonsTooltip(info));
 
+            // Growth info (includes DaysToProduce + ready day + warnings + Multiharvest)
+            list.AddRange(GetGrowthTooltip(info));
+
+
+
 
             if (info.Trellis)
                 list.Add(new TooltipElement { Text = "Requires a trellis", TextColor = Color.Orange });
 
 
-
             if (info.Paddy)
                 list.Add(new TooltipElement { Text = "Grows faster near water", TextColor = Color.CornflowerBlue });
 
-            // Growth info (includes DaysToProduce + ready day + warnings)
-            list.AddRange(GetGrowthTooltip(info));
+
 
             //Too late to plant
-            list.Add(new TooltipElement
-            {
-                Icon = TooltipIcons.Warning,
-                Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate),
-                TextColor = TooltipColors.Warning
-            });
+            //list.Add(new TooltipElement
+            //{
+            //    Icon = TooltipIcons.Warning,
+            //    Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate),
+            //    TextColor = TooltipColors.Warning
+            //});
 
             //Multicolor sprites
             if (info.MultiSprite > 0)
@@ -185,7 +180,7 @@ namespace PlantingDay
         }
 
         //----------------
-        // Days until harvest display
+        // How long to grow and when is it ready
         //----------------
 
         private static List<TooltipElement> GetGrowthTooltip(PlantInfo info)
@@ -194,97 +189,148 @@ namespace PlantingDay
             if (info.DaysToProduce <= 0)
                 return list;
 
-            // Line: How many days + when is it ready
-            // Line: Planting warning
             int today = Game1.dayOfMonth; // current day in the game
+            Season currentSeason = Game1.season; //current season in the game
+
             int days = info.DaysToProduce ?? 0; // how long for the crop to grow
             int readyDay = today + days; // what day is the crop ready
 
-            Season currentSeason = Game1.season; //current season in the game
+            Season nextSeason = NextSeason(currentSeason); //next season in the game
+            int overflowDay = readyDay - 28; //ready day if multiseason crop is ready next season
+
 
             List<Season> seasons = info.Seasons //list of seasons of the seed
                 .Select(s => Enum.Parse<Season>(s, ignoreCase: true))
                 .ToList();
 
+            //----------
+            // First / only harvest
+            //----------
 
-
-            // PRINT How many days until ready
-            list.Add(new TooltipElement
+            if (!seasons.Contains(currentSeason)) // out of season
             {
-                Text = string.Format(ModEntry.ModHelper.Translation
-                    .Get(TooltipKeys.DaysToProduce),
-                    info.DaysToProduce
-                ),
-                TextColor = TooltipColors.Normal
-            });
-
-
-            // Single-season crop
-            if (seasons.Count == 1)
-            {
-                if (readyDay <= 28)
-                {
-                    list.Add(new TooltipElement
-                    {
-                        Text = string.Format(ModEntry.ModHelper.Translation
-                            .Get(TooltipKeys.ReadyOn),
-                            Ordinal(readyDay),
-                            currentSeason
-                        ),
-
-                        //Text = $"Ready on: {Ordinal(readyDay)} {currentSeason}",
-                        TextColor = TooltipColors.Normal
-                    });
-                }
-                else
-                {
-                    list.Add(new TooltipElement
-                    {
-                        Text = "⚠ Too late to plant this season",
-                        TextColor = Color.DarkRed
-                    });
-                }
-
-                return list;
-            }
-
-            // Multi-season crop (e.g., corn)
-            Season nextSeason = NextSeason(currentSeason);
-
-            if (readyDay <= 28)
-            {
-                // Ready this season
                 list.Add(new TooltipElement
                 {
-                    Text = $"Ready on: {Ordinal(readyDay)} {currentSeason}",
-                    TextColor = Color.Black
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.DaysToProduce),
+                        info.DaysToProduce
+                    ),
+                    TextColor = TooltipColors.Normal
                 });
             }
-            else
-            {
-                int overflow = readyDay - 28;
 
-                if (seasons.Contains(nextSeason))
+            else if (readyDay <= 28) // ready in the current season
+                list.Add(new TooltipElement
                 {
-                    // Ready next season
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        info.DaysToProduce,
+                        currentSeason,
+                        readyDay
+                    ),
+                    TextColor = TooltipColors.Normal
+                });
+
+            else if (seasons.Contains(nextSeason)) // Ready next season
+            {       
+                list.Add(new TooltipElement
+                {
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        info.DaysToProduce,
+                        nextSeason,
+                        overflowDay
+                    ),
+                    TextColor = TooltipColors.Normal
+                });
+            }
+
+            else // too late to plant
+            {
+                // x days
+                list.Add(new TooltipElement
+                {
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.DaysToProduce),
+                        info.DaysToProduce
+                    ),
+                    TextColor = TooltipColors.Normal
+                });
+                
+                //warning
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Warning,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.TooLate)
+                        ),
+                    TextColor = TooltipColors.Warning
+
+                });
+
+            }       
+
+
+            //----------
+            // Multiharvest
+            //----------
+
+            // How many grow seasons after this one
+            int CountAdditionalSeasons(Season current, List<Season> allowed)
+            {
+                int count = 0;
+                Season s = NextSeason(current);
+
+                while (s != current)
+                {
+                    if (allowed.Contains(s))
+                        count++;
+
+                    s = NextSeason(s);
+                }
+
+                return count;
+            }
+
+            int? additionalSeasons = CountAdditionalSeasons(currentSeason, seasons);
+
+            //--------------------------
+            // TODO
+            // cap additional seasons at 4
+            // still show number of harvests assuming full season. e.g. up to x harvests
+            //------
+
+            // Grow days left
+
+            if (info.RegrowDays > 0 && seasons.Contains(currentSeason))
+            {
+                int? regrowDaysAvailable = ((28 - readyDay) + (additionalSeasons * 28));
+                int? regrowQty = regrowDaysAvailable / info.RegrowDays;
+
+                if (regrowQty < 100)
                     list.Add(new TooltipElement
                     {
-                        Text = $"Ready on: {Ordinal(overflow)} {nextSeason}",
-                        TextColor = Color.Black
+                        Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
+                            regrowQty
+                        ),
+                        TextColor = TooltipColors.Normal
                     });
-                }
+
                 else
                 {
-                    // Too late even with multi-season support
                     list.Add(new TooltipElement
                     {
-                        Text = "⚠ Will not mature in time",
-                        TextColor = Color.DarkRed
+                        Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
+                        "100+"
+                         ),
+                        TextColor = TooltipColors.Normal
                     });
+
                 }
             }
 
             return list;
+
         }
 
         private static Season NextSeason(Season s)
@@ -298,21 +344,6 @@ namespace PlantingDay
                 _ => Season.Spring
             };
         }
-
-        private static string Ordinal(int n)
-        {
-            if (n % 100 is 11 or 12 or 13)
-                return $"{n}th";
-
-            return (n % 10) switch
-            {
-                1 => $"{n}st",
-                2 => $"{n}nd",
-                3 => $"{n}rd",
-                _ => $"{n}th"
-            };
-        }
-
 
 
         //--------------
@@ -333,7 +364,7 @@ namespace PlantingDay
                         .OfType<StardewValley.Menus.InventoryPage>()
                         .FirstOrDefault();
 
-                    Item? hovered = invPage?.hoveredItem;
+                    //Item? hovered = invPage?.hoveredItem;
                     //if (hovered is not null)
                     //{
                     //    this.Monitor.Log($"Hover item QID: {hovered.QualifiedItemId}", LogLevel.Info);

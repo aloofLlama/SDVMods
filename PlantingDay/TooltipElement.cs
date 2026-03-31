@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PlantingDay;
+using PlantingDay.Helpers;
 
 
 namespace PlantingDay

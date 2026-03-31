@@ -1,10 +1,10 @@
 ﻿{
-	"Name": "Seed Info",
+	"Name": "Planting Day",
 	"Author": "<author>",
 	"Version": "1.0.0",
-	"Description": "<One or two sentences about the mod>STUFF",
-	"UniqueID": "SeedInfo",
-	"EntryDll": "SeedInfo.dll",
+	"Description": "<One or two sentences about the mod>",
+	"UniqueID": "PlantingDay",
+	"EntryDll": "PlantingDay.dll",
 	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [ "Nexus:<add-your-mod-id-here>" ]
 }
