@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using PlantingDay;
 using PlantingDay.Compatibility;
+using PlantingDay.Models;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
@@ -153,6 +153,8 @@ namespace PlantingDay
 
                 SeedName = seedName,
                 SeedDescription = seedDescription,
+                PlantType = PlantType.Crop,
+
 
                 HarvestName = harvestName,
                 HarvestDescription = harvestDescription,
@@ -190,6 +192,7 @@ namespace PlantingDay
                 // Sapling identity
                 SeedName = data.DisplayName?.ToString() ?? "Unknown Sapling",
                 SeedDescription = null, // you can fill this later if you want
+                PlantType = PlantType.FruitTree,
 
                 // Fruit identity
                 HarvestName = Game1.objectData.TryGetValue(fruitId.Replace("O:", ""), out var obj)

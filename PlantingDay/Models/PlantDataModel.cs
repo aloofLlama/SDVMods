@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PlantingDay
+namespace PlantingDay.Models
 {
 
         public class PlantInfo
@@ -9,6 +9,7 @@ namespace PlantingDay
             public string Id { get; set; } = "";
             public string SeedName { get; set; } = "";
             public string? SeedDescription { get; set; }
+            public PlantType PlantType { get; set; }
 
             public string HarvestName { get; set; } = "";
             public string? HarvestDescription { get; set; }
@@ -27,7 +28,7 @@ namespace PlantingDay
             // Flags (optional)
             public bool Trellis { get; set; }
             public bool Paddy { get; set; }
-            public int MultiSprite { get; set; } //number of different colors (e.g. poppy)m 0 if just one
+            public int MultiSprite { get; set; } //number of different colors (e.g. poppy) 0 if just one
 
 
         public class DropInfo
@@ -38,7 +39,14 @@ namespace PlantingDay
                 public int MaxStack { get; set; } = 1;
             }
         }
-    }
+        public enum PlantType
+        {
+            Crop,
+            FruitTree,
+            Bush,
+            Unknown
+        }
+}
     
 
 

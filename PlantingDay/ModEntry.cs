@@ -21,31 +21,18 @@ namespace PlantingDay
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-
             TooltipIcons.Load();
 
+            //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
-
-            // Load API + database once the save is ready
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
 
-            // Tooltip events
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
+
             //helper.Events.Display.RenderedHud += OnRenderedHud;
-
             //helper.Events.Input.ButtonPressed += OnButtonPressed;
-
-            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
-
-
             //Helper.Events.Content.AssetRequested += OnAssetRequested;
-
-    
-
-
         }
-
-
 
 
         private void OnGameLaunched(object? sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
@@ -67,19 +54,15 @@ namespace PlantingDay
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
+            PlantDatabase.Initialize();
+
+            Monitor.Log("Plant database initialized.", LogLevel.Info);
+
             // Load Custom Bush API
             //CustomBushApi = Helper.ModRegistry.GetApi<ICustomBushApi>("spacechase0.CustomBush");
 
             // if (CustomBushApi == null)
             //   Monitor.Log("Custom Bush API not found — bush tooltips disabled.", LogLevel.Warn);
-
-            // Initialize plant database
-            PlantDatabase.Initialize();
-
-            Monitor.Log("Plant database initialized.", LogLevel.Info);
-
-
-
 
         }
 
@@ -88,12 +71,10 @@ namespace PlantingDay
             
             TooltipRenderer.DrawMenu(e.SpriteBatch);
 
-
-
         }
 
 
-        /*DEBUG STUFF
+        /*DEBUG STUFF NOTHING BELOW HERE
                 private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
                 {
                     ModEntry.Instance.Monitor.Log("RUN BUTTON PRESS", LogLevel.Info);

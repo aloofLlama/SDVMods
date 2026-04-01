@@ -26,21 +26,26 @@ namespace PlantingDay.Helpers
     {
         public static Texture2D? Cursors { get; private set; }
         public static Texture2D? Objects { get; private set; }
+        public static Texture2D? Maps { get; private set; }
+
 
         // Icons
         public static IconRef Rainbow { get; private set; } //using prismatic shard
         public static IconRef Warning { get; private set; }
-        public static IconRef Clock { get; private set; }
+        public static IconRef WaterSeeds { get; private set; }
+
 
         public static void Load()
         {
             Cursors = Game1.content.Load<Texture2D>("LooseSprites\\Cursors");
             Objects = Game1.content.Load<Texture2D>("Maps\\springobjects");
+            Maps = Game1.content.Load<Texture2D>("Maps\\spring_beach");
+
 
             Warning = new IconRef(Cursors, new Rectangle(320, 496, 16, 16));
-            Clock = new IconRef(Cursors, new Rectangle(403, 495, 9, 9), size: 12);
 
             Rainbow = new IconRef(Objects, new Rectangle(32, 48, 16, 16));
+            WaterSeeds = new IconRef(Maps, new Rectangle(160, 112, 16, 16));
 
         }
     }

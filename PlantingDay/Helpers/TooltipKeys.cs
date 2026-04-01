@@ -14,9 +14,14 @@ namespace PlantingDay.Helpers
             public const string TooLate = "tooltip.too_late";
             public const string RegrowQty = "tooltip.regrow_qty";
 
+        // Paddy Growth
+            public const string PaddyDaysToProduce = "tooltip.days_to_produce";
+            public const string PaddyReadyOn = "tooltip.ready_on";
+            public const string PaddyTooLate = "tooltip.too_late";
+
+
         // Requirements
-            public const string RequiresTrellis = "tooltip.requires_trellis";
-            public const string RequiresPaddy = "tooltip.requires_paddy";
+        public const string RequiresTrellis = "tooltip.requires_trellis";
 
             // Seasons
             public const string Seasons = "tooltip.seasons";

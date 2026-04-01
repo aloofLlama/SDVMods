@@ -7,7 +7,6 @@
 
 	// Basic crop info
 	"tooltip.requires_trellis": "Requires a trellis",
-	"tooltip.grows_faster_water": "Grows faster near water",
 	"tooltip.multi_sprite": "{0} colors",
 
 	// Growth info
@@ -15,6 +14,13 @@
 	"tooltip.ready_on": "{0} days on {1} {2}",
 	"tooltip.too_late": "Too late to plant [TBD fertilizer]",
 	"tooltip.regrow_qty": "{0} total harvests",
+
+	// Growth info for paddy crops
+	"tooltip.paddy_days_to_produce": "{0} days near water",
+	"tooltip.paddy_ready_on": "{0} days on {1} {2} near water",
+	//"tooltip.paddy_too_late": "Too late to plant [TBD fertilizer]",
+	"tooltip.paddy_regrow_qty": "{0} total harvests near water",
+
 
 
 	// Bushes (future expansion)

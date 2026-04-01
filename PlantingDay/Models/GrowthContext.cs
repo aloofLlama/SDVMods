@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using StardewValley;
+
+
+namespace PlantingDay.Models
+{
+    internal class GrowthContext
+    {
+        // Time in the game
+        public int Today { get; set; }
+        public Season CurrentSeason { get; set; }
+        public Season NextSeason { get; set; }
+
+        // Plant info
+        public int ProduceDay { get; set; } // how many days until the first or only harvest 
+        public int PaddyProduceDay { get; set; } // Produce day if planted in a paddy
+
+
+        public int ReadyDay { get; set; } // what day is the crop ready 
+        public int PaddyReadyDay { get; set; } // ready day if planted in a paddy
+
+        public int OverflowDay { get; set; } //ready day if multiseason crop is ready next season
+        public int PaddyOverflowDay { get; set; } //overflow day if planted in a paddy
+
+        public int? AdditionalSeasons { get; set; } // how many regrow seasons
+        //public int RegrowDaysAvailable { get; set; } // how many days are available for regrowth
+        public int RegrowQty { get; set; } // how many times will it regrow, including the first harvest
+        public int PaddyRegrowQty { get; set; } // regrow quantity if placed in a paddy
+
+
+    }
+}
