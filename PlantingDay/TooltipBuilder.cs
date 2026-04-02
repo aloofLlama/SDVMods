@@ -1,14 +1,745 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using PlantingDay;
+using PlantingDay.Helpers;
+using PlantingDay.Models;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.GameData.Crops;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+
+
 
 namespace PlantingDay
 {
-    internal class TooltipBuilder
+    public static class TooltipBuilder
     {
+        public static List<TooltipElement> BuildTooltip(PlantInfo plant)
+        {
+            var list = new List<TooltipElement>();
+
+            list.AddRange(GetSeasonsTooltip(plant));
+
+            // Growth info (includes DaysToProduce + ready day + warnings + Multiharvest)
+            list.AddRange(GetPlantGrowthTooltip(plant));
+
+
+            if (plant.Trellis && plant.PlantType == PlantType.Crop)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.SeedIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RequiresTrellis)),
+                    TextColor = TooltipColors.Normal
+                });
+            }
+
+            //No watering
+            if (!plant.NeedsWatering && plant.PlantType == PlantType.Crop)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Watercan,
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.NoWatering)),
+                    TextColor = TooltipColors.Normal
+                });
+            }
+
+
+            //Harvest with scythe
+            if (plant.Scythe == HarvestMethod.Scythe && plant.PlantType == PlantType.Crop)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Scythe,
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.HarvestWithScythe)),
+                    TextColor = TooltipColors.Normal
+                });
+            }
+
+
+            //Multicolor sprites
+            if (plant.MultiSprite > 0)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Rainbow,
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.MultiSprite),
+                        plant.MultiSprite),
+                    TextColor = TooltipColors.Normal
+                });
+            }
+
+            return list;
+        }
+
+        //--------------
+        // Season display
+        //--------------
+        private static List<TooltipElement> GetSeasonsTooltip(PlantInfo info)
+        {
+            var list = new List<TooltipElement>();
+            if (info.Seasons == null || info.Seasons.Count == 0)
+                return list;
+
+            // Display the relevant seasons and highlight the current season
+            if (info.Seasons.Count > 0)
+            {
+                var segments = TooltipRenderer.BuildInlineSegments(
+                    info.Seasons,
+                    season =>
+                    {
+                        string translated = TranslateSeason(season);
+                        var (color, bold) = GetSeasonStyle(season);
+
+                        return new InlineSegment
+                        {
+                            Text = translated,
+                            Color = color,
+                            Bold = bold
+                        };
+                    }
+                );
+
+                list.Add(new TooltipElement
+                {
+                    InlineSegments = segments
+                });
+            }
+
+            return list;
+
+        }
+
+        private static string TranslateSeason(string season)
+        {
+            string key = season.ToLower() switch
+            {
+                "spring" => "season.spring",
+                "summer" => "season.summer",
+                "fall" => "season.fall",
+                "winter" => "season.winter",
+                _ => season // fallback: return raw string
+            };
+
+            return ModEntry.ModHelper.Translation.Get(key);
+        }
+
+        private static (Color color, bool bold) GetSeasonStyle(string season)
+        {
+            bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
+
+            Color color = season.ToLower() switch
+            {
+                "spring" => TooltipColors.SpringColor,
+                "summer" => TooltipColors.SummerColor,
+                "fall" => TooltipColors.FallColor,
+                "winter" => TooltipColors.WinterColor,
+                _ => TooltipColors.Normal
+            };
+
+            // If it's the current season → bold + colored
+            if (isCurrent)
+                return (color, true);
+
+            // Otherwise → normal color + not bold
+            return (TooltipColors.Normal, false);
+        }
+
+        //-----------------
+        // Plant growth and when it is ready (crops, fruit trees, etc)
+        //------------------
+
+        private static List<TooltipElement> GetPlantGrowthTooltip(PlantInfo plant)
+        {
+            var list = new List<TooltipElement>();
+
+            if (plant.DaysToProduce <= 0)
+                return list;
+
+            // build growth context (e.g. when is it ready)
+            GrowthContext growth = BuildGrowthContext(plant);
+
+            //Various options for crops
+            list.AddRange(CropsOutOfSeason(plant, growth));
+            list.AddRange(CropsReadyThisSeason(plant, growth));
+            list.AddRange(CropsReadyNextSeason(plant, growth)); // For multi-season crops
+            list.AddRange(CropsTooLateToPlant(plant, growth));
+
+            //Various options for paddy crops
+            list.AddRange(PaddyCropsOutOfSeason(plant, growth));
+            list.AddRange(PaddyCropsReadyThisSeason(plant, growth));
+            list.AddRange(PaddyCropsReadyNextSeason(plant, growth)); // For multi-season crops
+            list.AddRange(PaddyCropsTooLateToPlant(plant, growth));
+
+            //Various options for fruit trees
+            list.AddRange(FruitTreesReadyNextSeason(plant, growth)); //ready during in-season
+            list.AddRange(FruitTreesReadyInFuture(plant, growth)); //ready on day 1 next in-season
+
+
+            return list;
+
+        }
+
+        //---------------
+        // Crops in/out of Season
+        //-----------------
+
+
+        // Display basic data when crops are out of season (trees, bushes treated separately)
+        private static List<TooltipElement> CropsOutOfSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            // Only for Crops that are out of season
+            if (plant.PlantType == PlantType.Crop &&
+              !growth.Seasons.Contains(growth.CurrentSeason))
+
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.HarvestIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.DaysToProduce),
+                        growth.ProduceDay
+                    ),
+                    TextColor = TooltipColors.Normal
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.RegrowQty),
+                        TextColor = TooltipColors.Normal
+                    });
+                }
+
+
+            }
+            return list;
+        }
+
+        // Display ready data when crops are ready this season (trees, bushes treated separately)
+        private static List<TooltipElement> CropsReadyThisSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.Crop &&
+              growth.Seasons.Contains(growth.CurrentSeason) &&
+              growth.ReadyDay <= 28)
+
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.HarvestIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        growth.ProduceDay,
+                        growth.CurrentSeason,
+                        growth.ReadyDay
+                        ),
+                    TextColor = TooltipColors.Normal
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.RegrowQty),
+                        TextColor = TooltipColors.Normal
+                    });
+                }
+            }
+            return list;
+        }
+
+        // Display ready data when multiseason crops are ready next season (trees, bushes treated separately)
+        private static List<TooltipElement> CropsReadyNextSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.Crop &&
+              growth.Seasons.Contains(growth.CurrentSeason) &&
+              growth.Seasons.Contains(growth.NextSeason) &&
+              growth.ReadyDay >= 28)
+
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.HarvestIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        growth.ProduceDay,
+                        growth.NextSeason,
+                        growth.OverflowDay),
+                    TextColor = TooltipColors.Normal
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.RegrowQty),
+                        TextColor = TooltipColors.Normal
+                    });
+                }
+
+
+            }
+            return list;
+        }
+
+        // Display basic data and a warning when it is too late to plant (trees, bushes treated separately)
+        private static List<TooltipElement> CropsTooLateToPlant(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.Crop &&
+              growth.Seasons.Contains(growth.CurrentSeason) &&
+              !growth.Seasons.Contains(growth.NextSeason) &&
+              growth.ReadyDay >= 28)
+
+            {
+                // First show the basic days to produce
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.HarvestIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.DaysToProduce),
+                        growth.ProduceDay),
+                    TextColor = TooltipColors.Normal
+                });
+
+                // Add the too late warning message
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Warning,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.TooLate)),
+                    TextColor = TooltipColors.Warning
+                });
+
+            }
+            return list;
+        }
+
+        //---------------
+        // Paddy Crops in/out of Season
+        //-----------------
+        // Display basic data when crops are out of season (trees, bushes treated separately)
+        private static List<TooltipElement> PaddyCropsOutOfSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            // Only for Crops that are out of season
+            if (plant.PlantType == PlantType.Crop &&
+              !growth.Seasons.Contains(growth.CurrentSeason) &&
+              plant.Paddy)
+            {
+
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.WaterSeeds,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.DaysToProduce),
+                        growth.PaddyProduceDay
+                        ),
+                    TextColor = TooltipColors.Paddy
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.PaddyRegrowQty),
+                        TextColor = TooltipColors.Paddy
+                    });
+                }
+
+            }
+            return list;
+        }
+
+        // Display ready data when crops are ready this season (trees, bushes treated separately)
+        private static List<TooltipElement> PaddyCropsReadyThisSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.Crop &&
+              growth.Seasons.Contains(growth.CurrentSeason) &&
+              growth.PaddyReadyDay <= 28 &&
+              plant.Paddy)
+
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.WaterSeeds,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        growth.PaddyProduceDay,
+                        growth.CurrentSeason,
+                        growth.PaddyReadyDay),
+                    TextColor = TooltipColors.Paddy
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.PaddyRegrowQty),
+                        TextColor = TooltipColors.Paddy
+                    });
+
+                }
+            }
+            return list;
+        }
+
+        // Display ready data when multiseason crops are ready next season (trees, bushes treated separately)
+        private static List<TooltipElement> PaddyCropsReadyNextSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.Crop &&
+              growth.Seasons.Contains(growth.CurrentSeason) &&
+              growth.Seasons.Contains(growth.NextSeason) &&
+              growth.PaddyReadyDay >= 28 &&
+              plant.Paddy)
+
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.WaterSeeds,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        growth.PaddyProduceDay,
+                        growth.NextSeason,
+                        growth.PaddyOverflowDay),
+                    TextColor = TooltipColors.Paddy
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.PaddyRegrowQty),
+                        TextColor = TooltipColors.Paddy
+                    });
+                }
+
+            }
+            return list;
+        }
+
+        // Display basic data and a warning when it is too late to plant (trees, bushes treated separately)
+        private static List<TooltipElement> PaddyCropsTooLateToPlant(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.Crop &&
+              growth.Seasons.Contains(growth.CurrentSeason) &&
+              !growth.Seasons.Contains(growth.NextSeason) &&
+              growth.PaddyReadyDay >= 28 &&
+              plant.Paddy)
+
+            {
+                // First show the basic days to produce
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.WaterSeeds,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.DaysToProduce),
+                        growth.PaddyProduceDay),
+                    TextColor = TooltipColors.Paddy
+                });
+
+                // Add the too late warning message
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Warning,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.TooLate)),
+                    TextColor = TooltipColors.Warning
+                });
+
+            }
+            return list;
+        }
+
+        //---------------
+        // Fruit Trees in/out of Season
+        //-----------------
+
+        private static List<TooltipElement> FruitTreesReadyNextSeason(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.FruitTree &&
+              growth.Seasons.Contains(growth.NextSeason))
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.HarvestIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.ReadyOn),
+                        growth.ProduceDay,
+                        growth.NextSeason,
+                        growth.ReadyDay
+                        ),
+                    TextColor = TooltipColors.Normal
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.RegrowQty),
+                        TextColor = TooltipColors.Normal
+                    });
+                }
+            }
+            return list;
+        }
+
+        private static List<TooltipElement> FruitTreesReadyInFuture(PlantInfo plant, GrowthContext growth)
+        {
+
+            var list = new List<TooltipElement>();
+
+            if (plant.PlantType == PlantType.FruitTree &&
+              !growth.Seasons.Contains(growth.NextSeason))
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = plant.HarvestIcon,
+                    Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.TreeReadyInFuture),
+                        plant.Seasons?.FirstOrDefault()),
+                    TextColor = TooltipColors.Normal
+                });
+
+                if (plant.RegrowDays > 0)
+                {
+                    // How many harvests
+                    list.Add(new TooltipElement
+                    {
+                        //Icon = TooltipIcons.Spiral,
+                        Text = string.Format(ModEntry.ModHelper.Translation
+                            .Get(TooltipKeys.RegrowQty),
+                            growth.RegrowQty),
+                        TextColor = TooltipColors.Normal
+                    });
+                }
+            }
+            return list;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        private static GrowthContext BuildGrowthContext(PlantInfo plant)
+        {
+            int today = Game1.dayOfMonth;
+            Season currentSeason = Game1.season;
+            Season nextSeason = NextSeason(currentSeason);
+
+            // build season list for the seed. Converts spring from PlantDatabase to enum
+            List<Season> seasons = plant.Seasons
+                .Select(s => Enum.Parse<Season>(s, ignoreCase: true))
+                .ToList();
+
+            int days = plant.DaysToProduce ?? 0;
+
+            int readyDay = today + days;
+
+            int paddyDays = (int)Math.Floor(days / 1.25f);
+            int paddyReadyDay = today + paddyDays;
+
+            int regrowDays = plant.RegrowDays.GetValueOrDefault();
+            int paddyRegrowDays = (int)Math.Floor(regrowDays / 1.25f);
+            int additionalSeasons = CountAdditionalSeasons(currentSeason, seasons);
+            int regrowDaysAvailable = 0;
+            int paddyRegrowDaysAvailable = 0;
+            int regrowQty = 0;
+            int paddyRegrowQty = 0;
+
+            // Regrow days for current season and additonal seasons for multi-harvest crops.
+            if (plant.RegrowDays > 0 &&
+                seasons.Contains(currentSeason) &&
+                plant.PlantType == PlantType.Crop)
+            {
+                regrowDaysAvailable = ((1 + additionalSeasons) * 28) - readyDay;
+                paddyRegrowDaysAvailable = ((1 + additionalSeasons) * 28) - paddyReadyDay;
+            }
+
+            // Regrow days for out of season
+            if (plant.RegrowDays > 0 &&
+                !seasons.Contains(currentSeason) &&
+                plant.PlantType == PlantType.Crop)
+            {
+                regrowDaysAvailable = 28 * seasons.Count - days - 1;
+                paddyRegrowDaysAvailable = 28 * seasons.Count - paddyDays - 1;
+            }
+
+            // Regrow days for fruit trees next season
+            if (plant.RegrowDays > 0 &&
+                seasons.Contains(nextSeason) &&
+                plant.PlantType == PlantType.FruitTree)
+            {
+                readyDay = today + days - 28 * additionalSeasons;
+                regrowDaysAvailable = 28 - readyDay;
+            }
+
+            // Regrow days for fruit trees out of season / not ready in time
+            if (plant.RegrowDays > 0 &&
+                !seasons.Contains(nextSeason) &&
+                plant.PlantType == PlantType.FruitTree)
+            {
+                readyDay = 1;
+                regrowDaysAvailable = 27;
+            }
+
+
+            //ModEntry.Instance.Monitor.Log($"TEXT: {readyDay}", LogLevel.Info);
+
+                // paddyRegrowDaysAvailable = (int)Math.Floor(regrowDaysAvailable / 1.25);
+                double r = (double)regrowDaysAvailable / regrowDays;
+                regrowQty = 1 + (int)Math.Floor(r);
+
+                double pr = (double)paddyRegrowDaysAvailable / paddyRegrowDays;
+                paddyRegrowQty = 1 + (int)Math.Floor(pr);
+
+                return new GrowthContext
+                {
+                    Today = today,
+                    CurrentSeason = currentSeason,
+                    NextSeason = nextSeason,
+
+                    Seasons = seasons,
+                    ProduceDay = days,
+                    PaddyProduceDay = paddyDays,
+
+                    ReadyDay = readyDay,
+                    PaddyReadyDay = paddyReadyDay,
+
+                    OverflowDay = readyDay - 28,
+                    PaddyOverflowDay = paddyReadyDay - 28,
+
+                    RegrowQty = regrowQty,
+                    PaddyRegrowQty = paddyRegrowQty,
+
+                    //RegrowDaysAvailable = rew
+                    //AdditionalSeasons = CountAdditionalSeasons(currentSeason, seasons)
+                };
+            }
+
+        //---------------
+        // Crop growth supporting functions
+        //-------------------
+
+            // What is the next season
+        private static Season NextSeason(Season s)
+        {
+            return s switch
+            {
+                Season.Spring => Season.Summer,
+                Season.Summer => Season.Fall,
+                Season.Fall => Season.Winter,
+                Season.Winter => Season.Spring,
+                _ => Season.Spring
+            };
+        }
+
+        // How many grow seasons after this one (stops after a full year)
+        private static int CountAdditionalSeasons(Season current, List<Season> allowed)
+        {
+            if (allowed == null || allowed.Count == 0)
+                return 0;
+
+            int count = 0;
+            Season s = NextSeason(current);
+
+            // Maximum of 3 additional seasons in a year
+            for (int i = 0; i < 3; i++)
+            {
+                if (!allowed.Contains(s))
+                    break;
+
+                count++;
+                s = NextSeason(s);
+            }
+
+            return count;
+
+        }
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
 }
+

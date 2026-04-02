@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using StardewValley;
 
 
+
 namespace PlantingDay.Models
 {
     internal class GrowthContext
@@ -16,8 +17,9 @@ namespace PlantingDay.Models
         public Season NextSeason { get; set; }
 
         // Plant info
+        public List<Season> Seasons { get; set; } = new(); // list of seasons as enum for the plant
         public int ProduceDay { get; set; } // how many days until the first or only harvest 
-        public int PaddyProduceDay { get; set; } // Produce day if planted in a paddy
+        public int PaddyProduceDay { get; set; } // How many days wuntil first/only harvest if planted in a paddy
 
 
         public int ReadyDay { get; set; } // what day is the crop ready 

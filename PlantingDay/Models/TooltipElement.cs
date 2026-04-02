@@ -16,13 +16,14 @@ namespace PlantingDay.Models
         public List<InlineSegment>? InlineSegments { get; set; }
 
         // Seasons (optional)
-        public List<string> Seasons { get; set; } = new();
-        public List<Color> SeasonColors { get; set; } = new();
-        public List<bool> SeasonBold { get; set; } = new();
+        //public List<string> Seasons { get; set; } = new();
+        //public List<Color> SeasonColors { get; set; } = new();
+        //public List<bool> SeasonBold { get; set; } = new();
 
 
         // Icon (optional)
         public IconRef? Icon { get; set; }
+        public int? OverrideIconSize { get; set; }
 
 
 

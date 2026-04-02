@@ -6,8 +6,11 @@
 	"season.winter": "Winter",
 
 	// Basic crop info
-	"tooltip.requires_trellis": "Requires a trellis",
+	"tooltip.requires_trellis": "Trellis",
 	"tooltip.multi_sprite": "{0} colors",
+	"tooltip.no_watering": "No watering",
+	"tooltip.scythe": "Scythe",
+
 
 	// Growth info
 	"tooltip.days_to_produce": "{0} days",
@@ -15,19 +18,19 @@
 	"tooltip.too_late": "Too late to plant [TBD fertilizer]",
 	"tooltip.regrow_qty": "{0} total harvests",
 
+	// Trees
+	"tooltip.tree_ready_in_future": "Ready next {0}"
+
 	// Growth info for paddy crops
-	"tooltip.paddy_days_to_produce": "{0} days near water",
-	"tooltip.paddy_ready_on": "{0} days on {1} {2} near water",
+	//"tooltip.paddy_days_to_produce": "{0} days near water",
+	//"tooltip.paddy_ready_on": "{0} days on {1} {2} near water",
 	//"tooltip.paddy_too_late": "Too late to plant [TBD fertilizer]",
-	"tooltip.paddy_regrow_qty": "{0} total harvests near water",
+	//"tooltip.paddy_regrow_qty": "{0} total harvests near water",
 
 
 
 	// Bushes (future expansion)
-	"tooltip.bush.produces_in": "Produces in: {0} days",
-	"tooltip.bush.ready_on": "Bush ready on: {0} {1}",
+	//"tooltip.bush.produces_in": "Produces in: {0} days",
+	//"tooltip.bush.ready_on": "Bush ready on: {0} {1}",
 
-	// Trees (future expansion)
-	"tooltip.tree.matures_in": "Matures in: {0} days",
-	"tooltip.tree.ready_on": "Ready on: {0} {1}"
 }

@@ -1,9 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PlantingDay.Compatibility;
+using PlantingDay.Helpers;
 using PlantingDay.Models;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Objects;
 using StardewValley.GameData;
 using StardewValley.GameData.Buffs;
 using StardewValley.GameData.Crops;
@@ -11,6 +15,7 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Objects;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
+using System.Xml.Linq;
 //using System.Linq;
 //using System.Text.Json;
 
@@ -32,6 +37,9 @@ namespace PlantingDay
             LoadCrops();
             LoadFruitTrees();
             //LoadBushes(); PAUSEBUSHES
+
+            BuildHarvestIcons();
+            BuildSeedIcons();
         }
 
         // Lookup by seed item ID (e.g. "O:472" for Parsnip Seeds)
@@ -95,25 +103,25 @@ namespace PlantingDay
         //private static IModHelper Helper;
 
 
-/* PAUSEBUSHES
-        private static void LoadBushes()
-        {
-            try
-            {
-                var data = ModEntry.SHelper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
-
-                foreach (var key in data.Keys)
+        /* PAUSEBUSHES
+                private static void LoadBushes()
                 {
-                    ModEntry.Instance.Monitor.Log($"Bush key: {key}", LogLevel.Warn);
-                }
-            }
-            catch (Exception ex)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed to load Custom Bush data: {ex}", LogLevel.Error);
-            }
+                    try
+                    {
+                        var data = ModEntry.SHelper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
 
-        }
-*/
+                        foreach (var key in data.Keys)
+                        {
+                            ModEntry.Instance.Monitor.Log($"Bush key: {key}", LogLevel.Warn);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        ModEntry.Instance.Monitor.Log($"Failed to load Custom Bush data: {ex}", LogLevel.Error);
+                    }
+
+                }
+        */
 
         // -------------------------
         //  LOOKUP - Get all the data
@@ -155,10 +163,11 @@ namespace PlantingDay
                 SeedDescription = seedDescription,
                 PlantType = PlantType.Crop,
 
-
+                HarvestId = harvestId,
                 HarvestName = harvestName,
                 HarvestDescription = harvestDescription,
 
+                // List of season as strings.
                 Seasons = crop.Seasons?
                     .Select(s => s.ToString().ToLowerInvariant())
                     .ToList()
@@ -174,16 +183,24 @@ namespace PlantingDay
                 Trellis = crop.IsRaised,
                 Paddy = crop.IsPaddyCrop,
                 MultiSprite = crop.TintColors?.Count ?? 0,
+                NeedsWatering = crop.NeedsWatering,
+                Scythe = crop.HarvestMethod,
+
+                //Harvest item info
+                //HarvestTexture = crop.Texture,
+                //HarvestSpriteIndex = crop.SpriteIndex,
 
             };
         }
 
         private static PlantInfo FromFruitTree(string saplingId, FruitTreeData data)
         {
-            // Extract fruit item
+            // Extract fruit entry (vanilla + modded both use this)
             var fruit = data.Fruit.FirstOrDefault();
-            string fruitId = fruit?.ItemId ?? "";
-            fruitId = fruitId.Replace("(O)", "O:");
+
+            // Normalize the ItemId using your helper
+            string fruitId = ItemIDtoNumber(fruit?.ItemId ?? "");
+
 
             return new PlantInfo
             {
@@ -195,6 +212,7 @@ namespace PlantingDay
                 PlantType = PlantType.FruitTree,
 
                 // Fruit identity
+                HarvestId = fruitId,
                 HarvestName = Game1.objectData.TryGetValue(fruitId.Replace("O:", ""), out var obj)
                     ? obj.DisplayName
                     : "Unknown Fruit",
@@ -222,6 +240,127 @@ namespace PlantingDay
             };
         }
 
+        public static string ItemIDtoNumber(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw))
+                return "";
+
+            raw = raw.Trim();
+
+            // Vanilla format: (O)634 → 634
+            if (raw.StartsWith("(O)"))
+                return raw.Substring(3);
+
+            // Mod format: O:634 → 634
+            if (raw.StartsWith("O:") || raw.StartsWith("o:"))
+                return raw.Substring(2);
+
+            // Pure numeric → already correct
+            if (int.TryParse(raw, out _))
+                return raw;
+
+            return raw; // fallback
+        }
+
+        //-------------------------
+        // Build the Seed and Harvest Icons
+        //-------------------------
+
+        private static void BuildSeedIcons()
+        {
+            foreach (var plant in _plants.Values)
+            {
+                if (plant.Id is null)
+                    continue;
+
+                var item = ItemRegistry.Create(plant.Id);
+                if (item is null)
+                    continue;
+
+                // Use your helper so modded seeds work automatically
+                plant.SeedIcon = IconHelper.FromItem(item, scale: 1f);
+            }
+        }
+
+        public static class IconHelper
+        {
+
+            public static IconRef FromItem(Item item, float scale = 1f)
+            {
+                Rectangle src = Game1.getSourceRectForStandardTileSheet(
+                    Game1.objectSpriteSheet,
+                    item.ParentSheetIndex,
+                    16,
+                    16
+                );
+
+                return new IconRef(Game1.objectSpriteSheet, src, 16, scale);
+            }
+
+        }
+
+
+        private static void BuildHarvestIcons()
+        {
+            foreach (var plant in _plants.Values)
+            {
+                if (plant.HarvestId is null)
+                    continue;
+
+                var item = ItemRegistry.Create(plant.HarvestId);
+                if (item is null)
+                    continue;
+
+                Texture2D icon = RenderItemIcon(item, 16);
+
+                plant.HarvestIcon = new IconRef(icon, new Rectangle(0, 0, 16, 16));
+            }
+        }
+
+        private static Texture2D RenderItemIcon(Item item, int size = 16)
+        {
+            var device = Game1.graphics.GraphicsDevice;
+
+            // Step 1: draw into a 64x64 buffer (the size drawInMenu expects)
+            const int bufferSize = 64;
+            var buffer = new RenderTarget2D(device, bufferSize, bufferSize);
+
+            device.SetRenderTarget(buffer);
+            device.Clear(Color.Transparent);
+
+            SpriteBatch batch = Game1.spriteBatch;
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+
+            item.drawInMenu(
+                batch,
+                Vector2.Zero,
+                1f,            // natural scale
+                1f,
+                1f,
+                StackDrawType.Hide,
+                Color.White,
+                false
+            );
+
+            batch.End();
+            device.SetRenderTarget(null);
+
+            // Step 2: downscale the 64x64 buffer into your final 16x16 icon
+            var final = new RenderTarget2D(device, size, size);
+
+            device.SetRenderTarget(final);
+            device.Clear(Color.Transparent);
+
+            batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
+
+            float scale = size / (float)bufferSize;
+            batch.Draw(buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+
+            batch.End();
+            device.SetRenderTarget(null);
+
+            return final;
+        }
 
         //public static PlantInfo? FromItem(StardewValley.Object obj)
         //{
@@ -369,139 +508,6 @@ namespace PlantingDay
         //}
     }
 }
-//    public static class PlantDatabase
-//    {
-//        private static IModHelper _helper = null!;
-//        public static Dictionary<string, PlantDataModel> Crops { get; private set; } = new();
-
-//        public static void Load(IModHelper helper)
-//        {
-//            _helper = helper;
-//            Crops = new Dictionary<string, PlantDataModel>();
-
-//            // Vanilla (strongly typed)
-//            LoadVanillaCrops();
-//            LoadFruitTrees();
-//            BushDatabase.Load(helper);
-
-//            // Modded (JSON)
-//            LoadModded("Mods/cornucopia.crops/Data/Crops");
-//            LoadModded("Mods/sunberryvillage/Data/Crops");
-
-
-
-//        }
-
-//        private static void LoadVanillaCrops()
-//        {
-//            var raw = _helper.GameContent.Load<Dictionary<string, CropData>>("Data/Crops");
-
-//            foreach (var (key, crop) in raw)
-//            {
-//                Crops[key] = new PlantDataModel
-//                {
-//                    Seasons = crop.Seasons?
-//                        .Select(s => s.ToString())
-//                        .ToList(),
-//                    Trellis = crop.IsRaised,
-//                    Paddy = crop.IsPaddyCrop
-//                };
-//            }
-//        }
-
-//        private static void LoadFruitTrees()
-//        {
-//            var raw = _helper.GameContent.Load<Dictionary<string, FruitTreeData>>("Data/FruitTrees");
-
-//            foreach (var (key, tree) in raw)
-//            {
-//                string? season = tree.Seasons?
-//                    .Select(s => s.ToString().ToLowerInvariant())
-//                    .FirstOrDefault();
-
-//                Crops[key] = new PlantDataModel
-//                {
-//                    FruitSeason = season
-//                };
-//            }
-//        }
-
-
-
-//        private static void LoadModded(string path)
-//        {
-//            var assetName = _helper.GameContent.ParseAssetName(path);
-
-//            if (!_helper.GameContent.DoesAssetExist<Dictionary<string, JsonElement>>(assetName))
-//                return;
-
-//            var raw = _helper.GameContent.Load<Dictionary<string, JsonElement>>(path);
-
-//            foreach (var (key, entry) in raw)
-//                LoadModdedCropFields(key, entry);
-//        }
-
-//        private static void LoadModdedCropFields(string key, JsonElement crop)
-//        {
-//            if (!Crops.ContainsKey(key))
-//                Crops[key] = new PlantDataModel();
-
-//            // GrowSeasons
-//            if (crop.TryGetProperty("GrowSeasons", out var gsProp))
-//            {
-//                if (gsProp.ValueKind == JsonValueKind.Array)
-//                    Crops[key].GrowSeasons = gsProp.EnumerateArray().Select(e => e.GetString() ?? "").ToList();
-//                else if (gsProp.ValueKind == JsonValueKind.String)
-//                    Crops[key].GrowSeasons = gsProp.GetString()?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-//            }
-
-//            // ExtraSeasons
-//            if (crop.TryGetProperty("ExtraSeasons", out var esProp))
-//            {
-//                if (esProp.ValueKind == JsonValueKind.Array)
-//                    Crops[key].ExtraSeasons = esProp.EnumerateArray().Select(e => e.GetString() ?? "").ToList();
-//                else if (esProp.ValueKind == JsonValueKind.String)
-//                    Crops[key].ExtraSeasons = esProp.GetString()?.Split(' ', StringSplitOptions.RemoveEmptyEntries).ToList();
-//            }
-//        }
-
-
-
-//        private static List<string> GetAllSeasons(PlantDataModel data)
-//        {
-//            var seasons = new List<string>();
-
-//            if (data.Seasons != null)
-//                seasons.AddRange(data.Seasons);
-
-//            if (data.GrowSeasons != null)
-//                seasons.AddRange(data.GrowSeasons);
-
-//            if (data.ExtraSeasons != null)
-//                seasons.AddRange(data.ExtraSeasons);
-
-//            if (!string.IsNullOrEmpty(data.FruitSeason))
-//                seasons.Add(data.FruitSeason);
-
-//            if (data.HarvestSeasons != null)
-//                seasons.AddRange(data.HarvestSeasons);
-
-//            return seasons
-//                .Where(s => !string.IsNullOrWhiteSpace(s))
-//                .Select(s => s.Trim().ToLowerInvariant())
-//                .Distinct()
-//                .Select(s => char.ToUpper(s[0]) + s.Substring(1))
-//                .ToList();
-//        }
-//        public static List<string> GetSeasons(string itemId)
-//        {
-//            if (!Crops.TryGetValue(itemId, out var data))
-//                return new List<string>();
-
-//            return GetAllSeasons(data);
-//        }
-//    }
-//}
 
 
 
