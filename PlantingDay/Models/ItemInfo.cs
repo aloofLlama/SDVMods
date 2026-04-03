@@ -20,8 +20,8 @@ namespace PlantingDay.Models
         public int Category { get; set; } //e.g. seeds, vegetable,fruit
         public int Edibility { get; set; }
 
-        //[JsonIgnore]
-        //public IconRef? Icon { get; set; }
+
+
 
     }
 

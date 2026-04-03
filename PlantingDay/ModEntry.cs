@@ -3,6 +3,7 @@ using PlantingDay.Helpers;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.GameData.Shops;
 using System.Runtime.CompilerServices;
 
 
@@ -20,6 +21,14 @@ namespace PlantingDay
             Instance = this;
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
+
+            var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
+
+            // KEEP this debug for later, it shows all game shops available. Useful when needing to fix mod shops
+            foreach (var shopId in shops.Keys)
+            {
+                ModEntry.Instance.Monitor.Log($"[Planting Day] Found shop: {shopId}", LogLevel.Info);
+            }
 
             //TooltipIcons.Load();
             TooltipIcons.Initialize();

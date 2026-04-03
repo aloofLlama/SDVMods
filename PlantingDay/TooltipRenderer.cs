@@ -218,21 +218,49 @@ namespace PlantingDay
                 }
                 else if (el.IconRef.HasValue)
                 {
-                    int iconSize = IconRenderSize;
                     var icon = el.IconRef.Value;
 
+                    // Compute scaled size
+                    float scale = icon.Scale;                      
+                    int iconSize = (int)(icon.Source.Width * scale);
+
+                    // Center inside the icon column
                     int yOffset = drawY + (lineHeight - iconSize) / 2;
                     int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
 
+                    // Draw using scale (Stardew‑style)
                     b.Draw(
                         icon.Texture,
-                        new Rectangle(xOffset, yOffset, iconSize, iconSize),
+                        new Vector2(xOffset, yOffset),
                         icon.Source,
-                        Color.White
+                        Color.White,
+                        0f,
+                        Vector2.Zero,
+                        scale,
+                        SpriteEffects.None,
+                        1f
                     );
 
                     drawX += IconColumnWidth;
                 }
+                // This was working, just not scaling
+                //else if (el.IconRef.HasValue)
+                //{
+                //    int iconSize = IconRenderSize;
+                //    var icon = el.IconRef.Value;
+
+                //    int yOffset = drawY + (lineHeight - iconSize) / 2;
+                //    int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
+
+                //    b.Draw(
+                //        icon.Texture,
+                //        new Rectangle(xOffset, yOffset, iconSize, iconSize),
+                //        icon.Source,
+                //        Color.White
+                //    );
+
+                //    drawX += IconColumnWidth;
+                //}
 
                 //
                 // Inline segments

@@ -42,8 +42,6 @@ namespace PlantingDay.Models
         public bool NeedsWatering { get; set; }
         public HarvestMethod Scythe { get; set; }
 
-
-
         public class DropInfo
         {
             public string ItemId { get; set; } = "";
@@ -52,14 +50,16 @@ namespace PlantingDay.Models
             public int MaxStack { get; set; } = 1;
         }
 
-        // TODO Need to migrate this to the new Harvest above
+        // Economics
+        public int HarvestPrice { get; set; }
+        public List<PurchaseInfo> PurchaseOptions { get; set; } = new();
 
-        //// Usable icon reference after database has been initialized
-        ////[JsonIgnore]
-        //public IconRef? HarvestIcon { get; set; }
 
-        ////[JsonIgnore]
-        //public IconRef? SeedIcon { get; set; }
+
+        //---------
+        // ICONS
+        //---------
+
         public Texture2D? SeedIconTexture { get; set; }
         public Texture2D? HarvestIconTexture { get; set; }
 
@@ -71,10 +71,6 @@ namespace PlantingDay.Models
                 if (item != null)
                     SeedIconTexture = PlantDatabase.RenderItemIcon(item, 16);
 
-                ModEntry.Instance.Monitor.Log(
-$"Assigning SeedIconTexture for : {(SeedIconTexture != null)}",
-LogLevel.Alert);
-
             }
 
             if (Harvest != null)
@@ -82,10 +78,6 @@ LogLevel.Alert);
                 var item = ItemRegistry.Create(Harvest.Id);
                 if (item != null)
                     HarvestIconTexture = PlantDatabase.RenderItemIcon(item, 32);
-                ModEntry.Instance.Monitor.Log(
-    $"Assigning HarvestIconTexture for : {(HarvestIconTexture != null)}",
-    LogLevel.Alert
-);
             }
         }
 
@@ -105,7 +97,17 @@ LogLevel.Alert);
         Winter
     }
 
+    public class PurchaseInfo
+    {
+        public string VendorId { get; set; } = "";     // e.g. "SeedShop", "AriShop", "EggFestival"
+        public string VendorName { get; set; } = "";   // e.g. "Pierre", "Ari", "Egg Festival"
 
+        public int? GoldPrice { get; set; }            // null if it's a trade
+        public string? TradeItemId { get; set; }       // e.g. "(O)852"
+        public int TradeAmount { get; set; }           // e.g. 4
+
+        public string? Condition { get; set; }         // e.g. "EVENT eggFestival", "SEASON spring"
+    }
 
 }
 

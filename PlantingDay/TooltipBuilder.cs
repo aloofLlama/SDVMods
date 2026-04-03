@@ -26,10 +26,6 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             list.AddRange(GetSeasonsTooltip(plant));
-            ModEntry.Instance.Monitor.Log(
-    $"TooltipBuilder: Using IconTexture={(plant.HarvestIconTexture != null)}, IconRef={(plant.HarvestIconTexture != null)}",
-    LogLevel.Alert
-);
 
             // Growth info (includes DaysToProduce + ready day + warnings + Multiharvest)
             list.AddRange(GetPlantGrowthTooltip(plant));
@@ -83,23 +79,25 @@ namespace PlantingDay
 
             list.Add(new TooltipElement { IsSeparator = true, PaddingTop = 6, PaddingBottom = 6 });
 
+            list.AddRange(GetEconomicsTooltip(plant));
+
             return list;
         }
 
         //--------------
         // Season display
         //--------------
-        private static List<TooltipElement> GetSeasonsTooltip(PlantInfo info)
+        private static List<TooltipElement> GetSeasonsTooltip(PlantInfo plant)
         {
             var list = new List<TooltipElement>();
-            if (info.Seasons == null || info.Seasons.Count == 0)
+            if (plant.Seasons == null || plant.Seasons.Count == 0)
                 return list;
 
             // Display the relevant seasons and highlight the current season
-            if (info.Seasons.Count > 0)
+            if (plant.Seasons.Count > 0)
             {
                 var segments = TooltipRenderer.BuildInlineSegments(
-                    info.Seasons,
+                    plant.Seasons,
                     season =>
                     {
                         var (color, bold) = SeasonHelper.Style(season);
@@ -264,13 +262,7 @@ namespace PlantingDay
                     ),
                     TextColor = TooltipColors.Normal
                 });
-                    var el = list[list.Count - 1];
-
-                ModEntry.Instance.Monitor.Log(
-                    $"TooltipElement FINAL: IconTexture={(el.IconTexture != null)}, IconRef={el.IconRef.HasValue}",
-                    LogLevel.Alert
-                );
-                
+                var el = list[list.Count - 1];
 
                 if (plant.RegrowDays > 0)
                 {
@@ -728,10 +720,178 @@ namespace PlantingDay
             };
         }
 
-        
+        //---------------
+        // Economics
+        //-----------------
 
+        private static List<TooltipElement> GetEconomicsTooltip(PlantInfo plant)
+        {
+            var list = new List<TooltipElement>();
+
+            //----------------
+            // Seed purchase
+            //----------------
+
+            var goldVendors = plant.PurchaseOptions
+                .Where(p => p.GoldPrice.HasValue && p.GoldPrice > 0)
+                .Where(p => !IgnoredVendors.Contains(p.VendorId))
+                .ToList();
+
+            ////debug piece
+
+            //var pierre = plant.PurchaseOptions
+            //    .FirstOrDefault(p => p.VendorId == "SeedShop");
+
+            //if (pierre != null && pierre.GoldPrice.HasValue)
+            //{
+            //    ModEntry.Instance.Monitor.Log(
+            //        $"Pierre price: {pierre.GoldPrice.Value}",
+            //        LogLevel.Info
+            //    );
+            //}
+            //else
+            //{
+            //    ModEntry.Instance.Monitor.Log(
+            //        "Pierre price: <none found>",
+            //        LogLevel.Info
+            //    );
+            //}
+            ////debug
+
+
+            //TODO remove night market price and replace with NightStars icon, already created
+
+            // Sort the vendor list so Pierre's price outputs first
+            var sortedVendors = goldVendors
+                .OrderByDescending(v => v.VendorId == "SeedShop") // Pierre first
+                .ThenBy(v => v.VendorName)                        // optional
+                .ToList();
+
+            var segments = TooltipRenderer.BuildInlineSegments(
+                 goldVendors,
+                 vendor =>
+                 {
+                     bool isPierre = vendor.VendorId == "SeedShop";
+
+                    
+                     string text = isPierre
+                         ? string.Format(ModEntry.ModHelper.Translation
+                             .Get(TooltipKeys.PierresPurchase),
+                             vendor.GoldPrice)
+                         : string.Format(ModEntry.ModHelper.Translation
+                              .Get(TooltipKeys.OtherShopPurchase),
+                             vendor.GoldPrice,
+                             vendor.VendorName);
+
+                     return new InlineSegment
+                     {
+                         Text = text,
+                         Color = TooltipColors.Normal,
+                         Bold = false
+                     };
+                 });
+
+            list.Add(new TooltipElement
+            {
+                IconRef = TooltipIcons.LittleCoin,
+                InlineSegments = segments
+            });
+
+
+
+
+
+            //if (goldVendors.Count == 1)
+            //{
+            //    var vendor = goldVendors[0];
+
+            //    if (vendor.VendorId == "SeedShop") // Pierre
+            //    {
+            //        // 20g
+            //        list.Add(new TooltipElement
+            //        {
+            //            IconRef = TooltipIcons.LittleCoin,
+            //            Text = string.Format(ModEntry.ModHelper.Translation
+            //                               .Get(TooltipKeys.PierresPurchase),
+            //                               vendor.GoldPrice),
+            //            TextColor = TooltipColors.Normal
+            //        });
+            //    }
+            //    else
+            //    {
+            //        // Output: "20g at Ari's"
+            //        list.Add(new TooltipElement
+            //        {
+            //            IconRef = TooltipIcons.LittleCoin,
+            //            Text = string.Format(ModEntry.ModHelper.Translation
+            //               .Get(TooltipKeys.OtherShopPurchase),
+            //               vendor.GoldPrice),
+            //            TextColor = TooltipColors.Normal
+            //        });
+
+            //    }
+            //}
+
+            //// Display the relevant seasons and highlight the current season
+            //if (plant.PurchaseOptions.GoldPrice > 0)
+            //{
+            //    var segments = TooltipRenderer.BuildInlineSegments(
+            //        plant.Seasons,
+            //        season =>
+            //        {
+            //            var (color, bold) = SeasonHelper.Style(season);
+
+            //            return new InlineSegment
+            //            {
+            //                Text = SeasonHelper.Translate(season),
+            //                Color = color,
+            //                Bold = bold
+            //            };
+
+            //        }
+            //    );
+
+            //    list.Add(new TooltipElement
+            //    {
+            //        InlineSegments = segments
+            //    });
+
+
+            //----------------
+            // How many I have
+            //----------------
+
+
+            //----------------
+            // Harvest value
+            //----------------
+            int harvestBV = plant.HarvestPrice; //Base value of harvest items
+            ModEntry.Instance.Monitor.Log($"BV: {harvestBV}", LogLevel.Info);
+            int goldStarHarvest = (int)Math.Floor(1.5 * harvestBV); //Value of gold star quality harvest items
+
+
+            list.Add(new TooltipElement
+            {
+                IconRef = TooltipIcons.GoldStar,
+                Text = string.Format(ModEntry.ModHelper.Translation
+                        .Get(TooltipKeys.PriceRange),
+                        harvestBV,
+                        goldStarHarvest),
+                TextColor = TooltipColors.Normal
+            });
+
+            return list;
+
+
+
+        }
+
+        private static readonly HashSet<string> IgnoredVendors = new()
+            {
+                "JojaMart",
+                "NightMarket"
+            };
     }
-
 
 }
 
