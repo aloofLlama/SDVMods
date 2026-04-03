@@ -21,7 +21,8 @@ namespace PlantingDay
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            TooltipIcons.Load();
+            //TooltipIcons.Load();
+            TooltipIcons.Initialize();
 
             //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
@@ -56,7 +57,12 @@ namespace PlantingDay
         {
             PlantDatabase.Initialize();
 
-            Monitor.Log("Plant database initialized.", LogLevel.Info);
+            foreach (var plant in PlantDatabase.AllPlants)
+                plant.InitializeIcons();
+
+
+
+            //Monitor.Log("Plant database initialized.", LogLevel.Info);
 
             // Load Custom Bush API
             //CustomBushApi = Helper.ModRegistry.GetApi<ICustomBushApi>("spacechase0.CustomBush");

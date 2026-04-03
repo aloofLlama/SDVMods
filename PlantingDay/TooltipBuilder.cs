@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -25,6 +26,10 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             list.AddRange(GetSeasonsTooltip(plant));
+            ModEntry.Instance.Monitor.Log(
+    $"TooltipBuilder: Using IconTexture={(plant.HarvestIconTexture != null)}, IconRef={(plant.HarvestIconTexture != null)}",
+    LogLevel.Alert
+);
 
             // Growth info (includes DaysToProduce + ready day + warnings + Multiharvest)
             list.AddRange(GetPlantGrowthTooltip(plant));
@@ -34,7 +39,7 @@ namespace PlantingDay
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.SeedIcon,
+                    IconTexture = plant.SeedIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RequiresTrellis)),
                     TextColor = TooltipColors.Normal
                 });
@@ -45,7 +50,7 @@ namespace PlantingDay
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Watercan,
+                    IconRef = TooltipIcons.Watercan,
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.NoWatering)),
                     TextColor = TooltipColors.Normal
                 });
@@ -57,7 +62,7 @@ namespace PlantingDay
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Scythe,
+                    IconRef = TooltipIcons.Scythe,
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.HarvestWithScythe)),
                     TextColor = TooltipColors.Normal
                 });
@@ -69,12 +74,14 @@ namespace PlantingDay
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Rainbow,
+                    IconRef = TooltipIcons.Rainbow,
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.MultiSprite),
                         plant.MultiSprite),
                     TextColor = TooltipColors.Normal
                 });
             }
+
+            list.Add(new TooltipElement { IsSeparator = true, PaddingTop = 6, PaddingBottom = 6 });
 
             return list;
         }
@@ -95,15 +102,15 @@ namespace PlantingDay
                     info.Seasons,
                     season =>
                     {
-                        string translated = TranslateSeason(season);
-                        var (color, bold) = GetSeasonStyle(season);
+                        var (color, bold) = SeasonHelper.Style(season);
 
                         return new InlineSegment
                         {
-                            Text = translated,
+                            Text = SeasonHelper.Translate(season),
                             Color = color,
                             Bold = bold
                         };
+
                     }
                 );
 
@@ -117,40 +124,85 @@ namespace PlantingDay
 
         }
 
-        private static string TranslateSeason(string season)
+        public static class SeasonHelper
         {
-            string key = season.ToLower() switch
+            public static SeasonId FromGameSeason(StardewValley.Season s)
             {
-                "spring" => "season.spring",
-                "summer" => "season.summer",
-                "fall" => "season.fall",
-                "winter" => "season.winter",
-                _ => season // fallback: return raw string
-            };
+                return s switch
+                {
+                    StardewValley.Season.Spring => SeasonId.Spring,
+                    StardewValley.Season.Summer => SeasonId.Summer,
+                    StardewValley.Season.Fall => SeasonId.Fall,
+                    StardewValley.Season.Winter => SeasonId.Winter,
+                    _ => SeasonId.Spring
+                };
+            }
 
-            return ModEntry.ModHelper.Translation.Get(key);
+            public static string Translate(SeasonId season)
+            {
+                string key = season switch
+                {
+                    SeasonId.Spring => "season.spring",
+                    SeasonId.Summer => "season.summer",
+                    SeasonId.Fall => "season.fall",
+                    SeasonId.Winter => "season.winter",
+                    _ => "season.unknown"
+                };
+
+                return ModEntry.ModHelper.Translation.Get(key);
+            }
+
+            public static (Color color, bool bold) Style(SeasonId season)
+            {
+                bool isCurrent = season.ToString().Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
+
+                Color color = season switch
+                {
+                    SeasonId.Spring => TooltipColors.SpringColor,
+                    SeasonId.Summer => TooltipColors.SummerColor,
+                    SeasonId.Fall => TooltipColors.FallColor,
+                    SeasonId.Winter => TooltipColors.WinterColor,
+                    _ => TooltipColors.Normal
+                };
+
+                return isCurrent
+                    ? (color, true)
+                    : (TooltipColors.Normal, false);
+            }
+
+            public static SeasonId Next(SeasonId s)
+            {
+                return s switch
+                {
+                    SeasonId.Spring => SeasonId.Summer,
+                    SeasonId.Summer => SeasonId.Fall,
+                    SeasonId.Fall => SeasonId.Winter,
+                    SeasonId.Winter => SeasonId.Spring,
+                    _ => SeasonId.Spring
+                };
+            }
+            public static int CountAdditionalSeasons(SeasonId current, List<SeasonId> allowed)
+            {
+                if (allowed == null || allowed.Count == 0)
+                    return 0;
+
+                int count = 0;
+                SeasonId s = Next(current);
+
+                // Maximum of 3 additional seasons in a year
+                for (int i = 0; i < 3; i++)
+                {
+                    if (!allowed.Contains(s))
+                        break;
+
+                    count++;
+                    s = Next(s);
+                }
+
+                return count;
+            }
         }
 
-        private static (Color color, bool bold) GetSeasonStyle(string season)
-        {
-            bool isCurrent = season.Equals(Game1.currentSeason, StringComparison.OrdinalIgnoreCase);
-
-            Color color = season.ToLower() switch
-            {
-                "spring" => TooltipColors.SpringColor,
-                "summer" => TooltipColors.SummerColor,
-                "fall" => TooltipColors.FallColor,
-                "winter" => TooltipColors.WinterColor,
-                _ => TooltipColors.Normal
-            };
-
-            // If it's the current season → bold + colored
-            if (isCurrent)
-                return (color, true);
-
-            // Otherwise → normal color + not bold
-            return (TooltipColors.Normal, false);
-        }
 
         //-----------------
         // Plant growth and when it is ready (crops, fruit trees, etc)
@@ -200,18 +252,25 @@ namespace PlantingDay
 
             // Only for Crops that are out of season
             if (plant.PlantType == PlantType.Crop &&
-              !growth.Seasons.Contains(growth.CurrentSeason))
+              !plant.Seasons.Contains(growth.CurrentSeason))
 
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.HarvestIcon,
+                    IconTexture = plant.HarvestIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.DaysToProduce),
                         growth.ProduceDay
                     ),
                     TextColor = TooltipColors.Normal
                 });
+                    var el = list[list.Count - 1];
+
+                ModEntry.Instance.Monitor.Log(
+                    $"TooltipElement FINAL: IconTexture={(el.IconTexture != null)}, IconRef={el.IconRef.HasValue}",
+                    LogLevel.Alert
+                );
+                
 
                 if (plant.RegrowDays > 0)
                 {
@@ -238,13 +297,13 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.Crop &&
-              growth.Seasons.Contains(growth.CurrentSeason) &&
+              plant.Seasons.Contains(growth.CurrentSeason) &&
               growth.ReadyDay <= 28)
 
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.HarvestIcon,
+                    IconTexture = plant.HarvestIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.ReadyOn),
                         growth.ProduceDay,
@@ -277,14 +336,14 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.Crop &&
-              growth.Seasons.Contains(growth.CurrentSeason) &&
-              growth.Seasons.Contains(growth.NextSeason) &&
+              plant.Seasons.Contains(growth.CurrentSeason) &&
+              plant.Seasons.Contains(growth.NextSeason) &&
               growth.ReadyDay >= 28)
 
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.HarvestIcon,
+                    IconTexture = plant.HarvestIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.ReadyOn),
                         growth.ProduceDay,
@@ -318,15 +377,15 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.Crop &&
-              growth.Seasons.Contains(growth.CurrentSeason) &&
-              !growth.Seasons.Contains(growth.NextSeason) &&
+              plant.Seasons.Contains(growth.CurrentSeason) &&
+              !plant.Seasons.Contains(growth.NextSeason) &&
               growth.ReadyDay >= 28)
 
             {
                 // First show the basic days to produce
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.HarvestIcon,
+                    IconTexture = plant.HarvestIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.DaysToProduce),
                         growth.ProduceDay),
@@ -336,7 +395,7 @@ namespace PlantingDay
                 // Add the too late warning message
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Warning,
+                    IconRef = TooltipIcons.Warning,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.TooLate)),
                     TextColor = TooltipColors.Warning
@@ -357,13 +416,13 @@ namespace PlantingDay
 
             // Only for Crops that are out of season
             if (plant.PlantType == PlantType.Crop &&
-              !growth.Seasons.Contains(growth.CurrentSeason) &&
+              !plant.Seasons.Contains(growth.CurrentSeason) &&
               plant.Paddy)
             {
 
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.WaterSeeds,
+                    IconRef = TooltipIcons.WaterSeeds,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.DaysToProduce),
                         growth.PaddyProduceDay
@@ -395,14 +454,14 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.Crop &&
-              growth.Seasons.Contains(growth.CurrentSeason) &&
+              plant.Seasons.Contains(growth.CurrentSeason) &&
               growth.PaddyReadyDay <= 28 &&
               plant.Paddy)
 
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.WaterSeeds,
+                    IconRef = TooltipIcons.WaterSeeds,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.ReadyOn),
                         growth.PaddyProduceDay,
@@ -435,15 +494,15 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.Crop &&
-              growth.Seasons.Contains(growth.CurrentSeason) &&
-              growth.Seasons.Contains(growth.NextSeason) &&
+              plant.Seasons.Contains(growth.CurrentSeason) &&
+              plant.Seasons.Contains(growth.NextSeason) &&
               growth.PaddyReadyDay >= 28 &&
               plant.Paddy)
 
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.WaterSeeds,
+                    IconRef = TooltipIcons.WaterSeeds,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.ReadyOn),
                         growth.PaddyProduceDay,
@@ -476,8 +535,8 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.Crop &&
-              growth.Seasons.Contains(growth.CurrentSeason) &&
-              !growth.Seasons.Contains(growth.NextSeason) &&
+              plant.Seasons.Contains(growth.CurrentSeason) &&
+              !plant.Seasons.Contains(growth.NextSeason) &&
               growth.PaddyReadyDay >= 28 &&
               plant.Paddy)
 
@@ -485,7 +544,7 @@ namespace PlantingDay
                 // First show the basic days to produce
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.WaterSeeds,
+                    IconRef = TooltipIcons.WaterSeeds,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.DaysToProduce),
                         growth.PaddyProduceDay),
@@ -495,7 +554,7 @@ namespace PlantingDay
                 // Add the too late warning message
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Warning,
+                    IconRef = TooltipIcons.Warning,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.TooLate)),
                     TextColor = TooltipColors.Warning
@@ -515,11 +574,11 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.FruitTree &&
-              growth.Seasons.Contains(growth.NextSeason))
+              plant.Seasons.Contains(growth.NextSeason))
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.HarvestIcon,
+                    IconTexture = plant.HarvestIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.ReadyOn),
                         growth.ProduceDay,
@@ -551,11 +610,11 @@ namespace PlantingDay
             var list = new List<TooltipElement>();
 
             if (plant.PlantType == PlantType.FruitTree &&
-              !growth.Seasons.Contains(growth.NextSeason))
+              !plant.Seasons.Contains(growth.NextSeason))
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = plant.HarvestIcon,
+                    IconTexture = plant.HarvestIconTexture,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.TreeReadyInFuture),
                         plant.Seasons?.FirstOrDefault()),
@@ -580,28 +639,11 @@ namespace PlantingDay
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
         private static GrowthContext BuildGrowthContext(PlantInfo plant)
         {
             int today = Game1.dayOfMonth;
-            Season currentSeason = Game1.season;
-            Season nextSeason = NextSeason(currentSeason);
-
-            // build season list for the seed. Converts spring from PlantDatabase to enum
-            List<Season> seasons = plant.Seasons
-                .Select(s => Enum.Parse<Season>(s, ignoreCase: true))
-                .ToList();
+            SeasonId currentSeason = SeasonHelper.FromGameSeason(Game1.season);
+            SeasonId nextSeason = SeasonHelper.Next(currentSeason);
 
             int days = plant.DaysToProduce ?? 0;
 
@@ -612,15 +654,15 @@ namespace PlantingDay
 
             int regrowDays = plant.RegrowDays.GetValueOrDefault();
             int paddyRegrowDays = (int)Math.Floor(regrowDays / 1.25f);
-            int additionalSeasons = CountAdditionalSeasons(currentSeason, seasons);
+            int additionalSeasons = SeasonHelper.CountAdditionalSeasons(currentSeason, plant.Seasons);
             int regrowDaysAvailable = 0;
             int paddyRegrowDaysAvailable = 0;
-            int regrowQty = 0;
-            int paddyRegrowQty = 0;
+            int regrowQty;
+            int paddyRegrowQty;
 
             // Regrow days for current season and additonal seasons for multi-harvest crops.
             if (plant.RegrowDays > 0 &&
-                seasons.Contains(currentSeason) &&
+                plant.Seasons.Contains(currentSeason) &&
                 plant.PlantType == PlantType.Crop)
             {
                 regrowDaysAvailable = ((1 + additionalSeasons) * 28) - readyDay;
@@ -629,16 +671,16 @@ namespace PlantingDay
 
             // Regrow days for out of season
             if (plant.RegrowDays > 0 &&
-                !seasons.Contains(currentSeason) &&
+                !plant.Seasons.Contains(currentSeason) &&
                 plant.PlantType == PlantType.Crop)
             {
-                regrowDaysAvailable = 28 * seasons.Count - days - 1;
-                paddyRegrowDaysAvailable = 28 * seasons.Count - paddyDays - 1;
+                regrowDaysAvailable = 28 * plant.Seasons.Count - days - 1;
+                paddyRegrowDaysAvailable = 28 * plant.Seasons.Count - paddyDays - 1;
             }
 
             // Regrow days for fruit trees next season
             if (plant.RegrowDays > 0 &&
-                seasons.Contains(nextSeason) &&
+                plant.Seasons.Contains(nextSeason) &&
                 plant.PlantType == PlantType.FruitTree)
             {
                 readyDay = today + days - 28 * additionalSeasons;
@@ -647,7 +689,7 @@ namespace PlantingDay
 
             // Regrow days for fruit trees out of season / not ready in time
             if (plant.RegrowDays > 0 &&
-                !seasons.Contains(nextSeason) &&
+                !plant.Seasons.Contains(nextSeason) &&
                 plant.PlantType == PlantType.FruitTree)
             {
                 readyDay = 1;
@@ -657,89 +699,39 @@ namespace PlantingDay
 
             //ModEntry.Instance.Monitor.Log($"TEXT: {readyDay}", LogLevel.Info);
 
-                // paddyRegrowDaysAvailable = (int)Math.Floor(regrowDaysAvailable / 1.25);
-                double r = (double)regrowDaysAvailable / regrowDays;
-                regrowQty = 1 + (int)Math.Floor(r);
+            // paddyRegrowDaysAvailable = (int)Math.Floor(regrowDaysAvailable / 1.25);
+            double r = (double)regrowDaysAvailable / regrowDays;
+            regrowQty = 1 + (int)Math.Floor(r);
 
-                double pr = (double)paddyRegrowDaysAvailable / paddyRegrowDays;
-                paddyRegrowQty = 1 + (int)Math.Floor(pr);
+            double pr = (double)paddyRegrowDaysAvailable / paddyRegrowDays;
+            paddyRegrowQty = 1 + (int)Math.Floor(pr);
 
-                return new GrowthContext
-                {
-                    Today = today,
-                    CurrentSeason = currentSeason,
-                    NextSeason = nextSeason,
-
-                    Seasons = seasons,
-                    ProduceDay = days,
-                    PaddyProduceDay = paddyDays,
-
-                    ReadyDay = readyDay,
-                    PaddyReadyDay = paddyReadyDay,
-
-                    OverflowDay = readyDay - 28,
-                    PaddyOverflowDay = paddyReadyDay - 28,
-
-                    RegrowQty = regrowQty,
-                    PaddyRegrowQty = paddyRegrowQty,
-
-                    //RegrowDaysAvailable = rew
-                    //AdditionalSeasons = CountAdditionalSeasons(currentSeason, seasons)
-                };
-            }
-
-        //---------------
-        // Crop growth supporting functions
-        //-------------------
-
-            // What is the next season
-        private static Season NextSeason(Season s)
-        {
-            return s switch
+            return new GrowthContext
             {
-                Season.Spring => Season.Summer,
-                Season.Summer => Season.Fall,
-                Season.Fall => Season.Winter,
-                Season.Winter => Season.Spring,
-                _ => Season.Spring
+                //Today = today,
+                CurrentSeason = currentSeason,
+                NextSeason = nextSeason,
+
+                //Seasons = seasons,
+                ProduceDay = days,
+                PaddyProduceDay = paddyDays,
+
+                ReadyDay = readyDay,
+                PaddyReadyDay = paddyReadyDay,
+
+                OverflowDay = readyDay - 28,
+                PaddyOverflowDay = paddyReadyDay - 28,
+
+                RegrowQty = regrowQty,
+                PaddyRegrowQty = paddyRegrowQty,
+
             };
         }
 
-        // How many grow seasons after this one (stops after a full year)
-        private static int CountAdditionalSeasons(Season current, List<Season> allowed)
-        {
-            if (allowed == null || allowed.Count == 0)
-                return 0;
-
-            int count = 0;
-            Season s = NextSeason(current);
-
-            // Maximum of 3 additional seasons in a year
-            for (int i = 0; i < 3; i++)
-            {
-                if (!allowed.Contains(s))
-                    break;
-
-                count++;
-                s = NextSeason(s);
-            }
-
-            return count;
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
+        
 
     }
+
+
 }
 

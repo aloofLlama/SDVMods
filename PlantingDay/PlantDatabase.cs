@@ -26,9 +26,11 @@ namespace PlantingDay
     {
         private static bool _initialized;
         private static readonly Dictionary<string, PlantInfo> _plants = new();
+        public static IEnumerable<PlantInfo> AllPlants => _plants.Values;
 
         public static void Initialize()
         {
+            ModEntry.Instance.Monitor.Log("PlantDatabase.Load CALLED", LogLevel.Alert);
             if (_initialized)
                 return;
 
@@ -38,8 +40,7 @@ namespace PlantingDay
             LoadFruitTrees();
             //LoadBushes(); PAUSEBUSHES
 
-            BuildHarvestIcons();
-            BuildSeedIcons();
+            //IconBuilder.BuildIconsForAllPlants(_plants);
         }
 
         // Lookup by seed item ID (e.g. "O:472" for Parsnip Seeds)
@@ -48,37 +49,88 @@ namespace PlantingDay
             return _plants.TryGetValue(key, out var info) ? info : null;
         }
 
+        private static ItemInfo? FromObject(string objectId)
+        {
+            if (!Game1.objectData.TryGetValue(objectId, out var obj))
+                return null;
 
-        // -------------------------
-        //  LOADERS
-        // -------------------------
+            return new ItemInfo
+            {
+                Id = objectId,
+                Name = obj.DisplayName,
+                Description = obj.Description,
+                Price = obj.Price,
+                Category = obj.Category,
+                Edibility = obj.Edibility,
+                Type = obj.Type
+            };
+        }
 
         private static void LoadCrops()
         {
             foreach (var (seedId, cropData) in Game1.cropData)
             {
+                
                 var info = FromCrop(seedId, cropData);
                 if (info == null)
                     continue;
 
-                string key = "O:" + seedId;
+                // Seed object data
+                info.Seed = FromObject(seedId);
 
-                //ModEntry.Instance.Monitor.Log(
-                //    //$"[Seed Info] STORE: seedId='{seedId}', key='{key}', harvest='{cropData.HarvestItemId}'",
-                //    //LogLevel.Info
-                //);
+                // Harvest object data
+                if (!string.IsNullOrEmpty(info.HarvestId))
+                    info.Harvest = FromObject(info.HarvestId);
 
-                _plants[key] = info;
+                // Store
+                _plants["O:" + seedId] = info;
+                ModEntry.Instance.Monitor.Log($"Created PlantInfo for ", LogLevel.Alert);
+
             }
-
-            //ModEntry.Instance.Monitor.Log(
-            //    //$"[Seed Info] DONE LOADING: {_plants.Count} entries in _plants",
-            //    //LogLevel.Info
-            //);
         }
 
+        //-------
+        // Crops
+        //-------
+        public static PlantInfo FromCrop(string id, CropData crop)
+        {
+            return new PlantInfo
+            {
+                Id = id,
+                PlantType = PlantType.Crop,
 
+                Seasons = crop.Seasons?
+                    .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
+                    .ToList()
+                    ?? new List<SeasonId>(),
 
+                DaysToProduce = crop.DaysInPhase?.Sum() ?? 0,
+                RegrowDays = crop.RegrowDays > 0 ? crop.RegrowDays : null,
+
+                Trellis = crop.IsRaised,
+                Paddy = crop.IsPaddyCrop,
+                MultiSprite = crop.TintColors?.Count ?? 0,
+                NeedsWatering = crop.NeedsWatering,
+                Scythe = crop.HarvestMethod,
+
+                Harvest = new ItemInfo { Id = crop.HarvestItemId ?? "" },
+
+                Drops = new List<PlantInfo.DropInfo>
+        {
+            new PlantInfo.DropInfo
+            {
+                ItemId = crop.HarvestItemId ?? "",
+                MinStack = crop.HarvestMinStack,
+                MaxStack = crop.HarvestMaxStack,
+                ExtraHarvestChance = crop.ExtraHarvestChance
+            }
+        }
+            };
+        }
+
+        //-----
+        //Fruit Trees
+        //-------
         private static void LoadFruitTrees()
         {
             foreach (var (saplingId, treeData) in Game1.fruitTreeData)
@@ -87,16 +139,144 @@ namespace PlantingDay
                 if (info == null)
                     continue;
 
-                string key = "O:" + saplingId;
+                // Sapling object data
+                info.Seed = FromObject(saplingId);
 
-                //ModEntry.Instance.Monitor.Log(
-                //    $"[Seed Info] STORE FRUIT TREE: saplingId='{saplingId}', key='{key}', fruit='{treeData.Fruit}'",
-                //    LogLevel.Info
-                //);
+                // Fruit object data
+                if (!string.IsNullOrEmpty(info.Harvest?.Id))
+                    info.Harvest = FromObject(info.Harvest.Id);
 
-                _plants[key] = info;
+                _plants["O:" + saplingId] = info;
             }
         }
+
+        private static PlantInfo FromFruitTree(string saplingId, FruitTreeData data)
+        {
+            // FruitTreeData.Fruit is a list; take the first entry
+            var fruitEntry = data.Fruit.FirstOrDefault();
+
+            // Normalize fruit ID (your helper)
+            string fruitId = ItemIDtoNumber(fruitEntry?.ItemId ?? "");
+
+            return new PlantInfo
+            {
+                Id = saplingId,
+                PlantType = PlantType.FruitTree,
+
+                // Seed (sapling) and Harvest (fruit) will be filled in LoadFruitTrees()
+                Seed = new ItemInfo { Id = saplingId },
+                Harvest = new ItemInfo { Id = fruitId },
+
+                Seasons = data.Seasons?
+                    .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
+                    .ToList()
+                    ?? new List<SeasonId>(),
+
+                // Fruit trees always take 28 days to mature
+                DaysToProduce = 28,
+
+                // After maturity, they produce daily
+                RegrowDays = 1,
+
+                Drops = new List<PlantInfo.DropInfo>
+        {
+            new PlantInfo.DropInfo
+            {
+                ItemId = fruitId,
+                MinStack = fruitEntry?.MinStack ?? 1,
+                MaxStack = fruitEntry?.MaxStack ?? 1,
+                ExtraHarvestChance = 0f // fruit trees don't use this
+            }
+        }
+            };
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // -------------------------
+        //  LOADERS
+        // -------------------------
+
+        //private static void LoadCrops()
+        //{
+        //    foreach (var (seedId, cropData) in Game1.cropData)
+        //    {
+        //        var info = FromCrop(seedId, cropData);
+        //        if (info == null)
+        //            continue;
+
+        //        string key = "O:" + seedId;
+
+        //        //ModEntry.Instance.Monitor.Log(
+        //        //    //$"[Seed Info] STORE: seedId='{seedId}', key='{key}', harvest='{cropData.HarvestItemId}'",
+        //        //    //LogLevel.Info
+        //        //);
+
+        //        _plants[key] = info;
+        //    }
+
+        //    //ModEntry.Instance.Monitor.Log(
+        //    //    //$"[Seed Info] DONE LOADING: {_plants.Count} entries in _plants",
+        //    //    //LogLevel.Info
+        //    //);
+        //}
+
+
+
+        //private static void LoadFruitTrees()
+        //{
+        //    foreach (var (saplingId, treeData) in Game1.fruitTreeData)
+        //    {
+        //        var info = FromFruitTree(saplingId, treeData);
+        //        if (info == null)
+        //            continue;
+
+        //        string key = "O:" + saplingId;
+
+        //        //ModEntry.Instance.Monitor.Log(
+        //        //    $"[Seed Info] STORE FRUIT TREE: saplingId='{saplingId}', key='{key}', fruit='{treeData.Fruit}'",
+        //        //    LogLevel.Info
+        //        //);
+
+        //        _plants[key] = info;
+        //    }
+        //}
 
         //private static Dictionary<string, ICustomBushData> _customBushes = new();
 
@@ -127,118 +307,117 @@ namespace PlantingDay
         //  LOOKUP - Get all the data
         // -------------------------
 
-        public static PlantInfo FromCrop(string id, CropData crop)
-        {
-            // Create the seed item to get name/description
-            var seedItem = ItemRegistry.Create(id);
-            string seedName = seedItem.DisplayName;
-            string? seedDescription = seedItem.getDescription();
+        //public static PlantInfo FromCrop(string id, CropData crop)
+        //{
+        //    // Create the seed item to get name/description
+        //    var seedItem = ItemRegistry.Create(id);
+        //    string seedName = seedItem.DisplayName;
+        //    string? seedDescription = seedItem.getDescription();
 
-            // Calculate total days to first harvest
-            int daysToHarvest = crop.DaysInPhase?.Sum() ?? 0;
+        //    // Calculate total days to first harvest
+        //    int daysToHarvest = crop.DaysInPhase?.Sum() ?? 0;
 
-            // Harvest item
-            string harvestId = crop.HarvestItemId ?? "";
-            var harvestItem = ItemRegistry.Create(harvestId);
-            string harvestName = harvestItem.DisplayName;
-            string? harvestDescription = harvestItem.getDescription();
+        //    // Harvest item
+        //    string harvestId = crop.HarvestItemId ?? "";
+        //    var harvestItem = ItemRegistry.Create(harvestId);
+        //    string harvestName = harvestItem.DisplayName;
+        //    string? harvestDescription = harvestItem.getDescription();
 
-            var drops = new List<PlantInfo.DropInfo>();
-            if (!string.IsNullOrEmpty(harvestId))
-            {
-                drops.Add(new PlantInfo.DropInfo
-                {
-                    ItemId = harvestId,
-                    Chance = 1f,
-                    MinStack = 1,
-                    MaxStack = 1
-                });
-            }
+        //    var drops = new List<PlantInfo.DropInfo>();
+        //    if (!string.IsNullOrEmpty(harvestId))
+        //    {
+        //        drops.Add(new PlantInfo.DropInfo
+        //        {
+        //            ItemId = harvestId,
+        //            Chance = 1f,
+        //            MinStack = 1,
+        //            MaxStack = 1
+        //        });
+        //    }
 
-            return new PlantInfo
-            {
-                Id = id,
+        //    return new PlantInfo
+        //    {
+        //        Id = id,
 
-                SeedName = seedName,
-                SeedDescription = seedDescription,
-                PlantType = PlantType.Crop,
+        //        SeedName = seedName,
+        //        SeedDescription = seedDescription,
+        //        PlantType = PlantType.Crop,
 
-                HarvestId = harvestId,
-                HarvestName = harvestName,
-                HarvestDescription = harvestDescription,
+        //        HarvestId = harvestId,
+        //        HarvestName = harvestName,
+        //        HarvestDescription = harvestDescription,
 
-                // List of season as strings.
-                Seasons = crop.Seasons?
-                    .Select(s => s.ToString().ToLowerInvariant())
-                    .ToList()
-                    ?? new List<string>(),
+        //        // List of season as strings.
+        //        Seasons = crop.Seasons?
+        //            .Select(s => s.ToString().ToLowerInvariant())
+        //            .ToList()
+        //            ?? new List<string>(),
 
-                DaysToProduce = daysToHarvest,
-                RegrowDays = crop.RegrowDays > 0 ? crop.RegrowDays : null,
+        //        DaysToProduce = daysToHarvest,
+        //        RegrowDays = crop.RegrowDays > 0 ? crop.RegrowDays : null,
 
-                Drops = drops,
-
-
-                // Flags
-                Trellis = crop.IsRaised,
-                Paddy = crop.IsPaddyCrop,
-                MultiSprite = crop.TintColors?.Count ?? 0,
-                NeedsWatering = crop.NeedsWatering,
-                Scythe = crop.HarvestMethod,
-
-                //Harvest item info
-                //HarvestTexture = crop.Texture,
-                //HarvestSpriteIndex = crop.SpriteIndex,
-
-            };
-        }
-
-        private static PlantInfo FromFruitTree(string saplingId, FruitTreeData data)
-        {
-            // Extract fruit entry (vanilla + modded both use this)
-            var fruit = data.Fruit.FirstOrDefault();
-
-            // Normalize the ItemId using your helper
-            string fruitId = ItemIDtoNumber(fruit?.ItemId ?? "");
+        //        Drops = drops,
 
 
-            return new PlantInfo
-            {
-                Id = "O:" + saplingId,
+        //        // Flags
+        //        Trellis = crop.IsRaised,
+        //        Paddy = crop.IsPaddyCrop,
+        //        MultiSprite = crop.TintColors?.Count ?? 0,
+        //        NeedsWatering = crop.NeedsWatering,
+        //        Scythe = crop.HarvestMethod,
 
-                // Sapling identity
-                SeedName = data.DisplayName?.ToString() ?? "Unknown Sapling",
-                SeedDescription = null, // you can fill this later if you want
-                PlantType = PlantType.FruitTree,
+        //        //Prices
+        //        SeedPrice = seedItem.Price,
+        //        HarvestPrice = harvestItem.Price
+        //    };
+        //}
 
-                // Fruit identity
-                HarvestId = fruitId,
-                HarvestName = Game1.objectData.TryGetValue(fruitId.Replace("O:", ""), out var obj)
-                    ? obj.DisplayName
-                    : "Unknown Fruit",
-                HarvestDescription = null,
+        //private static PlantInfo FromFruitTree(string saplingId, FruitTreeData data)
+        //{
+        //    // Extract fruit entry (vanilla + modded both use this)
+        //    var fruit = data.Fruit.FirstOrDefault();
 
-                Seasons = data.Seasons
-                    .Select(s => s.ToString())
-                    .ToList(),
-                // Production timing
-                DaysToProduce = 28, // fruit trees always take 28 days
-                RegrowDays = 1,     // produce daily once mature
+        //    // Normalize the ItemId using your helper
+        //    string fruitId = ItemIDtoNumber(fruit?.ItemId ?? "");
 
-                // Drops (fruit)
-                Drops = new List<PlantInfo.DropInfo>
-                {
-                    new PlantInfo.DropInfo
-                    {
-                    ItemId = fruitId,
-                    Chance = fruit?.Chance ?? 1f,
-                    MinStack = fruit?.MinStack ?? 1,
-                    MaxStack = fruit?.MaxStack ?? 1
-                    }
 
-                },
-            };
-        }
+        //    return new PlantInfo
+        //    {
+        //        Id = "O:" + saplingId,
+
+        //        // Sapling identity
+        //        //SeedName = data.DisplayName?.ToString() ?? "Unknown Sapling",
+        //        //SeedDescription = null, // you can fill this later if you want
+        //        PlantType = PlantType.FruitTree,
+
+        //        // Fruit identity
+        //        HarvestId = fruitId,
+        //        //HarvestName = Game1.objectData.TryGetValue(fruitId.Replace("O:", ""), out var obj)
+        //        //    ? obj.DisplayName
+        //          //  : "Unknown Fruit",
+        //        //HarvestDescription = null,
+
+        //        Seasons = data.Seasons
+        //            .Select(s => s.ToString())
+        //            .ToList(),
+        //        // Production timing
+        //        DaysToProduce = 28, // fruit trees always take 28 days
+        //        RegrowDays = 1,     // produce daily once mature
+
+        //        // Drops (fruit)
+        //        Drops = new List<PlantInfo.DropInfo>
+        //        {
+        //            new PlantInfo.DropInfo
+        //            {
+        //            ItemId = fruitId,
+        //            Chance = fruit?.Chance ?? 1f,
+        //            MinStack = fruit?.MinStack ?? 1,
+        //            MaxStack = fruit?.MaxStack ?? 1
+        //            }
+
+        //        },
+        //    };
+        //}
 
         public static string ItemIDtoNumber(string raw)
         {
@@ -266,58 +445,141 @@ namespace PlantingDay
         // Build the Seed and Harvest Icons
         //-------------------------
 
-        private static void BuildSeedIcons()
-        {
-            foreach (var plant in _plants.Values)
-            {
-                if (plant.Id is null)
-                    continue;
+        //private static void BuildSeedIcons()
+        //{
+        //    foreach (var plant in _plants.Values)
+        //    {
+        //        if (plant.Id is null)
+        //            continue;
 
-                var item = ItemRegistry.Create(plant.Id);
-                if (item is null)
-                    continue;
+        //        var item = ItemRegistry.Create(plant.Id);
+        //        if (item is null)
+        //            continue;
 
-                // Use your helper so modded seeds work automatically
-                plant.SeedIcon = IconHelper.FromItem(item, scale: 1f);
-            }
-        }
+        //        // Use your helper so modded seeds work automatically
+        //        plant.SeedIcon = IconHelper.FromItem(item, scale: 1f);
+        //    }
+        //}
 
-        public static class IconHelper
-        {
+        //public static class IconHelper
+        //{
 
-            public static IconRef FromItem(Item item, float scale = 1f)
-            {
-                Rectangle src = Game1.getSourceRectForStandardTileSheet(
-                    Game1.objectSpriteSheet,
-                    item.ParentSheetIndex,
-                    16,
-                    16
-                );
+        //    public static IconRef FromItem(Item item, float scale = 1f)
+        //    {
+        //        Rectangle src = Game1.getSourceRectForStandardTileSheet(
+        //            Game1.objectSpriteSheet,
+        //            item.ParentSheetIndex,
+        //            16,
+        //            16
+        //        );
 
-                return new IconRef(Game1.objectSpriteSheet, src, 16, scale);
-            }
+        //        return new IconRef(Game1.objectSpriteSheet, src, 16, scale);
+        //    }
 
-        }
+        //}
 
 
-        private static void BuildHarvestIcons()
-        {
-            foreach (var plant in _plants.Values)
-            {
-                if (plant.HarvestId is null)
-                    continue;
+        //private static void BuildHarvestIcons()
+        //{
+        //    foreach (var plant in _plants.Values)
+        //    {
+        //        if (plant.HarvestId is null)
+        //            continue;
 
-                var item = ItemRegistry.Create(plant.HarvestId);
-                if (item is null)
-                    continue;
+        //        var item = ItemRegistry.Create(plant.HarvestId);
+        //        if (item is null)
+        //            continue;
 
-                Texture2D icon = RenderItemIcon(item, 16);
+        //        Texture2D icon = RenderItemIcon(item, 16);
 
-                plant.HarvestIcon = new IconRef(icon, new Rectangle(0, 0, 16, 16));
-            }
-        }
+        //        plant.HarvestIcon = new IconRef(icon, new Rectangle(0, 0, 16, 16));
+        //    }
+        //}
 
-        private static Texture2D RenderItemIcon(Item item, int size = 16)
+        //        public static Texture2D NormalizeItemIcon(Item item, int size = 32)
+        //        {
+        //            ModEntry.Instance.Monitor.Log($"NormalizeItemIcon called", LogLevel.Debug);
+        //            var device = Game1.graphics.GraphicsDevice;
+
+        //            const int bufferSize = 64;
+        //            var buffer = new RenderTarget2D(device, bufferSize, bufferSize);
+
+        //            device.SetRenderTarget(buffer);
+        //            device.Clear(Color.Transparent);
+
+        //            SpriteBatch batch = new SpriteBatch(device);
+        //            batch.Begin(
+        //                SpriteSortMode.Deferred,
+        //                BlendState.AlphaBlend,
+        //                SamplerState.PointClamp,
+        //                null,
+        //                null,
+        //                null,
+        //                Matrix.Identity   
+        //            );
+
+        //            // ⭐ Compute centered position
+        //            Vector2 pos = new Vector2(
+        //                (bufferSize - 16 * 4) / 2,   // 16px icon × 4 scale
+        //                (bufferSize - 16 * 4) / 2
+        //            );
+
+        //            // ⭐ Draw centered at scale 4
+        //            item.drawInMenu(
+        //                batch,
+        //                pos,
+        //                4f,
+        //                1f,
+        //                1f,
+        //                StackDrawType.Hide,
+        //                Color.White,
+        //                false
+        //            );
+        //            ModEntry.Instance.Monitor.Log(
+        //    $"Buffer has data? {buffer.Bounds.Width}x{buffer.Bounds.Height}",
+        //    LogLevel.Alert
+        //);
+
+        //            batch.End();
+        //            device.SetRenderTarget(null);
+
+        //            // Downscale to final size
+        //            var final = new RenderTarget2D(device, size, size);
+
+        //            device.SetRenderTarget(final);
+        //            device.Clear(Color.Transparent);
+
+        //            batch.Begin(
+        //                SpriteSortMode.Deferred,
+        //                BlendState.AlphaBlend,
+        //                SamplerState.PointClamp,
+        //                null,
+        //                null,
+        //                null,
+        //                Matrix.Identity   
+        //            );
+
+        //            float scale = size / (float)bufferSize;
+        //            batch.Draw(buffer, Vector2.Zero, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+
+        //            batch.End();
+        //            device.SetRenderTarget(null);
+
+        //            //add some debug below this
+        //            Color[] pixels = new Color[size * size];
+        //            final.GetData(pixels);
+
+        //            bool anyOpaque = pixels.Any(p => p.A > 0);
+
+        //            ModEntry.Instance.Monitor.Log(
+        //                $"Final icon has opaque pixels: {anyOpaque}",
+        //                LogLevel.Alert
+        //            );
+
+        //            return final;
+        //        }
+
+        public static Texture2D RenderItemIcon(Item item, int size = 16)
         {
             var device = Game1.graphics.GraphicsDevice;
 
@@ -325,16 +587,20 @@ namespace PlantingDay
             const int bufferSize = 64;
             var buffer = new RenderTarget2D(device, bufferSize, bufferSize);
 
+            var oldTargets = device.GetRenderTargets();
+
             device.SetRenderTarget(buffer);
             device.Clear(Color.Transparent);
 
+            // ⭐ CRITICAL: use the game's spriteBatch, just like before
             SpriteBatch batch = Game1.spriteBatch;
+
             batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
 
             item.drawInMenu(
                 batch,
                 Vector2.Zero,
-                1f,            // natural scale
+                1f,            // natural scale (same as before)
                 1f,
                 1f,
                 StackDrawType.Hide,

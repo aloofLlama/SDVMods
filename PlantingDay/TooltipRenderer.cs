@@ -95,43 +95,39 @@ namespace PlantingDay
         private static void DrawTooltip(SpriteBatch b, List<TooltipElement> elements)
         {
             SpriteFont font = Game1.smallFont;
-            const int IconRenderSize = 32;
+
+            const int IconRenderSize = 32;   // draw size (old system)
+            const int IconColumnWidth = 32;   // spacing you liked
 
             int width = 0;
             int height = 0;
             int maxIconColumnWidth = 0;
 
             //
-            // ───────────────────────────────────────────────
-            // PASS 1 — Measure height + max icon column width
-            // ───────────────────────────────────────────────
+            // PASS 1 — Measure height + icon column width
             //
             foreach (var el in elements)
             {
                 int lineHeight = font.LineSpacing;
 
-                if (el.Icon.HasValue)
+                if (el.IconTexture != null || el.IconRef.HasValue)
                 {
-                    int baseSize = el.OverrideIconSize ?? IconRenderSize;
-                    int iconSize = (int)(baseSize * el.Icon.Value.Scale);
-
+                    int iconSize = IconRenderSize;
                     lineHeight = Math.Max(lineHeight, iconSize + 2);
-                    maxIconColumnWidth = Math.Max(maxIconColumnWidth, iconSize + 4);
+                    maxIconColumnWidth = Math.Max(maxIconColumnWidth, IconColumnWidth);
                 }
 
                 height += el.PaddingTop + lineHeight + el.PaddingBottom;
             }
 
             //
-            // ───────────────────────────────────────────────
-            // PASS 2 — Measure width using final icon column
-            // ───────────────────────────────────────────────
+            // PASS 2 — Measure width
             //
             foreach (var el in elements)
             {
                 int lineWidth = 0;
 
-                if (el.Icon.HasValue)
+                if (el.IconTexture != null || el.IconRef.HasValue)
                     lineWidth += maxIconColumnWidth;
 
                 if (el.InlineSegments != null)
@@ -147,14 +143,11 @@ namespace PlantingDay
                 width = Math.Max(width, lineWidth);
             }
 
-            // Vanilla padding
             width += 32;
             height += 32;
 
             //
-            // ───────────────────────────────────────────────
             // Position tooltip
-            // ───────────────────────────────────────────────
             //
             int x = Game1.getMouseX() - width + 32;
             int y = Game1.getMouseY() + 32;
@@ -166,16 +159,12 @@ namespace PlantingDay
                 y = Game1.uiViewport.Height - height;
 
             //
-            // ───────────────────────────────────────────────
             // Draw background
-            // ───────────────────────────────────────────────
             //
             IClickableMenu.drawTextureBox(b, x, y, width, height, Color.White);
 
             //
-            // ───────────────────────────────────────────────
             // PASS 3 — Draw content
-            // ───────────────────────────────────────────────
             //
             int drawY = y + 16;
 
@@ -184,31 +173,56 @@ namespace PlantingDay
                 drawY += el.PaddingTop;
                 int drawX = x + 16;
 
-                // Compute line height again (same as pass 1)
                 int lineHeight = font.LineSpacing;
 
-                if (el.Icon.HasValue)
+                if (el.IconTexture != null || el.IconRef.HasValue)
                 {
-                    int baseSize = el.OverrideIconSize ?? IconRenderSize;
-                    int iconSize = (int)(baseSize * el.Icon.Value.Scale);
+                    int iconSize = IconRenderSize;
                     lineHeight = Math.Max(lineHeight, iconSize + 2);
+                }
+
+                //
+                // Separator
+                //
+                if (el.IsSeparator)
+                {
+                    int lineY = drawY + font.LineSpacing / 2;
+
+                    b.Draw(
+                        Game1.staminaRect,
+                        new Rectangle(drawX, lineY, width - 32, 2),
+                        Color.White * 0.35f
+                    );
+
+                    drawY += font.LineSpacing + el.PaddingBottom;
+                    continue;
                 }
 
                 //
                 // Draw icon
                 //
-                if (el.Icon.HasValue)
+                if (el.IconTexture != null)
                 {
-                    var icon = el.Icon.Value;
+                    int iconSize = IconRenderSize;
 
-                    int baseSize = el.OverrideIconSize ?? IconRenderSize;
-                    int iconSize = (int)(baseSize * icon.Scale);
-
-                    // Vertical centering relative to line box
                     int yOffset = drawY + (lineHeight - iconSize) / 2;
+                    int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
 
-                    // Horizontal centering inside icon column
-                    int xOffset = drawX + (maxIconColumnWidth - iconSize) / 2;
+                    b.Draw(
+                        el.IconTexture,
+                        new Rectangle(xOffset, yOffset, iconSize, iconSize),
+                        Color.White
+                    );
+
+                    drawX += IconColumnWidth;
+                }
+                else if (el.IconRef.HasValue)
+                {
+                    int iconSize = IconRenderSize;
+                    var icon = el.IconRef.Value;
+
+                    int yOffset = drawY + (lineHeight - iconSize) / 2;
+                    int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
 
                     b.Draw(
                         icon.Texture,
@@ -217,11 +231,11 @@ namespace PlantingDay
                         Color.White
                     );
 
-                    drawX += maxIconColumnWidth;
+                    drawX += IconColumnWidth;
                 }
 
                 //
-                // Draw inline segments
+                // Inline segments
                 //
                 if (el.InlineSegments != null)
                 {
@@ -247,7 +261,7 @@ namespace PlantingDay
                 }
 
                 //
-                // Draw normal text
+                // Normal text
                 //
                 if (!string.IsNullOrEmpty(el.Text))
                 {
@@ -264,8 +278,9 @@ namespace PlantingDay
 
                 drawY += lineHeight + el.PaddingBottom;
             }
-        
         }
+
+
 
 
         //-----------------
@@ -307,11 +322,5 @@ namespace PlantingDay
     }
 }
 
-// Supports putting multiple items with different formatting on the same line.
-public struct InlineSegment
-{
-    public string Text;
-    public Color Color;
-    public bool Bold;
-}
+
 

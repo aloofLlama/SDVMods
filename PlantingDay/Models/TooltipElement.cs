@@ -7,35 +7,37 @@ namespace PlantingDay.Models
 {
 
     public class TooltipElement
-        {
+    {
         // Text
         public string? Text { get; set; }
         public Color TextColor { get; set; } = TooltipColors.Normal;
         public bool Bold { get; set; }
 
-        public List<InlineSegment>? InlineSegments { get; set; }
-
-        // Seasons (optional)
-        //public List<string> Seasons { get; set; } = new();
-        //public List<Color> SeasonColors { get; set; } = new();
-        //public List<bool> SeasonBold { get; set; } = new();
-
-
         // Icon (optional)
-        public IconRef? Icon { get; set; }
-        public int? OverrideIconSize { get; set; }
-
-
-
+        public Texture2D? IconTexture { get; set; }   // dynamic item icons
+        public IconRef? IconRef { get; set; }         // static UI icons
 
         // Layout
         public int PaddingTop { get; set; } = 2;
         public int PaddingBottom { get; set; } = 2;
 
-
-
+        public List<InlineSegment>? InlineSegments { get; set; }
+        public bool IsSeparator { get; set; } = false;
     }
 
+    // Supports putting multiple items with different formatting on the same line.
+    public struct InlineSegment
+    {
+        public string Text;
+        public Color Color;
+        public bool Bold;
+    }
+
+
+
 }
+
+
+
 
 

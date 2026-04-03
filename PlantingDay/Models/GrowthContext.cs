@@ -12,12 +12,12 @@ namespace PlantingDay.Models
     internal class GrowthContext
     {
         // Time in the game
-        public int Today { get; set; }
-        public Season CurrentSeason { get; set; }
-        public Season NextSeason { get; set; }
+        //public int Today { get; set; }
+        public SeasonId CurrentSeason { get; set; }
+        public SeasonId NextSeason { get; set; }
 
         // Plant info
-        public List<Season> Seasons { get; set; } = new(); // list of seasons as enum for the plant
+        //public List<Season> Seasons { get; set; } = new(); // list of seasons as enum for the plant
         public int ProduceDay { get; set; } // how many days until the first or only harvest 
         public int PaddyProduceDay { get; set; } // How many days wuntil first/only harvest if planted in a paddy
 
