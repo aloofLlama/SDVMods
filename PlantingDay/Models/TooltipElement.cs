@@ -28,6 +28,7 @@ namespace PlantingDay.Models
     // Supports putting multiple items with different formatting on the same line.
     public struct InlineSegment
     {
+        public IconRef? IconRef;
         public string Text;
         public Color Color;
         public bool Bold;

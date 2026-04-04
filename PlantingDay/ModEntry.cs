@@ -5,6 +5,7 @@ using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using System.Runtime.CompilerServices;
+using StardewModdingAPI.Framework.ModLoading;
 
 
 namespace PlantingDay
@@ -29,6 +30,14 @@ namespace PlantingDay
             {
                 ModEntry.Instance.Monitor.Log($"[Planting Day] Found shop: {shopId}", LogLevel.Info);
             }
+            foreach (var pack in Helper.ContentPacks.GetOwned())
+            {
+                foreach (string file in Directory.GetFiles(pack.DirectoryPath, "shop_*.json", SearchOption.AllDirectories))
+                {
+                    Monitor.Log($"[Planting Day] Found mod shop file: {file}", LogLevel.Info);
+                }
+            }
+
 
             //TooltipIcons.Load();
             TooltipIcons.Initialize();
@@ -40,7 +49,7 @@ namespace PlantingDay
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
 
             //helper.Events.Display.RenderedHud += OnRenderedHud;
-            //helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.Input.ButtonPressed += OnButtonPressed;
             //Helper.Events.Content.AssetRequested += OnAssetRequested;
         }
 
@@ -69,6 +78,13 @@ namespace PlantingDay
             foreach (var plant in PlantDatabase.AllPlants)
                 plant.InitializeIcons();
 
+            string dataPath = ModEntry.ModHelper.DirectoryPath;
+
+            foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
+            {
+                string vendorId = Path.GetFileNameWithoutExtension(file);
+                ModEntry.Instance.Monitor.Log($"[Planting Day] Found mod shop: {vendorId}", LogLevel.Info);
+            }
 
 
             //Monitor.Log("Plant database initialized.", LogLevel.Info);
@@ -89,122 +105,179 @@ namespace PlantingDay
         }
 
 
-        /*DEBUG STUFF NOTHING BELOW HERE
-                private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
+
+        private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
+        {
+            // Only run when the player presses F5
+            if (e.Button != SButton.F5)
+                return;
+
+            ModEntry.Instance.Monitor.Log("RUN BUTTON PRESS", LogLevel.Info);
+            PlantDatabase.Initialize();
+
+            foreach (var plant in PlantDatabase.AllPlants)
+                plant.InitializeIcons();
+
+
+            var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
+
+            if (shops.TryGetValue("SeedShop", out var pierre))
+            {
+                foreach (var entry in pierre.Items)
                 {
-                    ModEntry.Instance.Monitor.Log("RUN BUTTON PRESS", LogLevel.Info);
+                    // Log the raw entry
+                    Monitor.Log($"Pierre sells entry: {entry.ItemId}", LogLevel.Info);
 
-
-
-
-                    if (ModEntry.Instance == null)
+                    // If it's a wildcard entry, test if it applies to Mustard
+                    if (entry.ItemId == "ALL_ITEMS (O)")
                     {
-                        Monitor.Log("[Seed Info] ERROR: ModEntry.Instance is NULL!", LogLevel.Error);
-                        return;
+                        bool matches = DebugMatchesWildcard("Cornucopia_MustardSeeds", entry);
+                        Monitor.Log($"  → Wildcard applies to Mustard? {matches}", LogLevel.Info);
                     }
+                }
+            }
+        }
+
+        private bool DebugMatchesWildcard(string itemId, ShopItemData entry)
+        {
+            // Get the actual item object
+            Item item = ItemRegistry.Create(itemId);
+            if (item == null)
+                return false;
+
+            // Get its context tags
+            var tags = item.GetContextTags();
+
+            // Cornucopia uses tags like:
+            //   cornucopia_shop_pierre
+            //   cornucopia_season_spring
+            //   modid_cornucopia.morecrops
+
+            // So we check if the PerItemCondition mentions any required tags
+            string cond = entry.PerItemCondition ?? "";
+
+            bool requiresPierre = cond.Contains("cornucopia_shop_pierre");
+            bool requiresSpring = cond.Contains("cornucopia_season_spring");
+            bool requiresCornucopia = cond.Contains("modid_cornucopia.morecrops");
+
+            bool hasPierre = tags.Contains("cornucopia_shop_pierre");
+            bool hasSpring = tags.Contains("cornucopia_season_spring");
+            bool hasCornucopia = tags.Any(t => t.StartsWith("modid_cornucopia.morecrops"));
+
+            return (!requiresPierre || hasPierre)
+                && (!requiresSpring || hasSpring)
+                && (!requiresCornucopia || hasCornucopia);
+        }
+        /*DEBUG STUFF NOTHING BELOW HERE
+
+                if (ModEntry.Instance == null)
+                {
+                    Monitor.Log("[Seed Info] ERROR: ModEntry.Instance is NULL!", LogLevel.Error);
+                    return;
+                }
 
 
-                    if (!Context.IsWorldReady)
-                        return;
+                if (!Context.IsWorldReady)
+                    return;
 
-                    Item item = Game1.player.CurrentItem;
-                    if (item == null)
-                        return;
+                Item item = Game1.player.CurrentItem;
+                if (item == null)
+                    return;
 
-                    Monitor.Log($"[Seed Info] Held item type: {item.GetType().FullName}", LogLevel.Warn);
+                Monitor.Log($"[Seed Info] Held item type: {item.GetType().FullName}", LogLevel.Warn);
 
-                    if (item is not StardewValley.Object obj)
+                if (item is not StardewValley.Object obj)
+                {
+                    Monitor.Log("[Seed Info] Item is not a StardewValley.Object — skipping bush test.", LogLevel.Warn);
+                    return;
+                }
+
+                Monitor.Log($"[Seed Info] Running TryGetCornucopiaBushInfo on {obj.QualifiedItemId}", LogLevel.Warn);
+
+                // Call your method
+                if (PlantDatabase.TryGetCornucopiaBushInfo(obj, out PlantInfo? info))
+                {
+                    Monitor.Log("[Seed Info] TryGetCornucopiaBushInfo returned TRUE.", LogLevel.Warn);
+
+                    if (info == null)
                     {
-                        Monitor.Log("[Seed Info] Item is not a StardewValley.Object — skipping bush test.", LogLevel.Warn);
-                        return;
-                    }
-
-                    Monitor.Log($"[Seed Info] Running TryGetCornucopiaBushInfo on {obj.QualifiedItemId}", LogLevel.Warn);
-
-                    // Call your method
-                    if (PlantDatabase.TryGetCornucopiaBushInfo(obj, out PlantInfo? info))
-                    {
-                        Monitor.Log("[Seed Info] TryGetCornucopiaBushInfo returned TRUE.", LogLevel.Warn);
-
-                        if (info == null)
-                        {
-                            Monitor.Log("[Seed Info] But PlantInfo is NULL (unexpected).", LogLevel.Warn);
-                        }
-                        else
-                        {
-                            Monitor.Log($"[Seed Info] PlantInfo created:", LogLevel.Warn);
-                            //Monitor.Log($"  Name: {info.Name}", LogLevel.Warn);
-                            //Monitor.Log($"  Type: {info.Type}", LogLevel.Warn);
-                            //Monitor.Log($"  Seasons: {string.Join(", ", info.Seasons ?? new())}", LogLevel.Warn);
-                            //Monitor.Log($"  AgeToProduce: {info.AgeToProduce}", LogLevel.Warn);
-                            //Monitor.Log($"  Texture: {info.TexturePath}", LogLevel.Warn);
-                            //Monitor.Log($"  SpriteRow: {info.TextureSpriteRow}", LogLevel.Warn);
-                        }
+                        Monitor.Log("[Seed Info] But PlantInfo is NULL (unexpected).", LogLevel.Warn);
                     }
                     else
                     {
-                        Monitor.Log("[Seed Info] TryGetCornucopiaBushInfo returned FALSE.", LogLevel.Warn);
+                        Monitor.Log($"[Seed Info] PlantInfo created:", LogLevel.Warn);
+                        //Monitor.Log($"  Name: {info.Name}", LogLevel.Warn);
+                        //Monitor.Log($"  Type: {info.Type}", LogLevel.Warn);
+                        //Monitor.Log($"  Seasons: {string.Join(", ", info.Seasons ?? new())}", LogLevel.Warn);
+                        //Monitor.Log($"  AgeToProduce: {info.AgeToProduce}", LogLevel.Warn);
+                        //Monitor.Log($"  Texture: {info.TexturePath}", LogLevel.Warn);
+                        //Monitor.Log($"  SpriteRow: {info.TextureSpriteRow}", LogLevel.Warn);
                     }
                 }
+                else
+                {
+                    Monitor.Log("[Seed Info] TryGetCornucopiaBushInfo returned FALSE.", LogLevel.Warn);
+                }
+            }
 
-                // -------------------------
-                // TEST 1: Load Custom Bush Data
-                // -------------------------
-                //Monitor.Log("=== Test 1: Loading furyx639.CustomBush/Data ===", LogLevel.Warn);
+            // -------------------------
+            // TEST 1: Load Custom Bush Data
+            // -------------------------
+            //Monitor.Log("=== Test 1: Loading furyx639.CustomBush/Data ===", LogLevel.Warn);
 
-                //Dictionary<string, object>? bushDb = null;
+            //Dictionary<string, object>? bushDb = null;
 
-                //try
-                //{
-                //    bushDb = Helper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
-                //    Monitor.Log($"Loaded bush database with {bushDb.Count} entries.", LogLevel.Warn);
-                //}
-                //catch (Exception ex)
-                //{
-                //    Monitor.Log($"Failed to load bush data: {ex}", LogLevel.Error);
-                //    return;
-                //}
+            //try
+            //{
+            //    bushDb = Helper.GameContent.Load<Dictionary<string, object>>("furyx639.CustomBush/Data");
+            //    Monitor.Log($"Loaded bush database with {bushDb.Count} entries.", LogLevel.Warn);
+            //}
+            //catch (Exception ex)
+            //{
+            //    Monitor.Log($"Failed to load bush data: {ex}", LogLevel.Error);
+            //    return;
+            //}
 
-                // -------------------------
-                // TEST 2: Does this sapling map to a bush?
-                // -------------------------
-                //Monitor.Log("=== Test 2: Checking sapling → bush mapping ===", LogLevel.Warn);
+            // -------------------------
+            // TEST 2: Does this sapling map to a bush?
+            // -------------------------
+            //Monitor.Log("=== Test 2: Checking sapling → bush mapping ===", LogLevel.Warn);
 
-                //    if (bushDb.TryGetValue(saplingId, out var rawEntry))
-                //    {
-                //        Monitor.Log($"Bush entry FOUND for {saplingId}.", LogLevel.Warn);
+            //    if (bushDb.TryGetValue(saplingId, out var rawEntry))
+            //    {
+            //        Monitor.Log($"Bush entry FOUND for {saplingId}.", LogLevel.Warn);
 
-                //        // Dump the raw JSON object (it will appear as a JsonElement or Dictionary)
-                //        Monitor.Log($"Raw bush entry: {rawEntry}", LogLevel.Warn);
-                //    }
-                //    else
-                //    {
-                //        Monitor.Log($"No bush entry found for {saplingId}.", LogLevel.Warn);
-                //    }
+            //        // Dump the raw JSON object (it will appear as a JsonElement or Dictionary)
+            //        Monitor.Log($"Raw bush entry: {rawEntry}", LogLevel.Warn);
+            //    }
+            //    else
+            //    {
+            //        Monitor.Log($"No bush entry found for {saplingId}.", LogLevel.Warn);
+            //    }
 
-                //    // -------------------------
-                //    // TEST 3: Check ObjectData.CustomFields
-                //    // -------------------------
-                //    Monitor.Log("=== Test 3: ObjectData.CustomFields ===", LogLevel.Warn);
+            //    // -------------------------
+            //    // TEST 3: Check ObjectData.CustomFields
+            //    // -------------------------
+            //    Monitor.Log("=== Test 3: ObjectData.CustomFields ===", LogLevel.Warn);
 
-                //    if (Game1.objectData.TryGetValue(obj.ItemId, out var od))
-                //    {
-                //        if (od.CustomFields == null || od.CustomFields.Count == 0)
-                //        {
-                //            Monitor.Log("No CustomFields found.", LogLevel.Warn);
-                //        }
-                //        else
-                //        {
-                //            foreach (var kvp in od.CustomFields)
-                //                Monitor.Log($"{kvp.Key} = {kvp.Value}", LogLevel.Warn);
-                //        }
-                //    }
-                //    else
-                //    {
-                //        Monitor.Log("ObjectData entry not found.", LogLevel.Warn);
-                //    }
-                //}
-        */
+            //    if (Game1.objectData.TryGetValue(obj.ItemId, out var od))
+            //    {
+            //        if (od.CustomFields == null || od.CustomFields.Count == 0)
+            //        {
+            //            Monitor.Log("No CustomFields found.", LogLevel.Warn);
+            //        }
+            //        else
+            //        {
+            //            foreach (var kvp in od.CustomFields)
+            //                Monitor.Log($"{kvp.Key} = {kvp.Value}", LogLevel.Warn);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        Monitor.Log("ObjectData entry not found.", LogLevel.Warn);
+            //    }
+            //}
+    */
 
 
 
@@ -216,9 +289,9 @@ namespace PlantingDay
         //    TooltipRenderer.DrawHud(e.SpriteBatch);
         //}
     }
-    //    //ModEntry.Instance.Monitor.Log("HERE", LogLevel.Info);
+        //    //ModEntry.Instance.Monitor.Log("HERE", LogLevel.Info);
 
-}
+    }
 
 
 

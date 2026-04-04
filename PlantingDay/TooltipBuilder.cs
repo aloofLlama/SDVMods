@@ -10,6 +10,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -728,14 +729,14 @@ namespace PlantingDay
         {
             var list = new List<TooltipElement>();
 
+            new InlineSegment
+            {
+                IconRef = TooltipIcons.LittleCoin
+            };
+
             //----------------
             // Seed purchase
             //----------------
-
-            var goldVendors = plant.PurchaseOptions
-                .Where(p => p.GoldPrice.HasValue && p.GoldPrice > 0)
-                .Where(p => !IgnoredVendors.Contains(p.VendorId))
-                .ToList();
 
             ////debug piece
 
@@ -759,43 +760,98 @@ namespace PlantingDay
             ////debug
 
 
-            //TODO remove night market price and replace with NightStars icon, already created
 
-            // Sort the vendor list so Pierre's price outputs first
+            bool IsPierre(PurchaseInfo v) =>
+                 v.VendorId == "SeedShop";
+
+            bool IsNightMarket(PurchaseInfo v) =>
+                v.VendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase);
+
+            string VendorKey(PurchaseInfo v)
+            {
+                if (IsPierre(v))
+                    return "SeedShop";      // all Pierre entries collapse to one
+
+                if (IsNightMarket(v))
+                    return "NightMarket";   // all Night Market entries collapse to one
+
+                return v.VendorId;          // others stay distinct
+            }
+
+            var goldVendors = plant.PurchaseOptions
+                .Where(p => p.GoldPrice.HasValue && p.GoldPrice > 0)
+                .Where(p => !IgnoredVendors.Contains(p.VendorId))
+                .GroupBy(v => VendorKey(v))
+                .Select(g => g.First())
+                .ToList();
+
+
+            // Sort the vendor list so Pierre's price outputs first and Night Market is last
+            int SortKey(PurchaseInfo v)
+            {
+                if (IsPierre(v))
+                    return 0;
+
+                if (IsNightMarket(v))
+                    return 2;
+
+                return 1;
+            }
+
             var sortedVendors = goldVendors
-                .OrderByDescending(v => v.VendorId == "SeedShop") // Pierre first
-                .ThenBy(v => v.VendorName)                        // optional
+                .OrderBy(v => SortKey(v))
+                .ThenBy(v => v.VendorName)
                 .ToList();
 
             var segments = TooltipRenderer.BuildInlineSegments(
-                 goldVendors,
-                 vendor =>
-                 {
-                     bool isPierre = vendor.VendorId == "SeedShop";
+                sortedVendors,
+                vendor =>
+                {
+                    if (IsPierre(vendor))
+                    {
+                        return new InlineSegment
+                        {
 
-                    
-                     string text = isPierre
-                         ? string.Format(ModEntry.ModHelper.Translation
-                             .Get(TooltipKeys.PierresPurchase),
-                             vendor.GoldPrice)
-                         : string.Format(ModEntry.ModHelper.Translation
-                              .Get(TooltipKeys.OtherShopPurchase),
-                             vendor.GoldPrice,
-                             vendor.VendorName);
+                            Text = string.Format(
+                                ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
+                                vendor.GoldPrice),
+                            Color = TooltipColors.Normal,
+                            Bold = false
 
-                     return new InlineSegment
-                     {
-                         Text = text,
-                         Color = TooltipColors.Normal,
-                         Bold = false
-                     };
-                 });
+
+                        };
+                    }
+
+                    else if (IsNightMarket(vendor))
+                    {
+                        return new InlineSegment
+                        {
+                            IconRef = TooltipIcons.NightStars
+                        };
+                    }
+                    else
+                    {
+                        return new InlineSegment
+                        {
+                            Text = string.Format(
+                                ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
+                                vendor.GoldPrice,
+                                vendor.VendorName),
+                            Color = TooltipColors.Normal,
+                            Bold = false
+
+                        };
+                    }
+
+
+                });
 
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.LittleCoin,
                 InlineSegments = segments
             });
+
+
 
 
 
@@ -866,7 +922,7 @@ namespace PlantingDay
             // Harvest value
             //----------------
             int harvestBV = plant.HarvestPrice; //Base value of harvest items
-            ModEntry.Instance.Monitor.Log($"BV: {harvestBV}", LogLevel.Info);
+                                                //ModEntry.Instance.Monitor.Log($"BV: {harvestBV}", LogLevel.Info);
             int goldStarHarvest = (int)Math.Floor(1.5 * harvestBV); //Value of gold star quality harvest items
 
 

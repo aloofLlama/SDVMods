@@ -77,7 +77,7 @@ namespace PlantingDay.Helpers
             //Economics Info
             GoldStar = new IconRef(Cursors, new Rectangle(346, 400, 8, 8), size: 8, scale: 2f);
             LittleCoin = new IconRef(Cursors, new Rectangle(290, 414, 6, 6), size: 6, scale: 2f);
-            NightStars = new IconRef(Objects, new Rectangle(272, 224, 16, 16), size: 16, scale: 2f);
+            NightStars = new IconRef(Objects, new Rectangle(272, 224, 16, 16), size: 16, scale: 1f);
 
         }
     }

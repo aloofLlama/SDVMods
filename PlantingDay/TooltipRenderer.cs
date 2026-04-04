@@ -44,6 +44,18 @@ namespace PlantingDay
 
             DrawTooltip(spriteBatch, elements);
 
+            foreach (var p in plant.PurchaseOptions)
+                {
+                    ModEntry.Instance.Monitor.Log(
+                        $"Item: {plant.Id} Vendor: {p.VendorId} Price: {p.GoldPrice}",
+                        LogLevel.Info
+                    );
+                }
+            ModEntry.Instance.Monitor.Log(
+    $"Plant {plant.Id} has {plant.PurchaseOptions.Count} purchase options.",
+    LogLevel.Info
+);
+
         }
 
         //--------------
@@ -133,7 +145,18 @@ namespace PlantingDay
                 if (el.InlineSegments != null)
                 {
                     foreach (var seg in el.InlineSegments)
-                        lineWidth += (int)font.MeasureString(seg.Text).X;
+                    {
+                        if (seg.IconRef.HasValue)
+                        {
+                            var icon = seg.IconRef.Value;
+                            int iconWidth = (int)(icon.Source.Width * icon.Scale);
+                            lineWidth += iconWidth;
+                        }
+                        else if (!string.IsNullOrEmpty(seg.Text))
+                        {
+                            lineWidth += (int)font.MeasureString(seg.Text).X;
+                        }
+                    }
                 }
                 else if (!string.IsNullOrEmpty(el.Text))
                 {
@@ -243,24 +266,6 @@ namespace PlantingDay
 
                     drawX += IconColumnWidth;
                 }
-                // This was working, just not scaling
-                //else if (el.IconRef.HasValue)
-                //{
-                //    int iconSize = IconRenderSize;
-                //    var icon = el.IconRef.Value;
-
-                //    int yOffset = drawY + (lineHeight - iconSize) / 2;
-                //    int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
-
-                //    b.Draw(
-                //        icon.Texture,
-                //        new Rectangle(xOffset, yOffset, iconSize, iconSize),
-                //        icon.Source,
-                //        Color.White
-                //    );
-
-                //    drawX += IconColumnWidth;
-                //}
 
                 //
                 // Inline segments
@@ -271,17 +276,43 @@ namespace PlantingDay
 
                     foreach (var seg in el.InlineSegments)
                     {
-                        if (seg.Bold)
+                        if (seg.IconRef.HasValue)
                         {
-                            b.DrawString(font, seg.Text, new Vector2(xCursor + 1, drawY), seg.Color);
-                            b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
-                        }
-                        else
-                        {
-                            b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
-                        }
+                            var icon = seg.IconRef.Value;
+                            float scale = icon.Scale;
+                            int iconWidth = (int)(icon.Source.Width * scale);
+                            int iconHeight = (int)(icon.Source.Height * scale);
 
-                        xCursor += (int)font.MeasureString(seg.Text).X;
+                            int yOffset = drawY + (lineHeight - iconHeight) / 2;
+
+                            b.Draw(
+                                icon.Texture,
+                                new Vector2(xCursor, yOffset),
+                                icon.Source,
+                                Color.White,
+                                0f,
+                                Vector2.Zero,
+                                scale,
+                                SpriteEffects.None,
+                                1f
+                            );
+
+                            xCursor += iconWidth;
+                        }
+                        else if (!string.IsNullOrEmpty(seg.Text))
+                        {
+                            if (seg.Bold)
+                            {
+                                b.DrawString(font, seg.Text, new Vector2(xCursor + 1, drawY), seg.Color);
+                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
+                            }
+                            else
+                            {
+                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
+                            }
+
+                            xCursor += (int)font.MeasureString(seg.Text).X;
+                        }
                     }
 
                     drawY += lineHeight + el.PaddingBottom;

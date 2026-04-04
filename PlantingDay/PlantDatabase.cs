@@ -32,8 +32,8 @@ namespace PlantingDay
         public static void Initialize()
         {
             ModEntry.Instance.Monitor.Log("PlantDatabase.Load CALLED", LogLevel.Alert);
-            if (_initialized)
-                return;
+            //if (_initialized)
+            //    return;
 
             _initialized = true;
 
@@ -274,12 +274,16 @@ namespace PlantingDay
         // Economics
         //-------
 
+        //TODO - non gold trades. Taro tuber. 2 bone fragment island trader.
+        //TODO - check crops from all mods. uncle iron sugarcane not working
+        //TODO - check sunberry shops
         private static List<PurchaseInfo> GetPurchaseInfo(string itemId)
         {
             var results = new List<PurchaseInfo>();
 
             var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
 
+            ModEntry.Instance.Monitor.Log($"Got purchase info:", LogLevel.Info);
 
             foreach (var (shopId, shop) in shops)
             {
@@ -288,33 +292,38 @@ namespace PlantingDay
 
                 foreach (var entry in shop.Items)
                 {
-                    if (NormalizeItemId(entry.ItemId) != NormalizeItemId(itemId))
-                        continue;
+                        bool directMatch = NormalizeItemId(entry.ItemId) == NormalizeItemId(itemId);
+                        bool wildcardMatch = entry.ItemId == "ALL_ITEMS (O)" && ItemMatchesWildcard(itemId, entry);
 
-                    var info = new PurchaseInfo
-                    {
-                        VendorId = shopId,
-                        VendorName = GetVendorName(shopId),
-                        Condition = entry.Condition
-                    };
+                        if (!directMatch && !wildcardMatch)
+                            continue;
 
-                    // Trade
-                    if (entry.TradeItemId != null)
-                    {
-                        info.TradeItemId = entry.TradeItemId;
-                        info.TradeAmount = entry.TradeItemAmount;
-                    }
-                    else
-                    {
-                        // Gold price
-                        if (entry.Price >= 0)
-                            info.GoldPrice = entry.Price;
+                        var info = new PurchaseInfo
+                        {
+                            VendorId = shopId,
+                            VendorName = GetVendorName(shopId),
+                            Condition = entry.Condition
+                        };
+
+                        // Trade
+                        if (entry.TradeItemId != null)
+                        {
+                            info.TradeItemId = entry.TradeItemId;
+                            info.TradeAmount = entry.TradeItemAmount;
+                        }
                         else
-                            info.GoldPrice = GetDefaultShopPrice(shopId, itemId);
+                        {
+                            // Gold price
+                            if (entry.Price >= 0)
+                                info.GoldPrice = entry.Price;
+                            else
+                                info.GoldPrice = GetDefaultShopPrice(shopId, itemId);
+                        }
+
+                        results.Add(info);
                     }
 
-                    results.Add(info);
-                }
+
             }
 
             // If Pierre doesn't appear in the shop data, generate a default price
@@ -344,6 +353,63 @@ namespace PlantingDay
             return results;
         }
 
+        private static bool ItemMatchesWildcard(string itemId, ShopItemData entry)
+        {
+            // Wildcard entries must have PerItemCondition
+            if (string.IsNullOrWhiteSpace(entry.PerItemCondition))
+                return false;
+
+            // Create the item instance
+            Item item = ItemRegistry.Create(itemId);
+            if (item == null)
+                return false;
+
+            // Get the item's context tags
+            var tags = item.GetContextTags();
+
+            // Split the PerItemCondition into individual rules
+            // Example:
+            // "ITEM_CONTEXT_TAG Target cornucopia_shop_pierre, ITEM_CONTEXT_TAG Target cornucopia_season_spring, !ITEM_CONTEXT_TAG Target cornucopia_shop_pierre_generic_banned"
+            var rules = entry.PerItemCondition
+                .Split(',')
+                .Select(r => r.Trim())
+                .Where(r => r.Length > 0);
+
+            foreach (var rule in rules)
+            {
+                bool negated = rule.StartsWith("!");
+                string cleanRule = negated ? rule.Substring(1).Trim() : rule;
+
+                // We only care about ITEM_CONTEXT_TAG rules
+                if (!cleanRule.StartsWith("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                // Extract the tag name (after "Target ")
+                int idx = cleanRule.IndexOf("Target ", StringComparison.OrdinalIgnoreCase);
+                if (idx < 0)
+                    continue;
+
+                string requiredTag = cleanRule.Substring(idx + "Target ".Length).Trim();
+
+                bool hasTag = tags.Contains(requiredTag);
+
+                // If rule is negated, item must NOT have the tag
+                if (negated)
+                {
+                    if (hasTag)
+                        return false;
+                }
+                else
+                {
+                    if (!hasTag)
+                        return false;
+                }
+            }
+
+            // Passed all rules
+            return true;
+        }
+
         private static string GetVendorName(string shopId)
         {
             return shopId switch
@@ -363,7 +429,7 @@ namespace PlantingDay
                 return 0;
 
             int sellPrice = obj.sellToStorePrice();
-            ModEntry.Instance.Monitor.Log($"sell price: {sellPrice}", LogLevel.Info);
+            //ModEntry.Instance.Monitor.Log($"sell price: {sellPrice}", LogLevel.Info);
 
             return shopId switch
             {
@@ -521,6 +587,11 @@ namespace PlantingDay
         //    };
         //}
     }
+}
+public class ModShopEntry
+{
+    public int Price { get; set; }
+    public int Stock { get; set; }
 }
 
 
