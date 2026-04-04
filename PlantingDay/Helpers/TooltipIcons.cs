@@ -46,6 +46,8 @@ namespace PlantingDay.Helpers
         public static IconRef Watercan { get; private set; }
         public static IconRef Scythe { get; private set; }
         public static IconRef GoldStar { get; private set; }
+        public static IconRef StarToken { get; private set; } //From Valley Fair
+
         public static IconRef LittleCoin { get; private set; }
         public static IconRef NightStars { get; private set; }
 
@@ -73,11 +75,12 @@ namespace PlantingDay.Helpers
             WaterSeeds = new IconRef(Beach, new Rectangle(160, 112, 16, 16), size: 16, scale: 2f);
             Watercan = new IconRef(Tools, new Rectangle(48, 225, 16, 16), size: 16, scale: 2f);
             Scythe = new IconRef(Weapons, new Rectangle(112, 80, 16, 16), size: 16, scale: 2f);
-            
+
             //Economics Info
+            StarToken = new IconRef(Cursors, new Rectangle(338, 400, 8, 8), size: 8, scale: 4f);
             GoldStar = new IconRef(Cursors, new Rectangle(346, 400, 8, 8), size: 8, scale: 2f);
             LittleCoin = new IconRef(Cursors, new Rectangle(290, 414, 6, 6), size: 6, scale: 2f);
-            NightStars = new IconRef(Objects, new Rectangle(272, 224, 16, 16), size: 16, scale: 1f);
+            NightStars = new IconRef(Objects, new Rectangle(272, 224, 16, 16), size: 16, scale: 1.5f);
 
         }
     }

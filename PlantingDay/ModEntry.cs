@@ -75,15 +75,15 @@ namespace PlantingDay
         {
             PlantDatabase.Initialize();
 
-            foreach (var plant in PlantDatabase.AllPlants)
-                plant.InitializeIcons();
+            //foreach (var plant in PlantDatabase.AllPlants)
+              //  plant.InitializeIcons();
 
             string dataPath = ModEntry.ModHelper.DirectoryPath;
 
             foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
             {
                 string vendorId = Path.GetFileNameWithoutExtension(file);
-                ModEntry.Instance.Monitor.Log($"[Planting Day] Found mod shop: {vendorId}", LogLevel.Info);
+                //ModEntry.Instance.Monitor.Log($"[Planting Day] Found mod shop: {vendorId}", LogLevel.Info);
             }
 
 
@@ -116,7 +116,7 @@ namespace PlantingDay
             PlantDatabase.Initialize();
 
             foreach (var plant in PlantDatabase.AllPlants)
-                plant.InitializeIcons();
+                PlantDatabase.InitializeIcons(plant);
 
 
             var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");

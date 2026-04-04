@@ -44,17 +44,17 @@ namespace PlantingDay
 
             DrawTooltip(spriteBatch, elements);
 
-            foreach (var p in plant.PurchaseOptions)
-                {
-                    ModEntry.Instance.Monitor.Log(
-                        $"Item: {plant.Id} Vendor: {p.VendorId} Price: {p.GoldPrice}",
-                        LogLevel.Info
-                    );
-                }
-            ModEntry.Instance.Monitor.Log(
-    $"Plant {plant.Id} has {plant.PurchaseOptions.Count} purchase options.",
-    LogLevel.Info
-);
+            //foreach (var p in plant.PurchaseOptions)
+            //{
+            //    ModEntry.Instance.Monitor.Log(
+            //        $"Item: {plant.Id} Vendor: {p.VendorId} Price: {p.GoldPrice}",
+            //        LogLevel.Info
+            //    );
+            //}
+            //ModEntry.Instance.Monitor.Log(
+            //    $"Plant {plant.Id} has {plant.PurchaseOptions.Count} purchase options.",
+            //    LogLevel.Info
+                //);
 
         }
 
@@ -139,9 +139,11 @@ namespace PlantingDay
             {
                 int lineWidth = 0;
 
-                if (el.IconTexture != null || el.IconRef.HasValue)
+                // Only add icon column width for NON-inline rows
+                if (el.InlineSegments == null && (el.IconTexture != null || el.IconRef.HasValue))
                     lineWidth += maxIconColumnWidth;
 
+                // Inline rows
                 if (el.InlineSegments != null)
                 {
                     foreach (var seg in el.InlineSegments)
@@ -152,7 +154,7 @@ namespace PlantingDay
                             int iconWidth = (int)(icon.Source.Width * icon.Scale);
                             lineWidth += iconWidth;
                         }
-                        else if (!string.IsNullOrEmpty(seg.Text))
+                        if (!string.IsNullOrEmpty(seg.Text))
                         {
                             lineWidth += (int)font.MeasureString(seg.Text).X;
                         }
@@ -244,7 +246,7 @@ namespace PlantingDay
                     var icon = el.IconRef.Value;
 
                     // Compute scaled size
-                    float scale = icon.Scale;                      
+                    float scale = icon.Scale;
                     int iconSize = (int)(icon.Source.Width * scale);
 
                     // Center inside the icon column
@@ -299,7 +301,7 @@ namespace PlantingDay
 
                             xCursor += iconWidth;
                         }
-                        else if (!string.IsNullOrEmpty(seg.Text))
+                        if (!string.IsNullOrEmpty(seg.Text))
                         {
                             if (seg.Bold)
                             {
@@ -349,19 +351,19 @@ namespace PlantingDay
 
         // Put multiple segments on the same line with separators (e.g., seasons)
         public static List<InlineSegment> BuildInlineSegments<T>(
-            IEnumerable<T> items,
-            Func<T, InlineSegment> buildSegment,
-            string separator = " • ")
+    IEnumerable<T> items,
+    Func<T, IEnumerable<InlineSegment>> buildSegments,
+    string separator = " • ")
         {
             var result = new List<InlineSegment>();
             var list = items.ToList();
 
             for (int i = 0; i < list.Count; i++)
             {
-                // Add the main segment
-                result.Add(buildSegment(list[i]));
+                // Add all segments for this vendor
+                result.AddRange(buildSegments(list[i]));
 
-                // Add separator if not last
+                // Add separator if not last vendor
                 if (i < list.Count - 1)
                 {
                     result.Add(new InlineSegment

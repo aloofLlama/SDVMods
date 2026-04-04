@@ -13,10 +13,12 @@ using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Shops;
+using StardewValley.Locations;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using SObject = StardewValley.Object;
 //using System.Linq;
 //using System.Text.Json;
 
@@ -29,6 +31,8 @@ namespace PlantingDay
         private static readonly Dictionary<string, PlantInfo> _plants = new();
         public static IEnumerable<PlantInfo> AllPlants => _plants.Values;
 
+        private static Dictionary<string, List<(int itemId, float chance)>> _monsterDropTable = new();
+
         public static void Initialize()
         {
             ModEntry.Instance.Monitor.Log("PlantDatabase.Load CALLED", LogLevel.Alert);
@@ -36,10 +40,12 @@ namespace PlantingDay
             //    return;
 
             _initialized = true;
+            LoadMonsterDropTable();
 
             LoadCrops();
             LoadFruitTrees();
             //LoadBushes(); PAUSEBUSHES
+
 
             //IconBuilder.BuildIconsForAllPlants(_plants);
         }
@@ -71,12 +77,16 @@ namespace PlantingDay
         {
             foreach (var (seedId, cropData) in Game1.cropData)
             {
-                var info = FromCrop(seedId, cropData);
-                if (info == null)
+                var plant = FromCrop(seedId, cropData);
+                if (plant == null)
                     continue;
-                info.PurchaseOptions = GetPurchaseInfo(seedId);
+                plant.PurchaseOptions = GetPurchaseInfo(seedId);
+                plant.MonsterDrops = GetMonsterDropsForItem(seedId);
 
-                _plants["O:" + seedId] = info;
+                PlantDatabase.InitializeIcons(plant);
+
+
+                _plants["O:" + seedId] = plant;
             }
         }
 
@@ -113,16 +123,17 @@ namespace PlantingDay
                 Harvest = harvestInfo,
                 HarvestPrice = harvestInfo?.Price ?? 0,
 
-                Drops = new List<PlantInfo.DropInfo>
-        {
-            new PlantInfo.DropInfo
-            {
-                ItemId = harvestId,
-                MinStack = crop.HarvestMinStack,
-                MaxStack = crop.HarvestMaxStack,
-                ExtraHarvestChance = crop.ExtraHarvestChance
-            }
-        }
+                Drops = new List<DropInfo>
+                    {
+                    new DropInfo
+                    {
+                        ItemId = harvestId,
+                        MinStack = crop.HarvestMinStack,
+                        MaxStack = crop.HarvestMaxStack,
+                        ExtraHarvestChance = crop.ExtraHarvestChance
+                    }
+                }.AsReadOnly(),
+
             };
         }
 
@@ -133,13 +144,16 @@ namespace PlantingDay
         {
             foreach (var (saplingId, treeData) in Game1.fruitTreeData)
             {
-                var info = FromFruitTree(saplingId, treeData);
-                if (info == null)
+                var plant = FromFruitTree(saplingId, treeData);
+                if (plant == null)
                     continue;
-                info.PurchaseOptions = GetPurchaseInfo(saplingId);
+                plant.PurchaseOptions = GetPurchaseInfo(saplingId);
+                plant.MonsterDrops = GetMonsterDropsForItem(saplingId);
+
+                PlantDatabase.InitializeIcons(plant);
 
 
-                _plants["O:" + saplingId] = info;
+                _plants["O:" + saplingId] = plant;
             }
         }
 
@@ -173,16 +187,18 @@ namespace PlantingDay
                 // After maturity, they produce daily
                 RegrowDays = 1,
 
-                Drops = new List<PlantInfo.DropInfo>
-        {
-            new PlantInfo.DropInfo
-            {
-                ItemId = fruitId,
-                MinStack = fruitEntry?.MinStack ?? 1,
-                MaxStack = fruitEntry?.MaxStack ?? 1,
-                ExtraHarvestChance = 0f
-            }
-        }
+                Drops = new List<DropInfo>
+                    {
+                    new DropInfo
+                    {
+                        ItemId = fruitId,
+                        MinStack = fruitEntry?.MinStack ?? 1,
+                        MaxStack = fruitEntry?.MaxStack ?? 1,
+                        ExtraHarvestChance = 0f
+                    }
+                
+                }.AsReadOnly(),
+
             };
         }
 
@@ -203,7 +219,7 @@ namespace PlantingDay
             raw = raw.Trim();
 
             // Strip (X)### → ###
-            if (raw.StartsWith("(") && raw.Contains(")"))
+            if (raw.StartsWith("(") && raw.Contains(')'))
             {
                 int close = raw.IndexOf(')');
                 return raw.Substring(close + 1);
@@ -221,6 +237,24 @@ namespace PlantingDay
             return raw;
         }
 
+        public static void InitializeIcons(PlantInfo plant)
+        {
+            if (plant.Seed != null)
+            {
+                var item = ItemRegistry.Create(plant.Seed.Id);
+                if (item != null)
+                    plant.SeedIconTexture = PlantDatabase.RenderItemIcon(item, 16);
+
+            }
+
+            if (plant.Harvest != null)
+            {
+                var item = ItemRegistry.Create(plant.Harvest.Id);
+                if (item != null)
+                    plant.HarvestIconTexture = PlantDatabase.RenderItemIcon(item, 32);
+            }
+        }
+
         public static Texture2D RenderItemIcon(Item item, int size = 16)
         {
             var device = Game1.graphics.GraphicsDevice;
@@ -229,12 +263,11 @@ namespace PlantingDay
             const int bufferSize = 64;
             var buffer = new RenderTarget2D(device, bufferSize, bufferSize);
 
-            var oldTargets = device.GetRenderTargets();
+            //var oldTargets = device.GetRenderTargets();
 
             device.SetRenderTarget(buffer);
             device.Clear(Color.Transparent);
 
-            // ⭐ CRITICAL: use the game's spriteBatch, just like before
             SpriteBatch batch = Game1.spriteBatch;
 
             batch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.PointClamp);
@@ -274,7 +307,6 @@ namespace PlantingDay
         // Economics
         //-------
 
-        //TODO - non gold trades. Taro tuber. 2 bone fragment island trader.
         //TODO - check crops from all mods. uncle iron sugarcane not working
         //TODO - check sunberry shops
         private static List<PurchaseInfo> GetPurchaseInfo(string itemId)
@@ -283,7 +315,7 @@ namespace PlantingDay
 
             var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
 
-            ModEntry.Instance.Monitor.Log($"Got purchase info:", LogLevel.Info);
+            //ModEntry.Instance.Monitor.Log($"Got purchase info:", LogLevel.Info);
 
             foreach (var (shopId, shop) in shops)
             {
@@ -292,65 +324,71 @@ namespace PlantingDay
 
                 foreach (var entry in shop.Items)
                 {
-                        bool directMatch = NormalizeItemId(entry.ItemId) == NormalizeItemId(itemId);
-                        bool wildcardMatch = entry.ItemId == "ALL_ITEMS (O)" && ItemMatchesWildcard(itemId, entry);
+                    bool directMatch = NormalizeItemId(entry.ItemId) == NormalizeItemId(itemId);
+                    bool wildcardMatch = entry.ItemId == "ALL_ITEMS (O)" && ItemMatchesWildcard(itemId, entry);
 
-                        if (!directMatch && !wildcardMatch)
-                            continue;
+                    if (!directMatch && !wildcardMatch)
+                        continue;
 
-                        var info = new PurchaseInfo
-                        {
-                            VendorId = shopId,
-                            VendorName = GetVendorName(shopId),
-                            Condition = entry.Condition
-                        };
+                    var info = new PurchaseInfo
+                    {
+                        VendorId = shopId,
+                        VendorName = GetVendorName(shopId),
+                        Condition = entry.Condition
+                    };
 
-                        // Trade
-                        if (entry.TradeItemId != null)
-                        {
-                            info.TradeItemId = entry.TradeItemId;
-                            info.TradeAmount = entry.TradeItemAmount;
-                        }
+                    //
+                    // TRADE CURRENCY (non-gold)
+                    //
+                    if (!string.IsNullOrEmpty(entry.TradeItemId))
+                    {
+                        info.TradeItemId = entry.TradeItemId;
+                        info.TradeAmount = entry.TradeItemAmount;
+
+                        // Assign correct icon tag
+                        info.CurrencyIconRef = GetCurrencyIconRef(entry.TradeItemId);
+                    }
+                    else
+                    {
+                        //
+                        // GOLD CURRENCY TODO FIX BOTH PIERRE AND OTHER SHOP PRICE
+                        //
+
+                        if (entry.Price >= 0)
+                            info.GoldPrice = entry.Price;
                         else
-                        {
-                            // Gold price
-                            if (entry.Price >= 0)
-                                info.GoldPrice = entry.Price;
-                            else
-                                info.GoldPrice = GetDefaultShopPrice(shopId, itemId);
-                        }
-
-                        results.Add(info);
+                            info.GoldPrice = GetDefaultShopPrice(shopId, itemId);
                     }
 
+                    results.Add(info);
+                }
 
             }
 
-            // If Pierre doesn't appear in the shop data, generate a default price
-            //bool hasPierre = results.Any(r => r.VendorId == "SeedShop");
-
-            //if (!hasPierre)
-            //{
-            //    int defaultPrice = GetDefaultShopPrice("SeedShop", itemId);
-
-            //    if (defaultPrice > 0)
-            //    {
-            //        results.Add(new PurchaseInfo
-            //        {
-            //            VendorId = "SeedShop",
-            //            VendorName = GetVendorName(shopId),
-            //            GoldPrice = defaultPrice,
-            //            Condition = null
-            //        });
-
-            //        ModEntry.Instance.Monitor.Log(
-            //            $"[Planting Day] Added default Pierre price {defaultPrice} for {itemId}",
-            //            LogLevel.Info
-            //        );
-            //    }
-            //}
 
             return results;
+        }
+        private static IconRef? GetCurrencyIconRef(string tradeItemId)
+        {
+            if (string.IsNullOrWhiteSpace(tradeItemId))
+                return null;
+
+            // Create the item
+            Item item = ItemRegistry.Create(tradeItemId);
+            if (item == null)
+                return null;
+
+            // Get the item data (this is where the sprite lives in 1.6)
+            var data = ItemRegistry.GetData(item.QualifiedItemId);
+            if (data == null)
+                return null;
+
+            // Texture and source rect come from ItemData
+            Texture2D texture = data.GetTexture();
+            Rectangle source = data.GetSourceRect();
+
+            // Build your icon
+            return new IconRef(texture, source, size: source.Width, scale: 2f);
         }
 
         private static bool ItemMatchesWildcard(string itemId, ShopItemData entry)
@@ -417,6 +455,28 @@ namespace PlantingDay
                 "SeedShop" => "Pierre",
                 "Joja" => "Joja",
                 "Sandy" => "Oasis",
+                "AnimalShop" => "Marnie",
+                "IslandTrade" => "Island Trader",
+                "DesertTrade" => "Desert Trader",
+                "Traveler" => "Traveling Cart",
+
+                //festivals
+                "Festival_Luau_Pierre" => "Luau",
+                "Festival_EggFestival_Pierre" => "Egg Festival",
+                "Festival_StardewValleyFair_StarTokens" => "Valley Fair",
+
+                // Collapse Desert Festival
+                _ when shopId.StartsWith("DesertFestival", StringComparison.OrdinalIgnoreCase)
+                    => string.Join(", ",
+                    shopId
+                    .Split(',')
+                    .Select(id => id.Replace("DesertFestival_", ""))
+            ),
+
+
+                //sunberry
+                "skellady.SBVCP_AriMarket" => "Ari",
+                "skellady.SBVCP_JumanaShop" => "Jumana",
 
                 _ => shopId // fallback for modded shops
             };
@@ -447,6 +507,104 @@ namespace PlantingDay
                 "Joja"
                 // add more as needed
             };
+
+        //-------------
+        // Monster Drops
+        //--------------
+
+
+        // Which seeds are monster drop loot
+        public static List<MonsterDropInfo> GetMonsterDropsForItem(string itemId)
+        {
+            var result = new List<MonsterDropInfo>();
+
+            // Convert string → int
+            if (!int.TryParse(itemId, out int id))
+                return result; // invalid ID, no drops
+
+            foreach (var (monster, drops) in _monsterDropTable)
+            {
+                foreach (var (dropId, chance) in drops)
+                {
+                    if (dropId == id)
+                    {
+                        result.Add(new MonsterDropInfo
+                        {
+                            MonsterName = monster,
+                            Chance = chance,
+                            MonsterIcon = LoadMonsterIcon(monster)
+                        });
+                    }
+                }
+            }
+
+            return result;
+        }
+        private static void LoadMonsterDropTable()
+        {
+            _monsterDropTable = new();
+
+            var monsters = Game1.content.Load<Dictionary<string, string>>("Data/Monsters");
+
+            foreach (var (monsterName, raw) in monsters)
+            {
+                string[] fields = raw.Split('/');
+
+                if (fields.Length <= 6)
+                    continue;
+
+                string dropField = fields[6];
+                var parts = dropField.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+
+                var drops = new List<(int, float)>();
+
+                for (int i = 0; i < parts.Length - 1; i += 2)
+                {
+                    if (int.TryParse(parts[i], out int id) &&
+                        float.TryParse(parts[i + 1], out float chance))
+                    {
+                        drops.Add((id, chance));
+                    }
+                }
+
+                if (drops.Count > 0)
+                    _monsterDropTable[monsterName] = drops;
+            }
+        }
+
+        private static IconRef? LoadMonsterIcon(string monsterName)
+        {
+            try
+            {
+                // Load monster metadata
+                var monsters = Game1.content.Load<Dictionary<string, string>>("Data/Monsters");
+                if (!monsters.TryGetValue(monsterName, out string? raw))
+                    return null;
+
+                string[] fields = raw.Split('/');
+
+                // Field 0 = sprite path
+                string texturePath = fields[0];
+
+                // Field 1 = frame width
+                int frameWidth = int.Parse(fields[1]);
+
+                // Field 2 = frame height
+                int frameHeight = int.Parse(fields[2]);
+
+                // Load texture
+                Texture2D tex = Game1.content.Load<Texture2D>(texturePath);
+
+                // First frame is always at (0,0)
+                Rectangle source = new Rectangle(0, 0, frameWidth, frameHeight);
+
+                return new IconRef(tex, source, frameWidth, scale: 2f);
+            }
+            catch
+            {
+                return null;
+            }
+        }
 
 
         /* PAUSE BUSHES NOTHING BELOW HERE WORKS YET

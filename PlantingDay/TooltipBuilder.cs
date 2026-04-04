@@ -11,9 +11,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static StardewValley.Menus.CharacterCustomization;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -103,11 +105,11 @@ namespace PlantingDay
                     {
                         var (color, bold) = SeasonHelper.Style(season);
 
-                        return new InlineSegment
+                        return new[] { new InlineSegment
                         {
                             Text = SeasonHelper.Translate(season),
                             Color = color,
-                            Bold = bold
+                            Bold = bold }
                         };
 
                     }
@@ -729,10 +731,6 @@ namespace PlantingDay
         {
             var list = new List<TooltipElement>();
 
-            new InlineSegment
-            {
-                IconRef = TooltipIcons.LittleCoin
-            };
 
             //----------------
             // Seed purchase
@@ -767,6 +765,13 @@ namespace PlantingDay
             bool IsNightMarket(PurchaseInfo v) =>
                 v.VendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase);
 
+            bool IsValleyFair(PurchaseInfo v) =>
+                v.VendorId.Contains("StardewValleyFair_StarTokens", StringComparison.OrdinalIgnoreCase);
+
+            bool IsDesertFestival(PurchaseInfo v) =>
+                v.VendorId.Contains("DesertFestival", StringComparison.OrdinalIgnoreCase);
+
+
             string VendorKey(PurchaseInfo v)
             {
                 if (IsPierre(v))
@@ -775,142 +780,172 @@ namespace PlantingDay
                 if (IsNightMarket(v))
                     return "NightMarket";   // all Night Market entries collapse to one
 
+                if (IsDesertFestival(v))
+                    return "DesertFestival";   // all Desert Festival entries collapse to one
+
+
                 return v.VendorId;          // others stay distinct
             }
 
-            var goldVendors = plant.PurchaseOptions
-                .Where(p => p.GoldPrice.HasValue && p.GoldPrice > 0)
+            var vendors = plant.PurchaseOptions
+                // .Where(p => p.GoldPrice.HasValue && p.GoldPrice > 0)
                 .Where(p => !IgnoredVendors.Contains(p.VendorId))
                 .GroupBy(v => VendorKey(v))
                 .Select(g => g.First())
                 .ToList();
 
 
-            // Sort the vendor list so Pierre's price outputs first and Night Market is last
+            // Sort the vendor list
             int SortKey(PurchaseInfo v)
             {
+                // 0 — Pierre always first
                 if (IsPierre(v))
                     return 0;
 
+                // 4 — Night Market always last
                 if (IsNightMarket(v))
-                    return 2;
+                    return 4;
 
-                return 1;
+                // 1 — Gold vendors (Joja, Traveling Cart, etc.)
+                if (v.GoldPrice.HasValue)
+                    return 1;
+
+                // 3 — Trade vendors (Desert Trader, Island Trader, Qi trade shops)
+                if (v.TradeAmount > 0)
+                    return 3;
+
+                // 2 — Everything else (icon-only vendors, special cases)
+                return 2;
             }
 
-            var sortedVendors = goldVendors
+            var sortedVendors = vendors
                 .OrderBy(v => SortKey(v))
                 .ThenBy(v => v.VendorName)
                 .ToList();
 
+            var sources = new List<object>();
+            sources.AddRange(sortedVendors);
+            sources.AddRange(plant.MonsterDrops);
+
+
             var segments = TooltipRenderer.BuildInlineSegments(
-                sortedVendors,
-                vendor =>
+                sources,
+                source =>
                 {
-                    if (IsPierre(vendor))
+                    if (source is PurchaseInfo vendor)
                     {
-                        return new InlineSegment
+                        // Pierre (gold only)
+                        if (IsPierre(vendor))
                         {
+                            return new[]
+                            {
+                                new InlineSegment
+                                {
 
-                            Text = string.Format(
-                                ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
-                                vendor.GoldPrice),
-                            Color = TooltipColors.Normal,
-                            Bold = false
+                                    Text = string.Format(
+                                        ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
+                                        vendor.GoldPrice),
+                                    Color = TooltipColors.Normal,
+                                    Bold = false
+                                }
+                            };
+                        }
 
+                        // Night Market (icon only)
+                        else if (IsNightMarket(vendor))
+                        {
+                            return new[]
+                            {
+                                    new InlineSegment
+                                    {
+                                        IconRef = TooltipIcons.NightStars
+                                    }
+                            };
+                        }
 
+                        // Valley Fair (star tokens)
+                        else if (IsValleyFair(vendor))
+                        {
+                            return new[]
+                            {
+                                new InlineSegment
+                                {
+                                    IconRef = TooltipIcons.StarToken,
+                                    Text = $" {vendor.GoldPrice} at {vendor.VendorName}",
+                                    Color = TooltipColors.Normal
+                                }
+                            };
+                        }
+
+                        // Other Shops (gold purchase)
+                        else if (vendor.GoldPrice.HasValue)
+                        {
+                            return new[]
+                            {
+                                new InlineSegment
+                                {
+                                    Text = string.Format(
+                                        ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
+                                        vendor.GoldPrice,
+                                        vendor.VendorName),
+                                    Color = TooltipColors.Normal,
+                                    Bold = false
+                                }
+                            };
+                        }
+
+                        // Other Shops (trade price)
+                        else if (vendor.TradeAmount > 0)
+                        {
+                            return new[]
+                            {
+                                new InlineSegment
+                                {
+                                    IconRef = vendor.CurrencyIconRef,
+                                    Text = string.Format(
+                                        ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
+                                        vendor.TradeAmount.ToString(),
+                                        vendor.VendorName),
+                                    Color = TooltipColors.Normal,
+                                    Bold = false
+                                }
+                            };
+                        }
+
+                        // Fallback for vendor
+                        return Array.Empty<InlineSegment>();
+                    }
+
+                    if (source is MonsterDropInfo drop)
+                    {
+                        return new[]
+                        {
+                            new InlineSegment
+                            {
+                                IconRef = drop.MonsterIcon,
+                                Text = $" {(drop.Chance * 100f):0.#}%",
+                                Color = TooltipColors.Normal
+                            }
                         };
                     }
 
-                    else if (IsNightMarket(vendor))
-                    {
-                        return new InlineSegment
-                        {
-                            IconRef = TooltipIcons.NightStars
-                        };
-                    }
-                    else
-                    {
-                        return new InlineSegment
-                        {
-                            Text = string.Format(
-                                ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
-                                vendor.GoldPrice,
-                                vendor.VendorName),
-                            Color = TooltipColors.Normal,
-                            Bold = false
-
-                        };
-                    }
-
-
+                    // Fallback for unknown source type
+                    return Array.Empty<InlineSegment>();
                 });
 
-            list.Add(new TooltipElement
-            {
-                InlineSegments = segments
-            });
+                // Coin icon at start of row if there are gold purchases
+                if (sortedVendors.Any(v => v.GoldPrice.HasValue))
+                {
+                    segments.Insert(0, new InlineSegment
+                    {
+                        IconRef = TooltipIcons.LittleCoin
+                    });
+                }
 
-
-
-
-
-
-
-            //if (goldVendors.Count == 1)
-            //{
-            //    var vendor = goldVendors[0];
-
-            //    if (vendor.VendorId == "SeedShop") // Pierre
-            //    {
-            //        // 20g
-            //        list.Add(new TooltipElement
-            //        {
-            //            IconRef = TooltipIcons.LittleCoin,
-            //            Text = string.Format(ModEntry.ModHelper.Translation
-            //                               .Get(TooltipKeys.PierresPurchase),
-            //                               vendor.GoldPrice),
-            //            TextColor = TooltipColors.Normal
-            //        });
-            //    }
-            //    else
-            //    {
-            //        // Output: "20g at Ari's"
-            //        list.Add(new TooltipElement
-            //        {
-            //            IconRef = TooltipIcons.LittleCoin,
-            //            Text = string.Format(ModEntry.ModHelper.Translation
-            //               .Get(TooltipKeys.OtherShopPurchase),
-            //               vendor.GoldPrice),
-            //            TextColor = TooltipColors.Normal
-            //        });
-
-            //    }
-            //}
-
-            //// Display the relevant seasons and highlight the current season
-            //if (plant.PurchaseOptions.GoldPrice > 0)
-            //{
-            //    var segments = TooltipRenderer.BuildInlineSegments(
-            //        plant.Seasons,
-            //        season =>
-            //        {
-            //            var (color, bold) = SeasonHelper.Style(season);
-
-            //            return new InlineSegment
-            //            {
-            //                Text = SeasonHelper.Translate(season),
-            //                Color = color,
-            //                Bold = bold
-            //            };
-
-            //        }
-            //    );
-
-            //    list.Add(new TooltipElement
-            //    {
-            //        InlineSegments = segments
-            //    });
+                list.Add(new TooltipElement
+                {
+                    InlineSegments = segments
+                });
 
 
             //----------------
@@ -922,7 +957,7 @@ namespace PlantingDay
             // Harvest value
             //----------------
             int harvestBV = plant.HarvestPrice; //Base value of harvest items
-                                                //ModEntry.Instance.Monitor.Log($"BV: {harvestBV}", LogLevel.Info);
+            //ModEntry.Instance.Monitor.Log($"BV: {harvestBV}", LogLevel.Info);
             int goldStarHarvest = (int)Math.Floor(1.5 * harvestBV); //Value of gold star quality harvest items
 
 

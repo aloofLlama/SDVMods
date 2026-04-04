@@ -20,9 +20,6 @@ namespace PlantingDay.Models
         public ItemInfo? Harvest { get; set; } = new ItemInfo();
 
 
-        // TODO Need to migrate this to the new Harvest above
-        public string HarvestId { get; set; } = "";
-
         //----
         // Planting the crop data
         //----
@@ -42,17 +39,12 @@ namespace PlantingDay.Models
         public bool NeedsWatering { get; set; }
         public HarvestMethod Scythe { get; set; }
 
-        public class DropInfo
-        {
-            public string ItemId { get; set; } = "";
-            public double ExtraHarvestChance { get; set; } = 1f; //e.g. potato
-            public int MinStack { get; set; } = 1;
-            public int MaxStack { get; set; } = 1;
-        }
 
         // Economics
         public int HarvestPrice { get; set; }
         public List<PurchaseInfo> PurchaseOptions { get; set; } = new();
+        public List<MonsterDropInfo> MonsterDrops { get; set; } = new();
+
 
 
 
@@ -63,23 +55,7 @@ namespace PlantingDay.Models
         public Texture2D? SeedIconTexture { get; set; }
         public Texture2D? HarvestIconTexture { get; set; }
 
-        public void InitializeIcons()
-        {
-            if (Seed != null)
-            {
-                var item = ItemRegistry.Create(Seed.Id);
-                if (item != null)
-                    SeedIconTexture = PlantDatabase.RenderItemIcon(item, 16);
-
-            }
-
-            if (Harvest != null)
-            {
-                var item = ItemRegistry.Create(Harvest.Id);
-                if (item != null)
-                    HarvestIconTexture = PlantDatabase.RenderItemIcon(item, 32);
-            }
-        }
+        
 
     }
     public enum PlantType
@@ -97,6 +73,14 @@ namespace PlantingDay.Models
         Winter
     }
 
+    public class DropInfo
+    {
+        public string ItemId { get; set; } = "";
+        public double ExtraHarvestChance { get; set; } = 1f; //e.g. potato
+        public int MinStack { get; set; } = 1;
+        public int MaxStack { get; set; } = 1;
+    }
+
     public class PurchaseInfo
     {
         public string VendorId { get; set; } = "";     // e.g. "SeedShop", "AriShop", "EggFestival"
@@ -104,12 +88,21 @@ namespace PlantingDay.Models
 
         public int? GoldPrice { get; set; }            // null if it's a trade
         public string? TradeItemId { get; set; }       // e.g. "(O)852"
+        public IconRef? CurrencyIconRef { get; set; }   // what you need to trade for 
         public int TradeAmount { get; set; }           // e.g. 4
 
         public string? Condition { get; set; }         // e.g. "EVENT eggFestival", "SEASON spring"
     }
 
+    public class MonsterDropInfo
+    {
+        public string? MonsterName { get; set; }
+        public float Chance { get; set; }
+        public IconRef? MonsterIcon { get; set; }
 }
+
+
+    }
 
 
 

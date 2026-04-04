@@ -8,10 +8,10 @@ namespace PlantingDay.Helpers
 {
     public static class TooltipKeys
     {
-                // Seasons
+        // Seasons
         public const string Seasons = "tooltip.seasons";
 
-// Growth
+        // Growth
         public const string DaysToProduce = "tooltip.days_to_produce";
         public const string ReadyOn = "tooltip.ready_on";
         public const string TooLate = "tooltip.too_late";
@@ -31,7 +31,8 @@ namespace PlantingDay.Helpers
         public const string PriceRange = "tooltip.price_range";
         public const string PierresPurchase = "tooltip.pierres_purchase";
         public const string OtherShopPurchase = "tooltip.other_shop_purchase";
-    }
+        public const string OtherShopTrade = "tooltip.other_shop_trade";
 
+    }
 }
 
