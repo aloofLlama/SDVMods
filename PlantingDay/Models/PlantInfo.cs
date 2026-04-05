@@ -12,7 +12,7 @@ namespace PlantingDay.Models
     public class PlantInfo
     {
 
-        public string Id { get; set; } = ""; //Seed Object ID
+        public string SeedId { get; set; } = ""; 
         public PlantType PlantType { get; set; } // Crop, FruitTree, Bush
 
         //Object info for the seed and harvest items
@@ -92,13 +92,14 @@ namespace PlantingDay.Models
         public int TradeAmount { get; set; }           // e.g. 4
 
         public string? Condition { get; set; }         // e.g. "EVENT eggFestival", "SEASON spring"
+        public bool IsNightMarket { get; set; }
     }
 
     public class MonsterDropInfo
     {
         public string? MonsterName { get; set; }
         public float Chance { get; set; }
-        public IconRef? MonsterIcon { get; set; }
+        public IconRef? MonsterIconRef { get; set; }
 }
 
 

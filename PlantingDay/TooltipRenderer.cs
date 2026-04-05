@@ -39,6 +39,7 @@ namespace PlantingDay
             var plant = PlantDatabase.LookupFromKey(lookupKey);
             if (plant is null)
                 return;
+            //ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Seed.Name} = {plant.Harvest?.Id}", LogLevel.Info);
 
             var elements = TooltipBuilder.BuildTooltip(plant);
 
@@ -150,9 +151,7 @@ namespace PlantingDay
                     {
                         if (seg.IconRef.HasValue)
                         {
-                            var icon = seg.IconRef.Value;
-                            int iconWidth = (int)(icon.Source.Width * icon.Scale);
-                            lineWidth += iconWidth;
+                            lineWidth += font.LineSpacing;
                         }
                         if (!string.IsNullOrEmpty(seg.Text))
                         {
@@ -245,28 +244,42 @@ namespace PlantingDay
                 {
                     var icon = el.IconRef.Value;
 
-                    // Compute scaled size
-                    float scale = icon.Scale;
-                    int iconSize = (int)(icon.Source.Width * scale);
-
-                    // Center inside the icon column
-                    int yOffset = drawY + (lineHeight - iconSize) / 2;
-                    int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
-
-                    // Draw using scale (Stardew‑style)
-                    b.Draw(
+                    int usedWidth = DrawPaddedIcon(
+                        b,
                         icon.Texture,
-                        new Vector2(xOffset, yOffset),
                         icon.Source,
-                        Color.White,
-                        0f,
-                        Vector2.Zero,
-                        scale,
-                        SpriteEffects.None,
-                        1f
+                        icon.Scale,
+                        IconColumnWidth,
+                        drawX,
+                        drawY,
+                        lineHeight
                     );
 
                     drawX += IconColumnWidth;
+                    //var icon = el.IconRef.Value;
+
+                    //// Compute scaled size
+                    //float scale = icon.Scale;
+                    //int iconSize = (int)(icon.Source.Width * scale);
+
+                    //// Center inside the icon column
+                    //int yOffset = drawY + (lineHeight - iconSize) / 2;
+                    //int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
+
+                    //// Draw using scale (Stardew‑style)
+                    //b.Draw(
+                    //    icon.Texture,
+                    //    new Vector2(xOffset, yOffset),
+                    //    icon.Source,
+                    //    Color.White,
+                    //    0f,
+                    //    Vector2.Zero,
+                    //    scale,
+                    //    SpriteEffects.None,
+                    //    1f
+                    //);
+
+                    //drawX += IconColumnWidth;
                 }
 
                 //
@@ -281,25 +294,39 @@ namespace PlantingDay
                         if (seg.IconRef.HasValue)
                         {
                             var icon = seg.IconRef.Value;
-                            float scale = icon.Scale;
-                            int iconWidth = (int)(icon.Source.Width * scale);
-                            int iconHeight = (int)(icon.Source.Height * scale);
 
-                            int yOffset = drawY + (lineHeight - iconHeight) / 2;
-
-                            b.Draw(
+                            DrawPaddedIcon(
+                                b,
                                 icon.Texture,
-                                new Vector2(xCursor, yOffset),
                                 icon.Source,
-                                Color.White,
-                                0f,
-                                Vector2.Zero,
-                                scale,
-                                SpriteEffects.None,
-                                1f
+                                icon.Scale,
+                                lineHeight, 
+                                xCursor,
+                                drawY,
+                                lineHeight
                             );
 
-                            xCursor += iconWidth;
+                            xCursor += lineHeight;
+                            //var icon = seg.IconRef.Value;
+                            //float scale = icon.Scale;
+                            //int iconWidth = (int)(icon.Source.Width * scale);
+                            //int iconHeight = (int)(icon.Source.Height * scale);
+
+                            //int yOffset = drawY + (lineHeight - iconHeight) / 2;
+
+                            //b.Draw(
+                            //    icon.Texture,
+                            //    new Vector2(xCursor, yOffset),
+                            //    icon.Source,
+                            //    Color.White,
+                            //    0f,
+                            //    Vector2.Zero,
+                            //    scale,
+                            //    SpriteEffects.None,
+                            //    1f
+                            //);
+
+                            //xCursor += iconWidth;
                         }
                         if (!string.IsNullOrEmpty(seg.Text))
                         {
@@ -351,9 +378,9 @@ namespace PlantingDay
 
         // Put multiple segments on the same line with separators (e.g., seasons)
         public static List<InlineSegment> BuildInlineSegments<T>(
-    IEnumerable<T> items,
-    Func<T, IEnumerable<InlineSegment>> buildSegments,
-    string separator = " • ")
+                IEnumerable<T> items,
+                Func<T, IEnumerable<InlineSegment>> buildSegments,
+                string separator = " • ")
         {
             var result = new List<InlineSegment>();
             var list = items.ToList();
@@ -378,7 +405,61 @@ namespace PlantingDay
             return result;
         }
 
+        private static int DrawPaddedIcon(
+             SpriteBatch b,
+             Texture2D texture,
+             Rectangle source,
+             float scale,
+             int boxSize,
+             int x,
+             int y,
+             int lineHeight
+             )
+        {
+            int drawW = (int)(source.Width * scale);
+            int drawH = (int)(source.Height * scale);
 
+            // Center inside the box
+            int xOffset = x + (boxSize - drawW) / 2;
+            int yOffset = y + (lineHeight - drawH) / 2;
+
+            b.Draw(texture, new Rectangle(xOffset, yOffset, drawW, drawH), source, Color.White);
+
+            return drawW;
+        }
+
+        //private static int DrawPaddedIcon(
+        //    SpriteBatch b,
+        //    Texture2D texture,
+        //    Rectangle source,
+        //    float scale,
+        //    int boxSize,
+        //    int x,
+        //    int y,
+        //    int lineHeight
+        //)
+        //{
+        //    // Scale based on source size, not box size
+        //    int drawW = (int)(source.Width * scale);
+        //    int drawH = (int)(source.Height * scale);
+
+        //    // If the icon is larger than the box, clamp it
+        //    float max = Math.Max(drawW, drawH);
+        //    if (max > boxSize)
+        //    {
+        //        float shrink = boxSize / max;
+        //        drawW = (int)(drawW * shrink);
+        //        drawH = (int)(drawH * shrink);
+        //    }
+
+        //    // Center inside the box
+        //    int xOffset = x + (boxSize - drawW) / 2;
+        //    int yOffset = y + (lineHeight - drawH) / 2;
+
+        //    b.Draw(texture, new Rectangle(xOffset, yOffset, drawW, drawH), source, Color.White);
+
+        //    return drawW;
+        //}
 
     }
 }

@@ -30,32 +30,31 @@ namespace PlantingDay.Helpers
     // Loads spritesheets and exposes ready-to-use icons
     public static class TooltipIcons
     {
+        // Icons
+        public static IconRef Warning { get; private set; }
+
+        // For the plant features
+        public static IconRef Rainbow { get; private set; }
+        public static IconRef WaterSeeds { get; private set; }
+        public static IconRef Watercan { get; private set; }
+        public static IconRef Scythe { get; private set; }
+        public static IconRef Trellis { get; private set; }
+
+
+        // For economics
+        public static IconRef GoldStar { get; private set; }
+        public static IconRef StarToken { get; private set; } //From Valley Fair
+        public static IconRef LittleCoin { get; private set; }
+        public static IconRef NightStars { get; private set; }
+        
+        
+        //Spritesheets
         public static Texture2D? Cursors { get; private set; }
         public static Texture2D? Objects { get; private set; }
         public static Texture2D? Beach { get; private set; }
         public static Texture2D? Tools { get; private set; }
         public static Texture2D? Weapons { get; private set; }
-
-
-
-
-        // Icons
-        public static IconRef Rainbow { get; private set; }
-        public static IconRef Warning { get; private set; }
-        public static IconRef WaterSeeds { get; private set; }
-        public static IconRef Watercan { get; private set; }
-        public static IconRef Scythe { get; private set; }
-        public static IconRef GoldStar { get; private set; }
-        public static IconRef StarToken { get; private set; } //From Valley Fair
-
-        public static IconRef LittleCoin { get; private set; }
-        public static IconRef NightStars { get; private set; }
-
-
-
-
-        //public static IconRef Spiral { get; private set; }
-
+        public static Texture2D? Fences { get; private set; }
 
 
 
@@ -67,19 +66,25 @@ namespace PlantingDay.Helpers
             Beach = Game1.content.Load<Texture2D>("Maps/spring_beach");
             Tools = Game1.content.Load<Texture2D>("TileSheets/tools");
             Weapons = Game1.content.Load<Texture2D>("TileSheets/weapons");
+            Fences = Game1.content.Load<Texture2D>("LooseSprites/Fence1");
 
+            //-------
             // Static UI icons (IconRef)
-            //Growth Info
+            //-------
+
             Warning = new IconRef(Cursors, new Rectangle(320, 496, 16, 16), size: 16, scale: 2f);
+
+            //For plant features
             Rainbow = new IconRef(Cursors, new Rectangle(596, 1888, 16, 16), size: 16, scale: 1.5f);
             WaterSeeds = new IconRef(Beach, new Rectangle(160, 112, 16, 16), size: 16, scale: 2f);
             Watercan = new IconRef(Tools, new Rectangle(48, 225, 16, 16), size: 16, scale: 2f);
             Scythe = new IconRef(Weapons, new Rectangle(112, 80, 16, 16), size: 16, scale: 2f);
-
+            Trellis = new IconRef(Fences, new Rectangle(43, 130, 5, 18), size: 18, scale: 2f);
+            
             //Economics Info
-            StarToken = new IconRef(Cursors, new Rectangle(338, 400, 8, 8), size: 8, scale: 4f);
+            StarToken = new IconRef(Cursors, new Rectangle(338, 400, 8, 8), size: 8, scale: 2f);
             GoldStar = new IconRef(Cursors, new Rectangle(346, 400, 8, 8), size: 8, scale: 2f);
-            LittleCoin = new IconRef(Cursors, new Rectangle(290, 414, 6, 6), size: 6, scale: 2f);
+            LittleCoin = new IconRef(Cursors, new Rectangle(290, 414, 6, 6), size: 6, scale: 1f);
             NightStars = new IconRef(Objects, new Rectangle(272, 224, 16, 16), size: 16, scale: 1.5f);
 
         }

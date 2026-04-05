@@ -2,10 +2,11 @@
 using PlantingDay.Helpers;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
+using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using System.Runtime.CompilerServices;
-using StardewModdingAPI.Framework.ModLoading;
+using static PlantingDay.Helpers.SeedSourceAggregator;
 
 
 namespace PlantingDay
@@ -23,9 +24,12 @@ namespace PlantingDay
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
+            TooltipIcons.Initialize();
 
             // KEEP this debug for later, it shows all game shops available. Useful when needing to fix mod shops
+
+            var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
+
             foreach (var shopId in shops.Keys)
             {
                 ModEntry.Instance.Monitor.Log($"[Planting Day] Found shop: {shopId}", LogLevel.Info);
@@ -38,69 +42,49 @@ namespace PlantingDay
                 }
             }
 
-
-            //TooltipIcons.Load();
-            TooltipIcons.Initialize();
-
             //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
 
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
 
-            //helper.Events.Display.RenderedHud += OnRenderedHud;
             helper.Events.Input.ButtonPressed += OnButtonPressed;
-            //Helper.Events.Content.AssetRequested += OnAssetRequested;
         }
 
 
         private void OnGameLaunched(object? sender, StardewModdingAPI.Events.GameLaunchedEventArgs e)
         {
-            /* PAUSE BUSH
-            // Load the Custom Bush API
-            CustomBushApi = Helper.ModRegistry.GetApi<ICustomBushApi>("furyx639.CustomBush");
-
-            if (CustomBushApi == null)
-            {
-                Monitor.Log("Custom Bush API not found.", LogLevel.Warn);
-                return;
-            }
-
-            Monitor.Log("Custom Bush API loaded!", LogLevel.Warn);
-            */
 
         }
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
             PlantDatabase.Initialize();
+            MonsterDropLoader.Initialize();
 
-            //foreach (var plant in PlantDatabase.AllPlants)
-              //  plant.InitializeIcons();
 
-            string dataPath = ModEntry.ModHelper.DirectoryPath;
-
-            foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
+            foreach (var plant in PlantDatabase.AllPlants)
             {
-                string vendorId = Path.GetFileNameWithoutExtension(file);
-                //ModEntry.Instance.Monitor.Log($"[Planting Day] Found mod shop: {vendorId}", LogLevel.Info);
+                SeedSourceAggregator.AddSeedSourcesToPlant(plant);
+                IconRenderer_plants.InitializeIcons(plant);
             }
 
 
-            //Monitor.Log("Plant database initialized.", LogLevel.Info);
+            //string dataPath = ModEntry.ModHelper.DirectoryPath;
 
-            // Load Custom Bush API
-            //CustomBushApi = Helper.ModRegistry.GetApi<ICustomBushApi>("spacechase0.CustomBush");
-
-            // if (CustomBushApi == null)
-            //   Monitor.Log("Custom Bush API not found — bush tooltips disabled.", LogLevel.Warn);
+            //foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
+            //{
+            //    string vendorId = Path.GetFileNameWithoutExtension(file);
+            //    //ModEntry.Instance.Monitor.Log($"[Planting Day] Found mod shop: {vendorId}", LogLevel.Info);
+            //}
 
         }
 
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
         {
-            
+
             TooltipRenderer.DrawMenu(e.SpriteBatch);
+
 
         }
 
@@ -113,61 +97,62 @@ namespace PlantingDay
                 return;
 
             ModEntry.Instance.Monitor.Log("RUN BUTTON PRESS", LogLevel.Info);
+
+            //Rebuild the Plant database
+            PlantDatabase.Reset();
             PlantDatabase.Initialize();
 
-            foreach (var plant in PlantDatabase.AllPlants)
-                PlantDatabase.InitializeIcons(plant);
+            //var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
 
+            //if (shops.TryGetValue("SeedShop", out var pierre))
+            //{
+            //    foreach (var entry in pierre.Items)
+            //    {
+            //        // Log the raw entry
+            //        Monitor.Log($"Pierre sells entry: {entry.ItemId}", LogLevel.Info);
 
-            var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
-
-            if (shops.TryGetValue("SeedShop", out var pierre))
-            {
-                foreach (var entry in pierre.Items)
-                {
-                    // Log the raw entry
-                    Monitor.Log($"Pierre sells entry: {entry.ItemId}", LogLevel.Info);
-
-                    // If it's a wildcard entry, test if it applies to Mustard
-                    if (entry.ItemId == "ALL_ITEMS (O)")
-                    {
-                        bool matches = DebugMatchesWildcard("Cornucopia_MustardSeeds", entry);
-                        Monitor.Log($"  → Wildcard applies to Mustard? {matches}", LogLevel.Info);
-                    }
-                }
-            }
+                    //// If it's a wildcard entry, test if it applies to Mustard
+                    //if (entry.ItemId == "ALL_ITEMS (O)")
+                    //{
+                    //    bool matches = DebugMatchesWildcard("Cornucopia_MustardSeeds", entry);
+                    //    Monitor.Log($"  → Wildcard applies to Mustard? {matches}", LogLevel.Info);
+                    //}
+              //  }
+            //}
         }
+    }
+}
 
-        private bool DebugMatchesWildcard(string itemId, ShopItemData entry)
-        {
-            // Get the actual item object
-            Item item = ItemRegistry.Create(itemId);
-            if (item == null)
-                return false;
+        //private static bool DebugMatchesWildcard(string itemId, ShopItemData entry)
+        //{
+        //    // Get the actual item object
+        //    Item item = ItemRegistry.Create(itemId);
+        //    if (item == null)
+        //        return false;
 
-            // Get its context tags
-            var tags = item.GetContextTags();
+        //    // Get its context tags
+        //    var tags = item.GetContextTags();
 
-            // Cornucopia uses tags like:
-            //   cornucopia_shop_pierre
-            //   cornucopia_season_spring
-            //   modid_cornucopia.morecrops
+        //    // Cornucopia uses tags like:
+        //    //   cornucopia_shop_pierre
+        //    //   cornucopia_season_spring
+        //    //   modid_cornucopia.morecrops
 
-            // So we check if the PerItemCondition mentions any required tags
-            string cond = entry.PerItemCondition ?? "";
+        //    // So we check if the PerItemCondition mentions any required tags
+        //    string cond = entry.PerItemCondition ?? "";
 
-            bool requiresPierre = cond.Contains("cornucopia_shop_pierre");
-            bool requiresSpring = cond.Contains("cornucopia_season_spring");
-            bool requiresCornucopia = cond.Contains("modid_cornucopia.morecrops");
+        //    bool requiresPierre = cond.Contains("cornucopia_shop_pierre");
+        //    bool requiresSpring = cond.Contains("cornucopia_season_spring");
+        //    bool requiresCornucopia = cond.Contains("modid_cornucopia.morecrops");
 
-            bool hasPierre = tags.Contains("cornucopia_shop_pierre");
-            bool hasSpring = tags.Contains("cornucopia_season_spring");
-            bool hasCornucopia = tags.Any(t => t.StartsWith("modid_cornucopia.morecrops"));
+        //    bool hasPierre = tags.Contains("cornucopia_shop_pierre");
+        //    bool hasSpring = tags.Contains("cornucopia_season_spring");
+        //    bool hasCornucopia = tags.Any(t => t.StartsWith("modid_cornucopia.morecrops"));
 
-            return (!requiresPierre || hasPierre)
-                && (!requiresSpring || hasSpring)
-                && (!requiresCornucopia || hasCornucopia);
-        }
+        //    return (!requiresPierre || hasPierre)
+        //        && (!requiresSpring || hasSpring)
+        //        && (!requiresCornucopia || hasCornucopia);
+        //}
         /*DEBUG STUFF NOTHING BELOW HERE
 
                 if (ModEntry.Instance == null)
@@ -288,10 +273,10 @@ namespace PlantingDay
 
         //    TooltipRenderer.DrawHud(e.SpriteBatch);
         //}
-    }
-        //    //ModEntry.Instance.Monitor.Log("HERE", LogLevel.Info);
+    
+    //    //ModEntry.Instance.Monitor.Log("HERE", LogLevel.Info);
 
-    }
+
 
 
 
