@@ -11,7 +11,6 @@ namespace PlantingDay.Models
 
     public class PlantInfo
     {
-
         public string SeedId { get; set; } = ""; // e.g. 890, CarrotSeeds, Cornucopia_BasilSeeds
         public string HarvestId { get; set; } = ""; // e.g. 889, Carrot, Cornucopia_Basil, (O)638 [for fruit tree fruit]
         public PlantType PlantType { get; set; } // Crop, FruitTree, Bush

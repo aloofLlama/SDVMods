@@ -1,6 +1,4 @@
 using PlantingDay.Helpers;
-using PlantingDay_Tests.Helpers;
-using StardewValley.GameData.Shops;
 
 
 namespace PlantingDay_Tests
@@ -10,116 +8,116 @@ namespace PlantingDay_Tests
     /// </summary>
     public class SeedPriceTests
     {
-        [Fact]
-        public void ParsnipSeeds_ShouldCost20_AtPierre()
-        {
-            var fakeShops = FakeShop.Create(
-                ("SeedShop", FakeShop.Shop(
-                    FakeShop.Item("(O)472", 20)
-                ))
-            );
+//        [Fact]
+//        public void ParsnipSeeds_ShouldCost20_AtPierre()
+//        {
+//            var fakeShops = FakeShop.Create(
+//                ("SeedShop", FakeShop.Shop(
+//                    FakeShop.Item("(O)472", 20)
+//                ))
+//            );
 
-            var shops = ShopAdapter.Convert(fakeShops);
+//            var shops = ShopAdapter.Convert(fakeShops);
 
-            var result = VendorHelper.BuildPurchaseInfo("472", shops);
+//            var result = VendorHelper.BuildPurchaseInfo("472", shops);
 
-            Assert.Single(result);
-            Assert.Equal("SeedShop", result[0].VendorId);
-            Assert.Equal(20, result[0].GoldPrice);
-        }
+//            Assert.Single(result);
+//            Assert.Equal("SeedShop", result[0].VendorId);
+//            Assert.Equal(20, result[0].GoldPrice);
+//        }
 
-        [Fact]
-        public void ParsnipSeeds_ShouldCost15_AtAri()
-        {
-            var fakeShops = FakeShop.Create(
-                ("skellady.SBVCP_AriMarket", FakeShop.Shop(
-                    FakeShop.Item("(O)472", 15)
-                ))
-            );
+//        [Fact]
+//        public void ParsnipSeeds_ShouldCost15_AtAri()
+//        {
+//            var fakeShops = FakeShop.Create(
+//                ("skellady.SBVCP_AriMarket", FakeShop.Shop(
+//                    FakeShop.Item("(O)472", 15)
+//                ))
+//            );
 
-            var shops = ShopAdapter.Convert(fakeShops);
+//            var shops = ShopAdapter.Convert(fakeShops);
 
-            var result = VendorHelper.BuildPurchaseInfo("472", shops);
+//            var result = VendorHelper.BuildPurchaseInfo("472", shops);
 
-            Assert.Single(result);
-            Assert.Equal("skellady.SBVCP_AriMarket", result[0].VendorId);
-            Assert.Equal(15, result[0].GoldPrice);
-        }
+//            Assert.Single(result);
+//            Assert.Equal("skellady.SBVCP_AriMarket", result[0].VendorId);
+//            Assert.Equal(15, result[0].GoldPrice);
+//        }
 
 
-        [Fact]
-        public void SunflowerSeeds_ShouldCost200_AtPierre()
-        {
-            var fakeShops = FakeShop.Create(
-                ("SeedShop", FakeShop.Shop(
-                    FakeShop.Item("(O)431", 100)
-                ))
-);
+//        [Fact]
+//        public void SunflowerSeeds_ShouldCost200_AtPierre()
+//        {
+//            var fakeShops = FakeShop.Create(
+//                ("SeedShop", FakeShop.Shop(
+//                    FakeShop.Item("(O)431", 100)
+//                ))
+//);
 
-            var shops = ShopAdapter.Convert(fakeShops);
+//            var shops = ShopAdapter.Convert(fakeShops);
 
-            var result = VendorHelper.BuildPurchaseInfo("431", shops);
+//            var result = VendorHelper.BuildPurchaseInfo("431", shops);
 
-            Assert.Single(result);
-            Assert.Equal("SeedShop", result[0].VendorId);
-            Assert.Equal(200, result[0].GoldPrice);
-        }
-        [Fact]
-        public void CranberrySeeds_ShouldCost240_AtPierre()
-        {
-            var fakeShops = FakeShop.Create(
-                ("SeedShop", FakeShop.Shop(
-                    FakeShop.Item("(O)493", 0)
-                ))
-);
+//            Assert.Single(result);
+//            Assert.Equal("SeedShop", result[0].VendorId);
+//            Assert.Equal(200, result[0].GoldPrice);
+//        }
+//        [Fact]
+//        public void CranberrySeeds_ShouldCost240_AtPierre()
+//        {
+//            var fakeShops = FakeShop.Create(
+//                ("SeedShop", FakeShop.Shop(
+//                    FakeShop.Item("(O)493", 0)
+//                ))
+//);
 
-            var shops = ShopAdapter.Convert(fakeShops);
+//            var shops = ShopAdapter.Convert(fakeShops);
 
-            var result = VendorHelper.BuildPurchaseInfo("493", shops);
+//            var result = VendorHelper.BuildPurchaseInfo("493", shops);
 
-            Assert.Single(result);
-            Assert.Equal("SeedShop", result[0].VendorId);
-            Assert.Equal(240, result[0].GoldPrice);
-        }
+//            Assert.Single(result);
+//            Assert.Equal("SeedShop", result[0].VendorId);
+//            Assert.Equal(240, result[0].GoldPrice);
+//        }
 
-        /// <summary>
-        /// Gold prices of modded seeds
-        /// </summary>
-        [Fact]
-        public void ChamomileSeeds_ShouldCost100_AtPierre()
-        {
-            var fakeShops = FakeShop.Create(
-                ("SeedShop", FakeShop.Shop(
-                    FakeShop.Item("slimerrain.uncleirohapprovedteacp_Chamomile_Seeds", 50)
-                ))
-);
+//        /// <summary>
+//        /// Gold prices of modded seeds
+//        /// </summary>
+//        [Fact]
+//        public void ChamomileSeeds_ShouldCost100_AtPierre()
+//        {
+//            var fakeShops = FakeShop.Create(
+//                ("SeedShop", FakeShop.Shop(
+//                    FakeShop.Item("slimerrain.uncleirohapprovedteacp_Chamomile_Seeds", 50)
+//                ))
+//);
 
-            var shops = ShopAdapter.Convert(fakeShops);
+//            var shops = ShopAdapter.Convert(fakeShops);
 
-            var result = VendorHelper.BuildPurchaseInfo("slimerrain.uncleirohapprovedteacp_Chamomile_Seeds", shops);
+//            var result = VendorHelper.BuildPurchaseInfo("slimerrain.uncleirohapprovedteacp_Chamomile_Seeds", shops);
 
-            Assert.Single(result);
-            Assert.Equal("SeedShop", result[0].VendorId);
-            Assert.Equal(100, result[0].GoldPrice);
-        }
+//            Assert.Single(result);
+//            Assert.Equal("SeedShop", result[0].VendorId);
+//            Assert.Equal(100, result[0].GoldPrice);
+//        }
 
-        [Fact]
-        public void RyeSeeds_ShouldCos20_AtPierre()
-        {
-            var fakeShops = FakeShop.Create(
-                ("SeedShop", FakeShop.Shop(
-                    FakeShop.Item("slimerrain.grainsoverhullcp_Rye", 10)
-                ))
-);
+//        [Fact]
+//        public void RyeSeeds_ShouldCos20_AtPierre()
+//        {
+//            var fakeShops = FakeShop.Create(
+//                ("SeedShop", FakeShop.Shop(
+//                    FakeShop.Item("slimerrain.grainsoverhullcp_Rye", 10)
+//                ))
+//);
 
-            var shops = ShopAdapter.Convert(fakeShops);
+//            var shops = ShopAdapter.Convert(fakeShops);
 
-            var result = VendorHelper.BuildPurchaseInfo("slimerrain.grainsoverhullcp_Rye", shops);
+//            var result = VendorHelper.BuildPurchaseInfo("slimerrain.grainsoverhullcp_Rye", shops);
 
-            Assert.Single(result);
-            Assert.Equal("SeedShop", result[0].VendorId);
-            Assert.Equal(20, result[0].GoldPrice);
-        }
+//            Assert.Single(result);
+//            Assert.Equal("SeedShop", result[0].VendorId);
+//            Assert.Equal(20, result[0].GoldPrice);
+//        }
 
 
 

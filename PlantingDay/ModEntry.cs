@@ -7,6 +7,7 @@ using StardewValley;
 using StardewValley.GameData.Shops;
 using StardewValley.Internal;
 using StardewValley.Menus;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using static PlantingDay.Helpers.SeedSourceAggregator;
 
@@ -45,8 +46,15 @@ namespace PlantingDay
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            Initialize.ForRuntime(this.Helper);
+            TooltipIcons.Initialize();
+            PlantDatabase.Initialize();
+            MonsterDropLoader.Initialize();
 
+            foreach (var plant in PlantDatabase.AllPlants)
+            {
+                SeedSourceAggregator.AddSeedSourcesToPlant(plant);
+                IconRenderer_plants.InitializeIcons(plant);
+            }
             //string dataPath = ModEntry.ModHelper.DirectoryPath;
 
             //foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
@@ -111,60 +119,22 @@ namespace PlantingDay
                 IconRenderer_plants.InitializeIcons(plant);
             }
 
-            //temp
-            //////foreach (var plant in PlantDatabase.AllPlants)
-            //////{
-
-            //////    // Create the item instance
-            //////    var item = ItemRegistry.Create(plant.SeedId);
-
-            //////    // Fake shop data (Pierre's)
-            //////    var shopData = new ShopData();
-
-            //////    // Fake shop item entry
-            //////    var itemData = new ShopItemData
-            //////    {
-            //////        Id = plant.SeedId,
-            //////        ItemId = plant.SeedId,
-            //////        Price = -1,
-            //////        IgnoreShopPriceModifiers = false,
-            //////        UseObjectDataPrice = false
-            //////    };
-
-            //////    // ItemQueryResult requires the item
-            //////    var output = new ItemQueryResult(item);
-
-            //////    // Compute the real base price Pierre charges
-            //////    int price = ShopBuilder.GetBasePrice(
-            //////        output,
-            //////        shopData,
-            //////        itemData,
-            //////        item,
-            //////        outOfSeasonPrice: false,
-            //////        useObjectDataPrice: false
-            //////    );
-
-            //////    foreach (var option in plant.PurchaseOptions)
-            //////    {
-            //////        if (option.VendorId != "SeedShop")
-            //////            continue;
+            CacheForTesting.DumpPlantDataBaseToJson();
 
 
-            //////        Monitor.Log($"GoldP:{option.GoldPrice} SellP: {price} for  { plant.SeedId}", LogLevel.Warn);
-            //////    }
-            //////}
+
 
             //KEEP Debug to output desired database variable from a list
-            //foreach (var plant in PlantDatabase.AllPlants)
-            //{
-            //    foreach (var option in plant.PurchaseOptions)
-            //    {
-            //        ModEntry.Instance.Monitor.Log(
-            //            $"Seed: {plant.SeedId} Vendor: {option.VendorId} Price: {option.GoldPrice}",
-            //            LogLevel.Warn
-            //        );
-            //    }
-            //}
+            foreach (var plant in PlantDatabase.AllPlants)
+            {
+                foreach (var option in plant.PurchaseOptions)
+                {
+                    ModEntry.Instance.Monitor.Log(
+                        $"Seed: {plant.SeedId} Vendor: {option.VendorId} Price: {option.GoldPrice}",
+                        LogLevel.Warn
+                    );
+                }
+            }
 
 
             // KEEP Shows all game shops available. Useful when needing to fix mod shops

@@ -37,14 +37,10 @@ namespace PlantingDay
         private static Dictionary<string, List<(int itemId, float chance)>> _monsterDropTable = new();
 
 
-        public static void Initialize(IContentHelper content)
+        public static void Initialize()
         {
             if (_isInitialized)
                 return;
-
-            var crops = content.Load<Dictionary<string, CropData>>("Data/Crops");
-            var objects = content.Load<Dictionary<string, ObjectData>>("Data/ObjectInformation");
-            var fruitTrees = content.Load<Dictionary<string, FruitTreeData>>("Data/FruitTrees");
 
 
             LoadCrops();
@@ -243,6 +239,7 @@ namespace PlantingDay
             };
 
         }
+
 
     }
 }

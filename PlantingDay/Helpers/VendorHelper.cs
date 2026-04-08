@@ -68,8 +68,8 @@ namespace PlantingDay.Helpers
                         //}
                         //else
                         //{
-                            info.GoldPrice = GetDefaultShopPrice(itemId);
-                            ModEntry.Instance.Monitor.Log($"Used GetDefaultShopPrice for: {info.GoldPrice}g   {itemId}                      {info.VendorId}", LogLevel.Info);
+                            //info.GoldPrice = GetDefaultShopPrice(itemId);
+                            //ModEntry.Instance.Monitor.Log($"Used GetDefaultShopPrice for: {info.GoldPrice}g   {itemId}                      {info.VendorId}", LogLevel.Info);
                         //}
                         }
 
