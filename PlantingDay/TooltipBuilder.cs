@@ -52,8 +52,27 @@ namespace PlantingDay
         }
         private static void AddIfNotNull(List<TooltipElement> list, TooltipElement? element)
         {
-            if (element != null)
+            if (element != null && IsVisible(element))
                 list.Add(element);
+        }
+
+        private static bool SectionHasVisibleContent(IEnumerable<TooltipElement> section)
+        {
+            return section.Any(IsVisible);
+        }
+
+        private static bool IsVisible(TooltipElement e)
+        {
+            bool hasInline = e.InlineSegments != null &&
+                             e.InlineSegments.Any(seg =>
+                                 !string.IsNullOrWhiteSpace(seg.Text) ||
+                                 seg.IconRef != null);
+
+            return
+                hasInline ||
+                !string.IsNullOrWhiteSpace(e.Text) ||
+                e.IconTexture != null ||
+                e.IsSeparator;
         }
 
         private static void AddSectionWithSeparator(
@@ -61,13 +80,12 @@ namespace PlantingDay
             Func<IEnumerable<TooltipElement>> sectionBuilder,
             int paddingTop = 3,
             int paddingBottom = 3
-        )
-        {
+            )
+            {
             var section = sectionBuilder()?.ToList();
-            if (section == null || section.Count == 0)
+            if (section == null || !SectionHasVisibleContent(section))
                 return;
 
-            // Only add separator if the list already has content
             if (list.Count > 0)
             {
                 list.Add(new TooltipElement
@@ -78,9 +96,9 @@ namespace PlantingDay
                 });
             }
 
-            list.AddRange(section);
+            foreach (var element in section)
+                AddIfNotNull(list, element);
         }
-
 
 
 

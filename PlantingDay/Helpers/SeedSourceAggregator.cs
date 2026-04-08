@@ -16,26 +16,22 @@ namespace PlantingDay.Helpers
         {
             var list = new List<object>();
 
-            // 1. Get raw vendor entries (collapsed, filtered)
+            // 1. Get fully processed vendor list (already collapsed + sorted)
             var vendors = VendorListBuilder.Build(plant);
 
-            // 2. Split vendors into categories
-            var pierre = vendors.Where(v => VendorHelper.IsPierre(v)).ToList();
-            var goldVendors = vendors.Where(v => v.GoldPrice.HasValue && !VendorHelper.IsPierre(v) && !v.IsNightMarket).ToList();
-            var tradeVendors = vendors.Where(v => v.TradeAmount > 0 && !v.IsNightMarket).ToList();
-            var nightMarket = vendors.Where(v => v.IsNightMarket).ToList();
+            // 2. Split Night Market out
+            var nightMarket = vendors.Where(v => VendorHelper.IsNightMarket(v)).ToList();
+            var nonNightVendors = vendors.Where(v => !VendorHelper.IsNightMarket(v)).ToList();
 
-            // 3. Sort each category alphabetically
-            goldVendors.Sort((a, b) => string.Compare(a.VendorName, b.VendorName, StringComparison.OrdinalIgnoreCase));
-            tradeVendors.Sort((a, b) => string.Compare(a.VendorName, b.VendorName, StringComparison.OrdinalIgnoreCase));
-            nightMarket.Sort((a, b) => string.Compare(a.VendorName, b.VendorName, StringComparison.OrdinalIgnoreCase));
+            // 3. Add in your desired order:
+            //    1. Most vendors (non-Night Market)
+            list.AddRange(nonNightVendors);
 
-            // 4. Add in the correct order
-            list.AddRange(pierre);        // 0. Pierre
-            list.AddRange(goldVendors);   // 1. Gold vendors
-            list.AddRange(tradeVendors);  // 2. Trade vendors
-            list.AddRange(plant.MonsterDrops); // 3. Monster drops
-            list.AddRange(nightMarket);   // 4. Night Market
+            //    2. Monster drops
+            list.AddRange(plant.MonsterDrops);
+
+            //    3. Night Market (always last)
+            list.AddRange(nightMarket);
 
             return list;
         }

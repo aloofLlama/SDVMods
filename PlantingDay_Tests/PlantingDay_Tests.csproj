@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net48</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="testpaths.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0" />
+		<PackageReference Include="xunit" Version="2.4.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="3.1.2">
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\PlantingDay\PlantingDay.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="MonoGame.Framework">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\MonoGame.Framework.dll</HintPath>
+		</Reference>
+		
+		<Reference Include="StardewValley.GameData">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\StardewValley.GameData.dll</HintPath>
+		</Reference>
+
+		<Reference Include="Stardew Valley">
+			<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Stardew Valley.dll</HintPath>
+		</Reference>
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="StardewModdingAPI">
+			<HintPath>..\..\SMAPI\StardewModdingAPI.dll</HintPath>
+		</Reference>
+		<Reference Include="StardewModdingAPI.Framework">
+			<HintPath>..\..\SMAPI\StardewModdingAPI.Framework.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<PropertyGroup>
+		<AssemblyName>PlantingDay.Tests</AssemblyName>
+	</PropertyGroup>
+
+
+
+</Project>

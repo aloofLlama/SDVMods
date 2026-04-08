@@ -17,11 +17,10 @@ using StardewValley.Locations;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
+using System.Reflection.Metadata;
 using System.Xml.Linq;
 using static StardewValley.Minigames.MineCart;
 using SObject = StardewValley.Object;
-//using System.Linq;
-//using System.Text.Json;
 
 namespace PlantingDay
 {
@@ -32,13 +31,21 @@ namespace PlantingDay
 
         private static readonly Dictionary<string, PlantInfo> _plants = new();
         public static IEnumerable<PlantInfo> AllPlants => _plants.Values;
+        public static IEnumerable<string> AllKeys() => _plants.Keys;
+
 
         private static Dictionary<string, List<(int itemId, float chance)>> _monsterDropTable = new();
 
-        public static void Initialize()
+
+        public static void Initialize(IContentHelper content)
         {
             if (_isInitialized)
                 return;
+
+            var crops = content.Load<Dictionary<string, CropData>>("Data/Crops");
+            var objects = content.Load<Dictionary<string, ObjectData>>("Data/ObjectInformation");
+            var fruitTrees = content.Load<Dictionary<string, FruitTreeData>>("Data/FruitTrees");
+
 
             LoadCrops();
             LoadFruitTrees();
@@ -49,6 +56,14 @@ namespace PlantingDay
             ModEntry.Instance.Monitor.Log(
                 $"[{DateTime.Now:HH:mm:ss}] Plant Database Initialized",
                 LogLevel.Alert);
+
+            // KEEP Debug to output desired database variable
+            /*
+            foreach (var plant in PlantDatabase.AllPlants)
+            {
+                ModEntry.Instance.Monitor.Log($"Seed: {plant.SeedId}", LogLevel.Warn);
+            }
+            */
 
         }
         public static void Reset()
@@ -82,7 +97,7 @@ namespace PlantingDay
 
             return new ItemInfo
             {
-                Id = IdHelper.NormalizeItemId(objectId),
+                Id = objectId,
                 Name = obj.DisplayName,
                 Description = obj.Description,
                 Price = obj.Price,
@@ -91,7 +106,7 @@ namespace PlantingDay
                 Type = obj.Type
             };
         }
-        
+
 
 
         //-------
@@ -106,10 +121,6 @@ namespace PlantingDay
                 if (plant == null)
                     continue;
 
-                //ModEntry.Instance.Monitor.Log(
-                //    $"Crop seed: {plant.Seed?.Id} -> Harvest: {plant.Harvest?.Id}",
-                //    LogLevel.Info);
-
                 _plants[plant.SeedId] = plant;
             }
         }
@@ -121,9 +132,11 @@ namespace PlantingDay
             var harvestId = crop.HarvestItemId ?? "";
             var harvestInfo = FromObject(harvestId);
 
+
             return new PlantInfo
             {
-                SeedId = IdHelper.NormalizeItemId(seedId),
+                SeedId = seedId,
+                HarvestId = harvestId,
                 PlantType = PlantType.Crop,
 
                 Seasons = crop.Seasons?
@@ -144,16 +157,16 @@ namespace PlantingDay
                 Harvest = harvestInfo,
                 HarvestPrice = harvestInfo?.Price ?? 0,
 
-                Drops = new List<DropInfo>
-                    {
-                    new DropInfo
-                    {
-                        ItemId = IdHelper.NormalizeItemId(harvestId),
-                        MinStack = crop.HarvestMinStack,
-                        MaxStack = crop.HarvestMaxStack,
-                        ExtraHarvestChance = crop.ExtraHarvestChance
-                    }
-                }.AsReadOnly(),
+                //Drops = new List<DropInfo>
+                //    {
+                //    new DropInfo
+                //    {
+                //        ItemId = harvestId,
+                //        MinStack = crop.HarvestMinStack,
+                //        MaxStack = crop.HarvestMaxStack,
+                //        ExtraHarvestChance = crop.ExtraHarvestChance
+                //    }
+                //}.AsReadOnly(),
 
             };
         }
@@ -170,7 +183,7 @@ namespace PlantingDay
                     continue;
 
                 //ModEntry.Instance.Monitor.Log(
-                //    $"Fruit Tree seed: {plant.Seed?.Id} -> Harvest: {plant.Harvest?.Id}",
+                //    $"LOAD FRUITTREE raw seed: {saplingId} -> plant seed: {plant.Seed?.Id}",
                 //    LogLevel.Info);
 
                 _plants[plant.SeedId] = plant;
@@ -183,18 +196,21 @@ namespace PlantingDay
             var fruitEntry = data.Fruit.FirstOrDefault();
 
             string fruitId = fruitEntry?.ItemId ?? "";
-            //string fruitId = IdHelper.NormalizeItemId(fruitEntry?.ItemId ?? "");
-
-            //ModEntry.Instance.Monitor.Log(
-            //    $"Fruit Tree Immediate seed: {saplingId} -> Harvest: {fruitId}",
-            //    LogLevel.Alert);
 
             var seedInfo = FromObject(saplingId);
             var harvestInfo = FromObject(fruitId);
 
+            // Patch for Uncle Iroh Approved Tea which mismatches the (O) prefix
+            if (harvestInfo == null && fruitId.StartsWith("(O)"))
+            {
+                string cleanId = fruitId.Substring(3); // remove "(O)"
+                harvestInfo = FromObject(cleanId);
+            }
+
             return new PlantInfo
             {
-                SeedId = IdHelper.NormalizeItemId(saplingId),
+                SeedId = saplingId,
+                HarvestId = fruitId,
                 PlantType = PlantType.FruitTree,
 
                 Seed = seedInfo,
@@ -212,17 +228,17 @@ namespace PlantingDay
                 // After maturity, they produce daily
                 RegrowDays = 1,
 
-                Drops = new List<DropInfo>
-                    {
-                    new DropInfo
-                    {
-                        ItemId = IdHelper.NormalizeItemId(fruitId),
-                        MinStack = fruitEntry?.MinStack ?? 1,
-                        MaxStack = fruitEntry?.MaxStack ?? 1,
-                        ExtraHarvestChance = 0f
-                    }
+                //Drops = new List<DropInfo>
+                //    {
+                //    new DropInfo
+                //    {
+                //        ItemId = fruitId,
+                //        MinStack = fruitEntry?.MinStack ?? 1,
+                //        MaxStack = fruitEntry?.MaxStack ?? 1,
+                //        ExtraHarvestChance = 0f
+                //    }
 
-                }.AsReadOnly(),
+                //}.AsReadOnly(),
 
             };
 

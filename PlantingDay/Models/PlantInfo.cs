@@ -12,12 +12,12 @@ namespace PlantingDay.Models
     public class PlantInfo
     {
 
-        public string SeedId { get; set; } = ""; 
+        public string SeedId { get; set; } = ""; // e.g. 890, CarrotSeeds, Cornucopia_BasilSeeds
+        public string HarvestId { get; set; } = ""; // e.g. 889, Carrot, Cornucopia_Basil, (O)638 [for fruit tree fruit]
         public PlantType PlantType { get; set; } // Crop, FruitTree, Bush
 
-        //Object info for the seed and harvest items
-        public ItemInfo? Seed { get; set; } = new ItemInfo();
-        public ItemInfo? Harvest { get; set; } = new ItemInfo();
+        // Output items (crops, fruit, bush drops)
+        //public IReadOnlyList<DropInfo> Drops { get; set; } = Array.Empty<DropInfo>();
 
 
         //----
@@ -29,8 +29,6 @@ namespace PlantingDay.Models
         public int? DaysToProduce { get; set; }
         public int? RegrowDays { get; set; }
 
-        // Output items (crops, fruit, bush drops)
-        public IReadOnlyList<DropInfo> Drops { get; set; } = Array.Empty<DropInfo>();
 
         // Flags (optional)
         public bool Trellis { get; set; }
@@ -47,15 +45,16 @@ namespace PlantingDay.Models
 
 
 
+        //Raw Object info for the seed and harvest items
+        public ItemInfo? Seed { get; set; } = new ItemInfo(); //Has raw icons
+        public ItemInfo? Harvest { get; set; } = new ItemInfo(); //Has raw icons, sell price
 
         //---------
-        // ICONS
+        // ICONS (use these ones, not the raw ones from ItemInfo)
         //---------
 
-        public Texture2D? SeedIconTexture { get; set; }
-        public Texture2D? HarvestIconTexture { get; set; }
-
-        
+        public IconRef? SeedIconRef { get; set; }
+        public IconRef? HarvestIconRef { get; set; }
 
     }
     public enum PlantType
@@ -73,13 +72,13 @@ namespace PlantingDay.Models
         Winter
     }
 
-    public class DropInfo
-    {
-        public string ItemId { get; set; } = "";
-        public double ExtraHarvestChance { get; set; } = 1f; //e.g. potato
-        public int MinStack { get; set; } = 1;
-        public int MaxStack { get; set; } = 1;
-    }
+    //public class DropInfo
+    //{
+    //    public string ItemId { get; set; } = "";
+    //    public double ExtraHarvestChance { get; set; } = 1f; //e.g. potato
+    //    public int MinStack { get; set; } = 1;
+    //    public int MaxStack { get; set; } = 1;
+    //}
 
     public class PurchaseInfo
     {
@@ -92,7 +91,6 @@ namespace PlantingDay.Models
         public int TradeAmount { get; set; }           // e.g. 4
 
         public string? Condition { get; set; }         // e.g. "EVENT eggFestival", "SEASON spring"
-        public bool IsNightMarket { get; set; }
     }
 
     public class MonsterDropInfo
@@ -100,7 +98,7 @@ namespace PlantingDay.Models
         public string? MonsterName { get; set; }
         public float Chance { get; set; }
         public IconRef? MonsterIconRef { get; set; }
-}
+    }
 
 
     }

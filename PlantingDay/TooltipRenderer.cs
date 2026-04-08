@@ -33,13 +33,17 @@ namespace PlantingDay
             if (hovered is not StardewValley.Object obj)
                 return;
 
+
+
             // Use the correct key format O:#### to see if the item is in the plant library
-            string lookupKey = "O:" + obj.ItemId;
+            string lookupKey = obj.ItemId;
 
             var plant = PlantDatabase.LookupFromKey(lookupKey);
+
             if (plant is null)
                 return;
-            //ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Seed.Name} = {plant.Harvest?.Id}", LogLevel.Info);
+            ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Seed.Name} = {plant.Harvest?.Id}", LogLevel.Info);
+
 
             var elements = TooltipBuilder.BuildTooltip(plant);
 
@@ -307,26 +311,6 @@ namespace PlantingDay
                             );
 
                             xCursor += lineHeight;
-                            //var icon = seg.IconRef.Value;
-                            //float scale = icon.Scale;
-                            //int iconWidth = (int)(icon.Source.Width * scale);
-                            //int iconHeight = (int)(icon.Source.Height * scale);
-
-                            //int yOffset = drawY + (lineHeight - iconHeight) / 2;
-
-                            //b.Draw(
-                            //    icon.Texture,
-                            //    new Vector2(xCursor, yOffset),
-                            //    icon.Source,
-                            //    Color.White,
-                            //    0f,
-                            //    Vector2.Zero,
-                            //    scale,
-                            //    SpriteEffects.None,
-                            //    1f
-                            //);
-
-                            //xCursor += iconWidth;
                         }
                         if (!string.IsNullOrEmpty(seg.Text))
                         {
@@ -378,19 +362,26 @@ namespace PlantingDay
 
         // Put multiple segments on the same line with separators (e.g., seasons)
         public static List<InlineSegment> BuildInlineSegments<T>(
-                IEnumerable<T> items,
-                Func<T, IEnumerable<InlineSegment>> buildSegments,
-                string separator = " • ")
+            IEnumerable<T> items,
+            Func<T, IEnumerable<InlineSegment>> buildSegments,
+            string separator = " • ")
         {
             var result = new List<InlineSegment>();
             var list = items.ToList();
 
             for (int i = 0; i < list.Count; i++)
             {
-                // Add all segments for this vendor
-                result.AddRange(buildSegments(list[i]));
+                // Build ONCE
+                var segs = buildSegments(list[i]).ToList();
 
-                // Add separator if not last vendor
+                // Skip empty
+                if (segs.Count == 0)
+                    continue;
+
+                // Add segments
+                result.AddRange(segs);
+
+                // Add separator if not last
                 if (i < list.Count - 1)
                 {
                     result.Add(new InlineSegment
@@ -404,7 +395,6 @@ namespace PlantingDay
 
             return result;
         }
-
         private static int DrawPaddedIcon(
              SpriteBatch b,
              Texture2D texture,

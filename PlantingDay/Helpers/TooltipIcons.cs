@@ -76,7 +76,7 @@ namespace PlantingDay.Helpers
 
             //For plant features
             Rainbow = new IconRef(Cursors, new Rectangle(596, 1888, 16, 16), size: 16, scale: 1.5f);
-            WaterSeeds = new IconRef(Beach, new Rectangle(160, 112, 16, 16), size: 16, scale: 2f);
+            WaterSeeds = new IconRef(Beach, new Rectangle(160, 112, 16, 16), size: 16, scale: 1.5f);
             Watercan = new IconRef(Tools, new Rectangle(48, 225, 16, 16), size: 16, scale: 2f);
             Scythe = new IconRef(Weapons, new Rectangle(112, 80, 16, 16), size: 16, scale: 2f);
             Trellis = new IconRef(Fences, new Rectangle(43, 130, 5, 18), size: 18, scale: 2f);

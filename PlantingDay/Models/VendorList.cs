@@ -1,110 +1,100 @@
 ﻿using PlantingDay.Helpers;
+using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static StardewValley.Menus.CharacterCustomization;
 
 namespace PlantingDay.Models
 {
     public static class VendorListBuilder
     {
+
         private static readonly HashSet<string> IgnoredVendors = new()
         {
            "JojaMart",
+           "Joja"
         };
 
+        //public static List<PurchaseInfo> Build(PlantInfo plant)
+        //{
+        //    // Filter and collapse duplicates
+        //    return plant.PurchaseOptions
+        //        .Where(p => !IgnoredVendors.Any(ignore =>
+        //            p.VendorId.StartsWith(ignore, StringComparison.OrdinalIgnoreCase)))
+        //        .GroupBy(v => VendorHelper.VendorKey(v))
+        //        .Select(g => g.First())
+        //        .ToList();
+        //}
+
+
+        //public static class VendorListBuilder
+        //{
+        //private static readonly HashSet<string> IgnoredVendors = new()
+        //    {
+        //        "JojaMart",
+        //    };
         public static List<PurchaseInfo> Build(PlantInfo plant)
         {
             // Filter and collapse duplicates
-            return plant.PurchaseOptions
-                .Where(p => !IgnoredVendors.Contains(p.VendorId))
-                .GroupBy(v => VendorKey(v))
+            var vendors = plant.PurchaseOptions
+                        .Where(p => !IgnoredVendors.Any(ignore =>
+                            p.VendorId.StartsWith(ignore, StringComparison.OrdinalIgnoreCase)))
+
+                .GroupBy(v => VendorHelper.VendorKey(v))
                 .Select(g => g.First())
                 .ToList();
-        }
 
-        private static string VendorKey(PurchaseInfo v)
-        {
-            if (VendorHelper.IsPierre(v))
-                return "SeedShop";
+            //ModEntry.Instance.Monitor.Log("=== VENDOR DETAILS ===", LogLevel.Warn);
+            //foreach (var v in vendors)
+            //{
+            //    ModEntry.Instance.Monitor.Log(
+            //        $"Vendor: {v.VendorName}, Price={v.GoldPrice}, Trade={v.TradeAmount}, IsNightMarket={VendorHelper.IsNightMarket(v)}",
+            //        LogLevel.Warn
+            //    );
+            //}
 
-            if (VendorHelper.IsNightMarket(v))
-                return "NightMarket";
+            // sort vendors
+            var sortedVendors = vendors
+                .OrderBy(v => VendorHelper.SortKey(v))
+                .ThenBy(v => v.VendorName)
+                .ToList();
 
-            if (VendorHelper.IsDesertFestival(v))
-                return "DesertFestival";
+            //ModEntry.Instance.Monitor.Log("=== SORTED VENDORS ===", LogLevel.Warn);
+            //foreach (var v in sortedVendors)
+            //{
+            //    ModEntry.Instance.Monitor.Log(
+            //        $"Vendor: {v.VendorName}, Price={v.GoldPrice}, Trade={v.TradeAmount}, IsNightMarket={VendorHelper.IsNightMarket(v)}",
+            //        LogLevel.Warn
+            //        );
+            //}
 
-            return v.VendorId;
+            return sortedVendors;
         }
     }
-    //public static class VendorListBuilder
-    //{
-    //    private static readonly HashSet<string> IgnoredVendors = new()
-    //        {
-    //            "JojaMart",
-    //        };
-    //    public static List<PurchaseInfo> Build(PlantInfo plant)
-    //    {
-    //        // Filter and collapse duplicates
-    //        var vendors = plant.PurchaseOptions
-    //            .Where(p => !IgnoredVendors.Contains(p.VendorId))
-    //            .GroupBy(v => VendorKey(v))
-    //            .Select(g => g.First())
-    //            .ToList();
 
-    //        // sort vendors
-    //        var sortedVendors = vendors
-    //            .OrderBy(v => SortKey(v))
-    //            .ThenBy(v => v.VendorName)
-    //            .ToList();
+        //    //-------------
+        //    // Grouping - Collapse multiple entries to one
+        //    //-------------
 
-    //        return sortedVendors;
-    //    }
+        //    private static string VendorKey(PurchaseInfo v)
+        //    {
+        //        if (Helpers.VendorHelper.IsPierre(v))
+        //            return "SeedShop";      
 
-    //    //-------------
-    //    // Grouping - Collapse multiple entries to one
-    //    //-------------
+        //        if (Helpers.VendorHelper.IsNightMarket(v))
+        //            return "NightMarket";   
 
-    //    private static string VendorKey(PurchaseInfo v)
-    //    {
-    //        if (Helpers.VendorHelper.IsPierre(v))
-    //            return "SeedShop";      
+        //        if (Helpers.VendorHelper.IsDesertFestival(v))
+        //            return "DesertFestival";   
 
-    //        if (Helpers.VendorHelper.IsNightMarket(v))
-    //            return "NightMarket";   
+        //        return v.VendorId;          
+        //    }
 
-    //        if (Helpers.VendorHelper.IsDesertFestival(v))
-    //            return "DesertFestival";   
+        //    //-------------
+        //    // Sorting
+        //    //-------------
 
-    //        return v.VendorId;          
-    //    }
-
-    //    //-------------
-    //    // Sorting
-    //    //-------------
-    //    private static int SortKey(PurchaseInfo v)
-    //    {
-    //        // 0 — Pierre always first
-    //        if (Helpers.VendorHelper.IsPierre(v))
-    //            return 0;
-
-    //        // 4 — Night Market always last
-    //        if (Helpers.VendorHelper.IsNightMarket(v))
-    //            return 4;
-
-    //        // 1 — Gold vendors (Joja, Traveling Cart, etc.)
-    //        if (v.GoldPrice.HasValue)
-    //            return 1;
-
-    //        // 3 — Trade vendors (Desert Trader, Island Trader, Qi trade shops)
-    //        if (v.TradeAmount > 0)
-    //            return 3;
-
-    //        // 2 — Everything else (icon-only vendors, special cases)
-    //        return 2;
-    //    }
-
-    //}
-
-}
+    }

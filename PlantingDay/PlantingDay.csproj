@@ -15,5 +15,10 @@
 		<None Include="i18n\**\*.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
+	<PropertyGroup>
+		<RootNamespace>PlantingDay</RootNamespace>
+	</PropertyGroup>
+
+
 </Project>
 

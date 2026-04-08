@@ -5,6 +5,8 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
 using StardewValley.GameData.Shops;
+using StardewValley.Internal;
+using StardewValley.Menus;
 using System.Runtime.CompilerServices;
 using static PlantingDay.Helpers.SeedSourceAggregator;
 
@@ -24,23 +26,7 @@ namespace PlantingDay
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            TooltipIcons.Initialize();
 
-            // KEEP this debug for later, it shows all game shops available. Useful when needing to fix mod shops
-
-            var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
-
-            foreach (var shopId in shops.Keys)
-            {
-                ModEntry.Instance.Monitor.Log($"[Planting Day] Found shop: {shopId}", LogLevel.Info);
-            }
-            foreach (var pack in Helper.ContentPacks.GetOwned())
-            {
-                foreach (string file in Directory.GetFiles(pack.DirectoryPath, "shop_*.json", SearchOption.AllDirectories))
-                {
-                    Monitor.Log($"[Planting Day] Found mod shop file: {file}", LogLevel.Info);
-                }
-            }
 
             //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 
@@ -59,16 +45,7 @@ namespace PlantingDay
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            PlantDatabase.Initialize();
-            MonsterDropLoader.Initialize();
-
-
-            foreach (var plant in PlantDatabase.AllPlants)
-            {
-                SeedSourceAggregator.AddSeedSourcesToPlant(plant);
-                IconRenderer_plants.InitializeIcons(plant);
-            }
-
+            Initialize.ForRuntime(this.Helper);
 
             //string dataPath = ModEntry.ModHelper.DirectoryPath;
 
@@ -85,8 +62,32 @@ namespace PlantingDay
 
             TooltipRenderer.DrawMenu(e.SpriteBatch);
 
+            if (Game1.activeClickableMenu is ShopMenu shop)
+            {
+                Monitor.Log("=== PIERRE SHOP DUMP ===", LogLevel.Warn);
 
+                foreach (var salable in shop.forSale)
+                {
+                    var item = salable as Item;
+                    if (item == null)
+                        continue;
+
+                    // 1. Get the stock info (price, stock, etc.)
+                    if (!shop.itemPriceAndStock.TryGetValue(salable, out var stockInfo))
+                        continue;
+
+                    int price = stockInfo.Price;   // <-- THIS is the final price Pierre is charging
+
+                    Monitor.Log(
+                        $"{item.Name} (ID: {item.ParentSheetIndex}) - Price: {price}",
+                        LogLevel.Warn
+                    );
+                }
+            }
         }
+
+
+        
 
 
 
@@ -101,24 +102,89 @@ namespace PlantingDay
             //Rebuild the Plant database
             PlantDatabase.Reset();
             PlantDatabase.Initialize();
+            MonsterDropLoader.Initialize();
 
-            //var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
+            foreach (var plant in PlantDatabase.AllPlants)
+            {
+                SeedSourceAggregator.AddSeedSourcesToPlant(plant);
+                //ModEntry.Instance.Monitor.Log($"HERE: {plant.HarvestId}", LogLevel.Info);
+                IconRenderer_plants.InitializeIcons(plant);
+            }
 
-            //if (shops.TryGetValue("SeedShop", out var pierre))
+            //temp
+            //////foreach (var plant in PlantDatabase.AllPlants)
+            //////{
+
+            //////    // Create the item instance
+            //////    var item = ItemRegistry.Create(plant.SeedId);
+
+            //////    // Fake shop data (Pierre's)
+            //////    var shopData = new ShopData();
+
+            //////    // Fake shop item entry
+            //////    var itemData = new ShopItemData
+            //////    {
+            //////        Id = plant.SeedId,
+            //////        ItemId = plant.SeedId,
+            //////        Price = -1,
+            //////        IgnoreShopPriceModifiers = false,
+            //////        UseObjectDataPrice = false
+            //////    };
+
+            //////    // ItemQueryResult requires the item
+            //////    var output = new ItemQueryResult(item);
+
+            //////    // Compute the real base price Pierre charges
+            //////    int price = ShopBuilder.GetBasePrice(
+            //////        output,
+            //////        shopData,
+            //////        itemData,
+            //////        item,
+            //////        outOfSeasonPrice: false,
+            //////        useObjectDataPrice: false
+            //////    );
+
+            //////    foreach (var option in plant.PurchaseOptions)
+            //////    {
+            //////        if (option.VendorId != "SeedShop")
+            //////            continue;
+
+
+            //////        Monitor.Log($"GoldP:{option.GoldPrice} SellP: {price} for  { plant.SeedId}", LogLevel.Warn);
+            //////    }
+            //////}
+
+            //KEEP Debug to output desired database variable from a list
+            //foreach (var plant in PlantDatabase.AllPlants)
             //{
-            //    foreach (var entry in pierre.Items)
+            //    foreach (var option in plant.PurchaseOptions)
             //    {
-            //        // Log the raw entry
-            //        Monitor.Log($"Pierre sells entry: {entry.ItemId}", LogLevel.Info);
-
-                    //// If it's a wildcard entry, test if it applies to Mustard
-                    //if (entry.ItemId == "ALL_ITEMS (O)")
-                    //{
-                    //    bool matches = DebugMatchesWildcard("Cornucopia_MustardSeeds", entry);
-                    //    Monitor.Log($"  → Wildcard applies to Mustard? {matches}", LogLevel.Info);
-                    //}
-              //  }
+            //        ModEntry.Instance.Monitor.Log(
+            //            $"Seed: {plant.SeedId} Vendor: {option.VendorId} Price: {option.GoldPrice}",
+            //            LogLevel.Warn
+            //        );
+            //    }
             //}
+
+
+            // KEEP Shows all game shops available. Useful when needing to fix mod shops
+            /*
+             var shops = Game1.content.Load<Dictionary<string, ShopData>>("Data/Shops");
+            foreach (var shopId in shops.Keys)
+            {
+                ModEntry.Instance.Monitor.Log($"[Planting Day] Found shop: {shopId}", LogLevel.Info);
+            }
+            foreach (var pack in Helper.ContentPacks.GetOwned())
+            {
+                foreach (string file in Directory.GetFiles(pack.DirectoryPath, "shop_*.json", SearchOption.AllDirectories))
+                {
+                    Monitor.Log($"[Planting Day] Found mod shop file: {file}", LogLevel.Info);
+                }
+            }
+            */
+
+
+
         }
     }
 }

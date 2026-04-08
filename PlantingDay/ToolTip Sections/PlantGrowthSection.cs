@@ -140,7 +140,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                IconTexture = plant.HarvestIconTexture,
+                IconRef = plant.HarvestIconRef,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.DaysToProduce),
                     plant.DaysToProduce
@@ -173,7 +173,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                IconTexture = plant.HarvestIconTexture,
+                IconRef = plant.HarvestIconRef,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
                     plant.DaysToProduce,
@@ -206,10 +206,10 @@ namespace PlantingDay.ToolTip_Sections
                 !plant.Seasons.Contains(growth.NextSeason) ||
                 growth.ReadyDay < 28)
                 return list;
-            ModEntry.Instance.Monitor.Log($"READY Day: {growth.ReadyDay}", LogLevel.Info);
+
             list.Add(new TooltipElement
             {
-                IconTexture = plant.HarvestIconTexture,
+                IconRef = plant.HarvestIconRef,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
                     plant.DaysToProduce,
@@ -245,7 +245,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                IconTexture = plant.HarvestIconTexture,
+                IconRef = plant.HarvestIconRef,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.DaysToProduce),
                     plant.DaysToProduce
@@ -425,7 +425,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                IconTexture = plant.HarvestIconTexture,
+                IconRef = plant.HarvestIconRef,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
                     plant.DaysToProduce,
@@ -458,7 +458,7 @@ namespace PlantingDay.ToolTip_Sections
 
                 list.Add(new TooltipElement
                 {
-                    IconTexture = plant.HarvestIconTexture,
+                    IconRef = plant.HarvestIconRef,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.TreeReadyInFuture),
                         plant.Seasons?.FirstOrDefault()

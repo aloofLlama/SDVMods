@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PlantingDay.Models;
+using StardewModdingAPI;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace PlantingDay.Helpers
 {
@@ -17,19 +19,43 @@ namespace PlantingDay.Helpers
             //Seed Icon
             if (plant.Seed != null)
             {
-                var item = ItemRegistry.Create(plant.Seed.Id);
+                string gameId = IdHelper.ToGameId(plant.Seed.Id);
+                var item = ItemRegistry.Create(gameId);
                 if (item != null)
-                    plant.SeedIconTexture = RenderItemIcon(item, 16);
+                {
+                    //MARK plant.SeedIconTexture = RenderItemIcon(item, 16);
+                    var tex = RenderItemIcon(item, 16);
+                    plant.SeedIconRef = new IconRef(
+                        tex,
+                        new Rectangle(0, 0, tex.Width, tex.Height),
+                        size: tex.Width,   // or 16
+                        scale: 2f          // ← make it bigger
+                    );
+                }
 
             }
 
             //Harvest Icon
-            if (plant.Harvest != null)
+            if (plant.Harvest!= null)
             {
-                var item = ItemRegistry.Create(plant.Harvest.Id);
+                //string gameId = IdHelper.ToGameId(plant.Harvest.Id);
+                var item = ItemRegistry.Create(plant.HarvestId);
+                //ModEntry.Instance.Monitor.Log($"ATTEMPT: {plant.HarvestId}", LogLevel.Info);
                 if (item != null)
-                    plant.HarvestIconTexture = RenderItemIcon(item, 32);
+                {
+                    //MARK plant.HarvestIconTexture = RenderItemIcon(item, 32);
+                    var tex = RenderItemIcon(item, 32);
+                    plant.HarvestIconRef = new IconRef(
+                        tex,
+                        new Rectangle(0, 0, tex.Width, tex.Height),
+                        size: tex.Width,   // or 16
+                        scale: 1f          // ← make it bigger
+                    );
+                    //ModEntry.Instance.Monitor.Log($"SUCEED: {plant.HarvestId}", LogLevel.Info);
+
+                }
             }
+
         }
 
         public static Texture2D RenderItemIcon(Item item, int size = 16)
@@ -52,7 +78,7 @@ namespace PlantingDay.Helpers
             item.drawInMenu(
                 batch,
                 Vector2.Zero,
-                1f,            // natural scale (same as before)
+                1f,           
                 1f,
                 1f,
                 StackDrawType.Hide,

@@ -1,5 +1,6 @@
 ﻿using PlantingDay.Helpers;
 using PlantingDay.Models;
+using StardewModdingAPI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,29 +17,86 @@ namespace PlantingDay.ToolTip_Sections
             var list = new List<TooltipElement>();
 
             // 1. Get the final ordered list (Pierre → Gold → Trade → Monster → Night Market)
-            var sources = SeedSourceAggregator.BuildFullSourceList(plant);
+            var sources = SeedSourceAggregator.BuildFullSourceList(plant)
+                .Where(s => s is PurchaseInfo || s is MonsterDropInfo)
+                .ToList();
+
+
+
+            ModEntry.Instance.Monitor.Log("=== INLINE SOURCE ITEMS ===", LogLevel.Warn);
+            ModEntry.Instance.Monitor.Log($"Count = {sources.Count}", LogLevel.Warn);
+            int idx = 0;
+            foreach (var s in sources)
+            {
+                if (s is PurchaseInfo p)
+                {
+                    ModEntry.Instance.Monitor.Log(
+                        $"[{idx}] PurchaseInfo: Vendor={p.VendorName}, Price={p.GoldPrice}, Trade={p.TradeAmount}, IsNightMarket={VendorHelper.IsNightMarket(p)}",
+                        LogLevel.Warn
+                    );
+                }
+                else if (s is MonsterDropInfo m)
+                {
+                    ModEntry.Instance.Monitor.Log(
+                        $"[{idx}] MonsterDrop: Monster={m.MonsterName}, Chance={m.Chance}",
+                        LogLevel.Warn
+                    );
+                }
+                else
+                {
+                    ModEntry.Instance.Monitor.Log(
+                        $"[{idx}] UNKNOWN TYPE: {s?.GetType().Name}",
+                        LogLevel.Warn
+                    );
+                }
+
+                idx++;
+            }
+
+
+
+
+
+
 
             // 2. Convert each source into inline segments
             var segments = TooltipRenderer.BuildInlineSegments(
                 sources,
                 source =>
                 {
+                    //ModEntry.Instance.Monitor.Log($"Selector invoked for {source.GetType().Name}", LogLevel.Warn);
+
                     if (source is PurchaseInfo vendor)
-                        return BuildVendorSegments(vendor);
+                        return BuildVendorSegments(vendor) ?? Array.Empty<InlineSegment>();
+
 
                     if (source is MonsterDropInfo drop)
-                        return BuildMonsterSegments(drop);
+                        return BuildMonsterSegments(drop) ?? Array.Empty<InlineSegment>();
+
 
                     return Array.Empty<InlineSegment>();
-                });
 
-            // 3. Add coin icon at start if any gold vendors exist
-            if (plant.PurchaseOptions.Any(v => v.GoldPrice.HasValue))
+                });
+            //for (int i = 0; i < segments.Count; i++)
+            //{
+            //    ModEntry.Instance.Monitor.Log(
+            //        $"SEGMENT[{i}]: IconTexture={segments[i].IconTexture != null}, IconRef={segments[i].IconRef}, Text='{segments[i].Text}'",
+            //        LogLevel.Info
+            //    );
+            //}
+
+            // 3. Add seed icon at the start
+            if (plant.SeedIconRef != null)
             {
                 segments.Insert(0, new InlineSegment
                 {
-                    IconRef = TooltipIcons.LittleCoin
+                    IconRef = plant.SeedIconRef,
                 });
+//                ModEntry.Instance.Monitor.Log(
+//    $"SEGMENT[0] after insert: IconTexture={segments[0].IconTexture != null}, Text='{segments[0].Text}'",
+//    LogLevel.Info
+//);
+
             }
 
             list.Add(new TooltipElement
@@ -52,7 +110,7 @@ namespace PlantingDay.ToolTip_Sections
         //──────────────────────────────────────────────
         // Vendor → InlineSegments
         //──────────────────────────────────────────────
-        private static InlineSegment[] BuildVendorSegments(PurchaseInfo vendor)
+        private static InlineSegment[]? BuildVendorSegments(PurchaseInfo vendor)
         {
             // Pierre (gold only)
             if (VendorHelper.IsPierre(vendor))
@@ -70,7 +128,7 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             // Night Market (icon only)
-            if (vendor.IsNightMarket)
+            if (VendorHelper.IsNightMarket(vendor))
             {
                 return new[]
                 {
@@ -96,7 +154,8 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             // Gold vendors
-            if (vendor.GoldPrice.HasValue)
+            if (vendor.GoldPrice.HasValue && 
+                !VendorHelper.IsNightMarket(vendor)) // night market handled above
             {
                 return new[]
                 {
@@ -129,13 +188,13 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             // Fallback
-            return Array.Empty<InlineSegment>();
+            return null;
         }
 
         //──────────────────────────────────────────────
         // Monster Drop → InlineSegments
         //──────────────────────────────────────────────
-        private static InlineSegment[] BuildMonsterSegments(MonsterDropInfo drop)
+        private static InlineSegment[]? BuildMonsterSegments(MonsterDropInfo drop)
         {
             return new[]
             {
@@ -145,7 +204,9 @@ namespace PlantingDay.ToolTip_Sections
                 Text = $" {(drop.Chance * 100f):0.#}%",
                 Color = TooltipColors.Normal
             }
-        };
+
+            };
+
         }
     }
 

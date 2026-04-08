@@ -8,40 +8,34 @@ namespace PlantingDay.Helpers
 {
     public static class IdHelper
     {
-        public static string NormalizeItemId(string raw)
+        //Seed and Harvest Ids are stored raw from game data:
+        //e.g. 890, CarrotSeeds, Cornucopia_BasilSeeds, 889, Carrot, Cornucopia_Basil, (O)638 [for fruit tree fruit]
+        //Shop data lists seeds as (O)890, Carrot Seeds, Cornucopia_BasilSeeds
+        public static string CanonicalItemId(string? raw)
         {
-            if (string.IsNullOrWhiteSpace(raw))
-                return "";
+            if (string.IsNullOrEmpty(raw))
+                return string.Empty;
 
-            raw = raw.Trim();
+            // Vanilla object: (O)### → ###
+            if (raw.StartsWith("(O)") && int.TryParse(raw.AsSpan(3), out int num))
+                return num.ToString();
 
-            // Convert (O)### → O:###
-            if (raw.StartsWith("(") && raw.Contains(')'))
-            {
-                int close = raw.IndexOf(')');
-                string prefix = raw.Substring(1, close - 1);
-                string number = raw.Substring(close + 1);
-                return $"{prefix}:{number}";
-            }
+            // Modded object: (O)StringId → StringId
+            if (raw.StartsWith("(O)"))
+                return raw.Substring(3);
 
-            // Already qualified (O:###, S:###, modded IDs)
-            if (raw.Contains(":"))
-                return raw;
-
-            // Numeric → assume O:###
-            if (int.TryParse(raw, out _))
-                return $"O:{raw}";
-
-            // Modded string IDs (Cornucopia_*)
+            // Already canonical (modded seeds, JA, DGA, etc.)
             return raw;
         }
-
-        public static string ExtractNumericId(string id)
+        public static string ToGameId(string id)
         {
-            // "(O)638" → "638"
-            // "O:638"  → "638"
-            // "638"    → "638"
-            return new string(id.Where(char.IsDigit).ToArray());
+            // Modded IDs contain no digits → return raw
+            if (!id.Any(char.IsDigit))
+                return id;
+
+            // Vanilla IDs → return numeric form
+                return new string(id.Where(char.IsDigit).ToArray());
+            ;
         }
 
         //public static string NormalizeItemId(string raw)
