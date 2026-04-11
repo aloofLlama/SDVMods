@@ -16,6 +16,16 @@
 		<None Include="i18n\**\*.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\PlantingDay_Models\PlantingDay_Models.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="0Harmony">
+	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\smapi-internal\0Harmony.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+
 	
 
 

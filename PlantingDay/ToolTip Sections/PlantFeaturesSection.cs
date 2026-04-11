@@ -1,4 +1,5 @@
 ﻿using PlantingDay.Helpers;
+using PlantingDay.Helpers.Icons;
 using PlantingDay.Models;
 using StardewValley.GameData.Crops;
 using System;
@@ -17,12 +18,12 @@ namespace PlantingDay.ToolTip_Sections
             var list = new List<TooltipElement>();
 
             //Trellis
-            if (plant.Trellis && 
-                plant.PlantType == PlantType.Crop)
+            if (plant.Data.Trellis && 
+                plant.Data.PlantType == PlantType.Crop)
             {
                 list.Add(new TooltipElement
                 {
-                    IconRef = TooltipIcons.Trellis,
+                    Icon = TooltipIcons.Trellis,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RequiresTrellis)
                     ),
@@ -30,12 +31,12 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             //No watering
-            if (!plant.NeedsWatering && 
-                plant.PlantType == PlantType.Crop)
+            if (!plant.Data.NeedsWatering && 
+                plant.Data.PlantType == PlantType.Crop)
             {
                 list.Add(new TooltipElement
                 {
-                    IconRef = TooltipIcons.Watercan,
+                    Icon = TooltipIcons.Watercan,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.NoWatering)
                     ),
@@ -43,12 +44,12 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             //Harvest with scythe
-            if (plant.Scythe == HarvestMethod.Scythe && 
-                plant.PlantType == PlantType.Crop)
+            if (plant.Data.NeedsScythe && 
+                plant.Data.PlantType == PlantType.Crop)
             {
                 list.Add(new TooltipElement
                 {
-                    IconRef = TooltipIcons.Scythe,
+                    Icon = TooltipIcons.Scythe,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.HarvestWithScythe)
                     ),
@@ -56,14 +57,14 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             //Multicolor sprites
-            if (plant.MultiSprite > 0)
+            if (plant.Data.MultiSprite > 0)
             {
                 list.Add(new TooltipElement
                 {
-                    IconRef = TooltipIcons.Rainbow,
+                    Icon = TooltipIcons.Rainbow,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.MultiSprite),
-                        plant.MultiSprite
+                        plant.Data.MultiSprite
                     ),
                 });
             }

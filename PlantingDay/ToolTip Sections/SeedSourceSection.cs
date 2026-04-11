@@ -1,11 +1,11 @@
 ﻿using PlantingDay.Helpers;
+using PlantingDay.Helpers.Icons;
+using PlantingDay.Helpers.SeedSource;
 using PlantingDay.Models;
+using PlantingDay.RuntimeModels;
 using StardewModdingAPI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PlantingDay.ToolTip_Sections
 {
@@ -16,89 +16,46 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            // 1. Get the final ordered list (Pierre → Gold → Trade → Monster → Night Market)
-            var sources = SeedSourceAggregator.BuildFullSourceList(plant)
-                .Where(s => s is PurchaseInfo || s is MonsterDropInfo)
-                .ToList();
+            // ------------------------------------------------------------
+            // 1. Build unified source list (vendors + monster drops)
+            // ------------------------------------------------------------
+            var vendors = VendorListBuilder.Build(plant);          // List<PurchaseInfoRuntime>
+            var monsterDrops = plant.MonsterDrops;                 // List<MonsterDropInfoRuntime>
 
+            var sources = new List<object>();
+            sources.AddRange(vendors);
+            sources.AddRange(monsterDrops);
 
-
-            ModEntry.Instance.Monitor.Log("=== INLINE SOURCE ITEMS ===", LogLevel.Warn);
-            ModEntry.Instance.Monitor.Log($"Count = {sources.Count}", LogLevel.Warn);
-            int idx = 0;
-            foreach (var s in sources)
-            {
-                if (s is PurchaseInfo p)
-                {
-                    ModEntry.Instance.Monitor.Log(
-                        $"[{idx}] PurchaseInfo: Vendor={p.VendorName}, Price={p.GoldPrice}, Trade={p.TradeAmount}, IsNightMarket={VendorHelper.IsNightMarket(p)}",
-                        LogLevel.Warn
-                    );
-                }
-                else if (s is MonsterDropInfo m)
-                {
-                    ModEntry.Instance.Monitor.Log(
-                        $"[{idx}] MonsterDrop: Monster={m.MonsterName}, Chance={m.Chance}",
-                        LogLevel.Warn
-                    );
-                }
-                else
-                {
-                    ModEntry.Instance.Monitor.Log(
-                        $"[{idx}] UNKNOWN TYPE: {s?.GetType().Name}",
-                        LogLevel.Warn
-                    );
-                }
-
-                idx++;
-            }
-
-
-
-
-
-
-
+            // ------------------------------------------------------------
             // 2. Convert each source into inline segments
+            // ------------------------------------------------------------
             var segments = TooltipRenderer.BuildInlineSegments(
                 sources,
                 source =>
                 {
-                    //ModEntry.Instance.Monitor.Log($"Selector invoked for {source.GetType().Name}", LogLevel.Warn);
+                    if (source is PurchaseInfoRuntime vendor)
+                        return BuildVendorSegments(vendor) ?? System.Array.Empty<InlineSegment>();
 
-                    if (source is PurchaseInfo vendor)
-                        return BuildVendorSegments(vendor) ?? Array.Empty<InlineSegment>();
+                    if (source is MonsterDropInfoRuntime drop)
+                        return BuildMonsterSegments(drop) ?? System.Array.Empty<InlineSegment>();
 
-
-                    if (source is MonsterDropInfo drop)
-                        return BuildMonsterSegments(drop) ?? Array.Empty<InlineSegment>();
-
-
-                    return Array.Empty<InlineSegment>();
-
+                    return System.Array.Empty<InlineSegment>();
                 });
-            //for (int i = 0; i < segments.Count; i++)
-            //{
-            //    ModEntry.Instance.Monitor.Log(
-            //        $"SEGMENT[{i}]: IconTexture={segments[i].IconTexture != null}, IconRef={segments[i].IconRef}, Text='{segments[i].Text}'",
-            //        LogLevel.Info
-            //    );
-            //}
 
+            // ------------------------------------------------------------
             // 3. Add seed icon at the start
-            if (plant.SeedIconRef != null)
+            // ------------------------------------------------------------
+            if (plant.Runtime.SeedIcon != null)
             {
                 segments.Insert(0, new InlineSegment
                 {
-                    IconRef = plant.SeedIconRef,
+                    Icon = plant.Runtime.SeedIcon
                 });
-//                ModEntry.Instance.Monitor.Log(
-//    $"SEGMENT[0] after insert: IconTexture={segments[0].IconTexture != null}, Text='{segments[0].Text}'",
-//    LogLevel.Info
-//);
-
             }
 
+            // ------------------------------------------------------------
+            // 4. Add final tooltip element
+            // ------------------------------------------------------------
             list.Add(new TooltipElement
             {
                 InlineSegments = segments
@@ -110,81 +67,82 @@ namespace PlantingDay.ToolTip_Sections
         //──────────────────────────────────────────────
         // Vendor → InlineSegments
         //──────────────────────────────────────────────
-        private static InlineSegment[]? BuildVendorSegments(PurchaseInfo vendor)
+        private static InlineSegment[]? BuildVendorSegments(PurchaseInfoRuntime vendor)
         {
+            var data = vendor.Data;
+
             // Pierre (gold only)
-            if (VendorHelper.IsPierre(vendor))
+            if (VendorHelper.IsPierre(data.VendorId))
             {
                 return new[]
                 {
-                new InlineSegment
-                {
-                    Text = string.Format(
-                        ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
-                        vendor.GoldPrice),
-                    Color = TooltipColors.Normal
-                }
-            };
+                    new InlineSegment
+                    {
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
+                            data.GoldPrice),
+                        Color = TooltipColors.Normal
+                    }
+                };
             }
 
             // Night Market (icon only)
-            if (VendorHelper.IsNightMarket(vendor))
+            if (VendorHelper.IsNightMarket(data.VendorId))
             {
                 return new[]
                 {
-                new InlineSegment
-                {
-                    IconRef = TooltipIcons.NightStars
-                }
-            };
+                    new InlineSegment
+                    {
+                        Icon = TooltipIcons.NightStars
+                    }
+                };
             }
 
             // Valley Fair (star tokens)
-            if (VendorHelper.IsValleyFair(vendor))
+            if (VendorHelper.IsValleyFair(data.VendorId))
             {
                 return new[]
                 {
-                new InlineSegment
-                {
-                    IconRef = TooltipIcons.StarToken,
-                    Text = $" {vendor.GoldPrice} at {vendor.VendorName}",
-                    Color = TooltipColors.Normal
-                }
-            };
+                    new InlineSegment
+                    {
+                        Icon = TooltipIcons.StarToken,
+                        Text = $" {data.GoldPrice} at {data.VendorName}",
+                        Color = TooltipColors.Normal
+                    }
+                };
             }
 
             // Gold vendors
-            if (vendor.GoldPrice.HasValue && 
-                !VendorHelper.IsNightMarket(vendor)) // night market handled above
+            if (data.GoldPrice.HasValue)
             {
                 return new[]
                 {
-                new InlineSegment
-                {
-                    Text = string.Format(
-                        ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
-                        vendor.GoldPrice,
-                        vendor.VendorName),
-                    Color = TooltipColors.Normal
-                }
-            };
+                    new InlineSegment
+                    {
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
+                            data.GoldPrice,
+                            data.VendorName),
+                        Color = TooltipColors.Normal
+                    }
+                };
             }
 
             // Trade vendors
-            if (vendor.TradeAmount > 0)
+            if (data.TradeAmount > 0)
             {
                 return new[]
                 {
-                new InlineSegment
-                {
-                    IconRef = vendor.CurrencyIconRef,
-                    Text = string.Format(
-                        ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
-                        vendor.TradeAmount.ToString(),
-                        vendor.VendorName),
-                    Color = TooltipColors.Normal
-                }
-            };
+                    new InlineSegment
+                    {
+                        Icon = vendor.CurrencyIcon,
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
+                            data.TradeAmount.ToString(),
+                            data.VendorName),
+                        Color = TooltipColors.Normal
+                    }
+                };
             }
 
             // Fallback
@@ -194,173 +152,19 @@ namespace PlantingDay.ToolTip_Sections
         //──────────────────────────────────────────────
         // Monster Drop → InlineSegments
         //──────────────────────────────────────────────
-        private static InlineSegment[]? BuildMonsterSegments(MonsterDropInfo drop)
+        private static InlineSegment[]? BuildMonsterSegments(MonsterDropInfoRuntime drop)
         {
+            var data = drop.Data;
+
             return new[]
             {
-            new InlineSegment
-            {
-                IconRef = drop.MonsterIconRef,
-                Text = $" {(drop.Chance * 100f):0.#}%",
-                Color = TooltipColors.Normal
-            }
-
+                new InlineSegment
+                {
+                    Icon = drop.MonsterIcon,
+                    Text = $" {(data.DropChance * 100f):0.#}%",
+                    Color = TooltipColors.Normal
+                }
             };
-
         }
     }
-
-
-    //internal class SeedSourceSection
-    //{
-    //    public static List<TooltipElement> Build(PlantInfo plant)
-    //    {
-    //        var list = new List<TooltipElement>();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //        var sources = new List<object>();
-    //        sources.AddRange(sortedVendors);
-    //        sources.AddRange(plant.MonsterDrops);
-
-
-    //        var segments = TooltipRenderer.BuildInlineSegments(
-    //            sources,
-    //            source =>
-    //            {
-    //                if (source is PurchaseInfo vendor)
-    //                {
-    //                    // Pierre (gold only)
-    //                    if (IsPierre(vendor))
-    //                    {
-    //                        return new[]
-    //                        {
-    //                            new InlineSegment
-    //                            {
-
-    //                                Text = string.Format(
-    //                                    ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
-    //                                    vendor.GoldPrice),
-    //                                Color = TooltipColors.Normal,
-    //                                Bold = false
-    //                            }
-    //                        };
-    //                    }
-
-    //                    // Night Market (icon only)
-    //                    else if (IsNightMarket(vendor))
-    //                    {
-    //                        return new[]
-    //                        {
-    //                                new InlineSegment
-    //                                {
-    //                                    IconRef = TooltipIcons.NightStars
-    //                                }
-    //                        };
-    //                    }
-
-    //                    // Valley Fair (star tokens)
-    //                    else if (IsValleyFair(vendor))
-    //                    {
-    //                        return new[]
-    //                        {
-    //                            new InlineSegment
-    //                            {
-    //                                IconRef = TooltipIcons.StarToken,
-    //                                Text = $" {vendor.GoldPrice} at {vendor.VendorName}",
-    //                                Color = TooltipColors.Normal
-    //                            }
-    //                        };
-    //                    }
-
-    //                    // Other Shops (gold purchase)
-    //                    else if (vendor.GoldPrice.HasValue)
-    //                    {
-    //                        return new[]
-    //                        {
-    //                            new InlineSegment
-    //                            {
-    //                                Text = string.Format(
-    //                                    ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
-    //                                    vendor.GoldPrice,
-    //                                    vendor.VendorName),
-    //                                Color = TooltipColors.Normal,
-    //                                Bold = false
-    //                            }
-    //                        };
-    //                    }
-
-    //                    // Other Shops (trade price)
-    //                    else if (vendor.TradeAmount > 0)
-    //                    {
-    //                        return new[]
-    //                        {
-    //                            new InlineSegment
-    //                            {
-    //                                IconRef = vendor.CurrencyIconRef,
-    //                                Text = string.Format(
-    //                                    ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
-    //                                    vendor.TradeAmount.ToString(),
-    //                                    vendor.VendorName),
-    //                                Color = TooltipColors.Normal,
-    //                                Bold = false
-    //                            }
-    //                        };
-    //                    }
-
-    //                    // Fallback for vendor
-    //                    return Array.Empty<InlineSegment>();
-    //                }
-
-    //                if (source is MonsterDropInfo drop)
-    //                {
-    //                    return new[]
-    //                    {
-    //                        new InlineSegment
-    //                        {
-    //                            IconRef = drop.MonsterIconRef,
-    //                            Text = $" {(drop.Chance * 100f):0.#}%",
-    //                            Color = TooltipColors.Normal
-    //                        }
-    //                    };
-    //                }
-
-    //                // Fallback for unknown source type
-    //                return Array.Empty<InlineSegment>();
-    //            });
-
-    //        // Coin icon at start of row if there are gold purchases
-    //        if (sortedVendors.Any(v => v.GoldPrice.HasValue))
-    //        {
-    //            segments.Insert(0, new InlineSegment
-    //            {
-    //                IconRef = TooltipIcons.LittleCoin
-    //            });
-    //        }
-
-    //        list.Add(new TooltipElement
-    //        {
-    //            InlineSegments = segments
-    //        });
-    //    }
-
-
-
-
-
-
-    //}
 }

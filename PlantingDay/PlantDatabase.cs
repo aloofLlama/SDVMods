@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using PlantingDay.Compatibility;
 using PlantingDay.Helpers;
 using PlantingDay.Models;
+using PlantingDay.RuntimeModels;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData;
@@ -50,7 +51,7 @@ namespace PlantingDay
             _isInitialized = true;
 
             ModEntry.Instance.Monitor.Log(
-                $"[{DateTime.Now:HH:mm:ss}] Plant Database Initialized",
+                "Plant Database Initialized",
                 LogLevel.Alert);
 
             // KEEP Debug to output desired database variable
@@ -117,7 +118,7 @@ namespace PlantingDay
                 if (plant == null)
                     continue;
 
-                _plants[plant.SeedId] = plant;
+                _plants[plant.Data.SeedId] = plant;
             }
         }
 
@@ -129,7 +130,7 @@ namespace PlantingDay
             var harvestInfo = FromObject(harvestId);
 
 
-            return new PlantInfo
+            var data = new PlantInfoData
             {
                 SeedId = seedId,
                 HarvestId = harvestId,
@@ -147,7 +148,7 @@ namespace PlantingDay
                 Paddy = crop.IsPaddyCrop,
                 MultiSprite = crop.TintColors?.Count ?? 0,
                 NeedsWatering = crop.NeedsWatering,
-                Scythe = crop.HarvestMethod,
+                NeedsScythe = crop.HarvestMethod == HarvestMethod.Scythe,
 
                 Seed = seedInfo,
                 Harvest = harvestInfo,
@@ -165,6 +166,7 @@ namespace PlantingDay
                 //}.AsReadOnly(),
 
             };
+            return new PlantInfo(data);
         }
 
         //-----
@@ -182,14 +184,14 @@ namespace PlantingDay
                 //    $"LOAD FRUITTREE raw seed: {saplingId} -> plant seed: {plant.Seed?.Id}",
                 //    LogLevel.Info);
 
-                _plants[plant.SeedId] = plant;
+                _plants[plant.Data.SeedId] = plant;
             }
         }
 
-        private static PlantInfo FromFruitTree(string saplingId, FruitTreeData data)
+        private static PlantInfo FromFruitTree(string saplingId, FruitTreeData fruitTree)
         {
             // Fruit tree always has exactly one fruit entry
-            var fruitEntry = data.Fruit.FirstOrDefault();
+            var fruitEntry = fruitTree.Fruit.FirstOrDefault();
 
             string fruitId = fruitEntry?.ItemId ?? "";
 
@@ -203,7 +205,7 @@ namespace PlantingDay
                 harvestInfo = FromObject(cleanId);
             }
 
-            return new PlantInfo
+            var data = new PlantInfoData
             {
                 SeedId = saplingId,
                 HarvestId = fruitId,
@@ -213,7 +215,7 @@ namespace PlantingDay
                 Harvest = harvestInfo,
                 HarvestPrice = harvestInfo?.Price ?? 0,
 
-                Seasons = data.Seasons?
+                Seasons = fruitTree.Seasons?
                     .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
                     .ToList()
                     ?? new List<SeasonId>(),
@@ -237,8 +239,31 @@ namespace PlantingDay
                 //}.AsReadOnly(),
 
             };
+            return new PlantInfo(data);
 
         }
+
+        //Bushes. Try this code for accessing custom bush drops from UI Info Suite Alt 2 -> Infrastructure -> Tools:
+        // Custom Bush saplings and vanilla tea sapling
+//    if (
+//      ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi)
+//      && customBushApi.TryGetDrops(item.QualifiedItemId, out IList<ICustomBushDrop>? drops)
+//      && drops.Count > 0
+//    )
+//    {
+//      return ItemRegistry.Create<SObject>(drops[0].ItemId);
+//    }
+
+//    // Vanilla tea sapling fallback (no Custom Bush mod)
+//    if (item.QualifiedItemId == "(O)251")
+//    {
+//      return ItemRegistry.Create<SObject>("(O)614");
+//    }
+
+//return null;
+//  }
+
+
 
 
     }

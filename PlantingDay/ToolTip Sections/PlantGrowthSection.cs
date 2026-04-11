@@ -1,4 +1,5 @@
 ﻿using PlantingDay.Helpers;
+using PlantingDay.Helpers.Icons;
 using PlantingDay.Models;
 using StardewModdingAPI;
 using StardewValley;
@@ -16,7 +17,7 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.DaysToProduce <= 0)
+            if (plant.Data.DaysToProduce <= 0)
                 return list;
 
             // build growth context (e.g. when is it ready)
@@ -47,15 +48,15 @@ namespace PlantingDay.ToolTip_Sections
 
             SeasonId currentSeason = SeasonHelper.FromGameSeason(Game1.season);
             SeasonId nextSeason = SeasonHelper.Next(currentSeason);
-            int additionalSeasons = SeasonHelper.CountAdditionalSeasons(currentSeason, plant.Seasons);
+            int additionalSeasons = SeasonHelper.CountAdditionalSeasons(currentSeason, plant.Data.Seasons);
 
-            int growDays = plant.DaysToProduce ?? 0;
+            int growDays = plant.Data.DaysToProduce ?? 0;
             int paddyGrowDays = (int)Math.Floor(growDays / 1.25f);
 
             int readyDay = today + growDays;
             int paddyReadyDay = today + paddyGrowDays;
 
-            int regrowDays = plant.RegrowDays.GetValueOrDefault();
+            int regrowDays = plant.Data.RegrowDays.GetValueOrDefault();
             int paddyRegrowDays = (int)Math.Floor(regrowDays / 1.25f);
 
             int regrowDaysAvailable = 0;
@@ -66,36 +67,36 @@ namespace PlantingDay.ToolTip_Sections
 
 
             // Regrow days for current season and additonal seasons for multi-harvest crops.
-            if (plant.RegrowDays > 0 &&
-                plant.Seasons.Contains(currentSeason) &&
-                plant.PlantType == PlantType.Crop)
+            if (plant.Data.RegrowDays > 0 &&
+                plant.Data.Seasons.Contains(currentSeason) &&
+                plant.Data.PlantType == PlantType.Crop)
             {
                 regrowDaysAvailable = ((1 + additionalSeasons) * 28) - readyDay;
                 paddyRegrowDaysAvailable = ((1 + additionalSeasons) * 28) - paddyReadyDay;
             }
 
             // Regrow days for out of season
-            if (plant.RegrowDays > 0 &&
-                !plant.Seasons.Contains(currentSeason) &&
-                plant.PlantType == PlantType.Crop)
+            if (plant.Data.RegrowDays > 0 &&
+                !plant.Data.Seasons.Contains(currentSeason) &&
+                plant.Data.PlantType == PlantType.Crop)
             {
-                regrowDaysAvailable = 28 * plant.Seasons.Count - growDays - 1;
-                paddyRegrowDaysAvailable = 28 * plant.Seasons.Count - paddyGrowDays - 1;
+                regrowDaysAvailable = 28 * plant.Data.Seasons.Count - growDays - 1;
+                paddyRegrowDaysAvailable = 28 * plant.Data.Seasons.Count - paddyGrowDays - 1;
             }
 
             // Regrow days for fruit trees next season
-            if (plant.RegrowDays > 0 &&
-                plant.Seasons.Contains(nextSeason) &&
-                plant.PlantType == PlantType.FruitTree)
+            if (plant.Data.RegrowDays > 0 &&
+                plant.Data.Seasons.Contains(nextSeason) &&
+                plant.Data.PlantType == PlantType.FruitTree)
             {
                 readyDay = today + growDays - 28 * additionalSeasons;
                 regrowDaysAvailable = 28 - readyDay;
             }
 
             // Regrow days for fruit trees out of season / not ready in time
-            if (plant.RegrowDays > 0 &&
-                !plant.Seasons.Contains(nextSeason) &&
-                plant.PlantType == PlantType.FruitTree)
+            if (plant.Data.RegrowDays > 0 &&
+                !plant.Data.Seasons.Contains(nextSeason) &&
+                plant.Data.PlantType == PlantType.FruitTree)
             {
                 readyDay = 1;
                 regrowDaysAvailable = 27;
@@ -134,23 +135,24 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                plant.Seasons.Contains(growth.CurrentSeason))
+            if (plant.Data.PlantType != PlantType.Crop ||
+                plant.Data.Seasons.Contains(growth.CurrentSeason))
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = plant.HarvestIconRef,
+                Icon = plant.Runtime.HarvestIcon,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.DaysToProduce),
-                    plant.DaysToProduce
+                    plant.Data.DaysToProduce
                 ),
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty
@@ -166,26 +168,27 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                !plant.Seasons.Contains(growth.CurrentSeason) ||
+            if (plant.Data.PlantType != PlantType.Crop ||
+                !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
                 growth.ReadyDay > 28)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = plant.HarvestIconRef,
+                Icon = plant.Runtime.HarvestIcon,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
-                    plant.DaysToProduce,
+                    plant.Data.DaysToProduce,
                     growth.CurrentSeason,
                     growth.ReadyDay
                 ),
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty
@@ -201,27 +204,28 @@ namespace PlantingDay.ToolTip_Sections
 
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                !plant.Seasons.Contains(growth.CurrentSeason) ||
-                !plant.Seasons.Contains(growth.NextSeason) ||
+            if (plant.Data.PlantType != PlantType.Crop ||
+                !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
+                !plant.Data.Seasons.Contains(growth.NextSeason) ||
                 growth.ReadyDay < 28)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = plant.HarvestIconRef,
+                Icon = plant.Runtime.HarvestIcon,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
-                    plant.DaysToProduce,
+                    plant.Data.DaysToProduce,
                     growth.NextSeason,
                     growth.OverflowDay
                 ),
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty
@@ -237,25 +241,25 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                !plant.Seasons.Contains(growth.CurrentSeason) ||
-                plant.Seasons.Contains(growth.NextSeason) ||
+            if (plant.Data.PlantType != PlantType.Crop ||
+                !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
+                plant.Data.Seasons.Contains(growth.NextSeason) ||
                 growth.ReadyDay < 28)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = plant.HarvestIconRef,
+                Icon = plant.Runtime.HarvestIcon,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.DaysToProduce),
-                    plant.DaysToProduce
+                    plant.Data.DaysToProduce
                 ),
             });
 
             // Too late warning
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.Warning,
+                Icon = TooltipIcons.Warning,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.TooLate)),
                 TextColor = TooltipColors.Warning
@@ -273,14 +277,14 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                plant.Seasons.Contains(growth.CurrentSeason) ||
-                !plant.Paddy)
+            if (plant.Data.PlantType != PlantType.Crop ||
+                plant.Data.Seasons.Contains(growth.CurrentSeason) ||
+                !plant.Data.Paddy)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.WaterSeeds,
+                Icon = TooltipIcons.WaterSeeds,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.DaysToProduce),
                     growth.PaddyProduceDay
@@ -288,10 +292,11 @@ namespace PlantingDay.ToolTip_Sections
                 TextColor = TooltipColors.Paddy
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.PaddyRegrowQty
@@ -308,15 +313,15 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                !plant.Seasons.Contains(growth.CurrentSeason) ||
+            if (plant.Data.PlantType != PlantType.Crop ||
+                !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
                 growth.PaddyReadyDay > 28 ||
-                !plant.Paddy)
+                !plant.Data.Paddy)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.WaterSeeds,
+                Icon = TooltipIcons.WaterSeeds,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
                     growth.PaddyProduceDay,
@@ -326,10 +331,11 @@ namespace PlantingDay.ToolTip_Sections
                 TextColor = TooltipColors.Paddy
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.PaddyRegrowQty
@@ -345,16 +351,16 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                  !plant.Seasons.Contains(growth.CurrentSeason) ||
-                  !plant.Seasons.Contains(growth.NextSeason) ||
+            if (plant.Data.PlantType != PlantType.Crop ||
+                  !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
+                  !plant.Data.Seasons.Contains(growth.NextSeason) ||
                   growth.PaddyReadyDay < 28 ||
-                  !plant.Paddy)
+                  !plant.Data.Paddy)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.WaterSeeds,
+                Icon = TooltipIcons.WaterSeeds,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
                     growth.PaddyProduceDay,
@@ -363,10 +369,11 @@ namespace PlantingDay.ToolTip_Sections
                 TextColor = TooltipColors.Paddy
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.PaddyRegrowQty),
@@ -381,16 +388,16 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.Crop ||
-                  !plant.Seasons.Contains(growth.CurrentSeason) ||
-                  plant.Seasons.Contains(growth.NextSeason) ||
+            if (plant.Data.PlantType != PlantType.Crop ||
+                  !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
+                  plant.Data.Seasons.Contains(growth.NextSeason) ||
                   growth.PaddyReadyDay < 28 ||
-                  !plant.Paddy)
+                  !plant.Data.Paddy)
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.WaterSeeds,
+                Icon = TooltipIcons.WaterSeeds,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.DaysToProduce),
                     growth.PaddyProduceDay
@@ -401,7 +408,7 @@ namespace PlantingDay.ToolTip_Sections
             // Too late warning
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.Warning,
+                Icon = TooltipIcons.Warning,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.TooLate)
                 ),
@@ -419,25 +426,26 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.FruitTree ||
-                  !plant.Seasons.Contains(growth.NextSeason))
+            if (plant.Data.PlantType != PlantType.FruitTree ||
+                  !plant.Data.Seasons.Contains(growth.NextSeason))
                 return list;
 
             list.Add(new TooltipElement
             {
-                IconRef = plant.HarvestIconRef,
+                Icon = plant.Runtime.HarvestIcon,
                 Text = string.Format(ModEntry.ModHelper.Translation
                     .Get(TooltipKeys.ReadyOn),
-                    plant.DaysToProduce,
+                    plant.Data.DaysToProduce,
                     growth.NextSeason,
                     growth.ReadyDay
                 ),
             });
 
-            if (plant.RegrowDays > 0)
+            if (plant.Data.RegrowDays > 0)
             {
                 list.Add(new TooltipElement
                 {
+                    Icon = TooltipIcons.Spiral,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty),
@@ -452,23 +460,24 @@ namespace PlantingDay.ToolTip_Sections
 
             var list = new List<TooltipElement>();
 
-            if (plant.PlantType != PlantType.FruitTree ||
-                  plant.Seasons.Contains(growth.NextSeason))
+            if (plant.Data.PlantType != PlantType.FruitTree ||
+                  plant.Data.Seasons.Contains(growth.NextSeason))
                 return list;
 
                 list.Add(new TooltipElement
                 {
-                    IconRef = plant.HarvestIconRef,
+                    Icon = plant.Runtime.HarvestIcon,
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.TreeReadyInFuture),
-                        plant.Seasons?.FirstOrDefault()
+                        plant.Data.Seasons?.FirstOrDefault()
                     ),
                 });
 
-                if (plant.RegrowDays > 0)
+                if (plant.Data.RegrowDays > 0)
                 {
                     list.Add(new TooltipElement
                     {
+                        Icon = TooltipIcons.Spiral,
                         Text = string.Format(ModEntry.ModHelper.Translation
                             .Get(TooltipKeys.RegrowQty),
                             growth.RegrowQty

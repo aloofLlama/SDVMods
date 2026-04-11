@@ -17,11 +17,11 @@ namespace PlantingDay.ToolTip_Sections
 
         public static TooltipElement? Build(PlantInfo plant)
         {
-            if (plant.Seasons.Count == 0)
+            if (plant.Data.Seasons.Count == 0)
                 return null;
 
             var segments = TooltipRenderer.BuildInlineSegments(
-                plant.Seasons,
+                plant.Data.Seasons,
                 season =>
                 {
                     var (color, bold) = Style(season);

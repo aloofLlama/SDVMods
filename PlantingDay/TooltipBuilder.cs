@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using PlantingDay;
 using PlantingDay.Helpers;
+using PlantingDay.Helpers.Icons;
 using PlantingDay.Models;
 using PlantingDay.ToolTip_Sections;
 using StardewModdingAPI;
@@ -66,7 +67,7 @@ namespace PlantingDay
             bool hasInline = e.InlineSegments != null &&
                              e.InlineSegments.Any(seg =>
                                  !string.IsNullOrWhiteSpace(seg.Text) ||
-                                 seg.IconRef != null);
+                                 seg.Icon != null);
 
             return
                 hasInline ||
@@ -144,7 +145,7 @@ namespace PlantingDay
 
 
 
-           
+
 
 
             //----------------
@@ -155,14 +156,16 @@ namespace PlantingDay
             //----------------
             // Harvest value
             //----------------
-            int harvestBV = plant.HarvestPrice; //Base value of harvest items
+
+            //TODO: Try this command that UI Info Suite Alt 2 uses:    return GetHarvest(item)?.sellToStorePrice() ?? 0;
+            int harvestBV = plant.Data.HarvestPrice; //Base value of harvest items
             //ModEntry.Instance.Monitor.Log($"BV: {harvestBV}", LogLevel.Info);
             int goldStarHarvest = (int)Math.Floor(1.5 * harvestBV); //Value of gold star quality harvest items
 
 
             list.Add(new TooltipElement
             {
-                IconRef = TooltipIcons.GoldStar,
+                Icon = TooltipIcons.GoldStar,
                 Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.PriceRange),
                         harvestBV,

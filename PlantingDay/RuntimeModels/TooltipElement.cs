@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PlantingDay.Helpers;
+using PlantingDay.Helpers.Icons;
 
 
 namespace PlantingDay.Models
@@ -15,7 +16,7 @@ namespace PlantingDay.Models
 
         // Icon (optional)
         public Texture2D? IconTexture { get; set; }   // dynamic item icons
-        public IconRef? IconRef { get; set; }         // static UI icons
+        public Icon? Icon { get; set; }         // static UI icons
 
         // Layout
         public int PaddingTop { get; set; } = 2;
@@ -28,7 +29,7 @@ namespace PlantingDay.Models
     // Supports putting multiple items with different formatting on the same line.
     public struct InlineSegment
     {
-        public IconRef? IconRef;
+        public Icon? Icon;
         public string Text;
         public Color Color;
         public bool Bold;

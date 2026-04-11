@@ -16,11 +16,11 @@ namespace PlantingDay_Tests
         [Fact]
         public void ParsnipSeeds_ShouldCost20_AtPierre()
         {
-            var seed = _plants.Single(p => p.SeedId == "472");
-            var shop = seed.PurchaseOptions.Single(p => p.VendorId == "SeedShop");
+            var seed = _plants.Single(p => p.Data.SeedId == "472");
+            var shop = seed.PurchaseOptions.Single(p => p.Data.VendorId == "SeedShop");
             var expectedPrice = 20;
 
-            Assert.Equal(expectedPrice, shop.GoldPrice);
+            Assert.Equal(expectedPrice, shop.Data.GoldPrice);
         }
     }
 

@@ -1,11 +1,4 @@
-﻿using PlantingDay.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json.Serialization;
-
+﻿
 
 namespace PlantingDay.Models
 {
@@ -19,9 +12,6 @@ namespace PlantingDay.Models
         public int Price { get; set; }
         public int Category { get; set; } //e.g. seeds, vegetable,fruit
         public int Edibility { get; set; }
-
-
-
 
     }
 

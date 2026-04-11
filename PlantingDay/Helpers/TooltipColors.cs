@@ -14,6 +14,8 @@ namespace PlantingDay.Helpers
         public static readonly Color Warning = Color.DarkRed;
         public static readonly Color Trellis = Color.Orange;
         public static readonly Color Paddy = Color.CornflowerBlue;
+        public static readonly Color Separator = new(188,148,60);
+
 
         //seasons
         public static readonly Color SpringColor = new(80, 200, 120); //green

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StardewValley;
-
+﻿
 
 
 namespace PlantingDay.Models
 {
-    internal class GrowthContext
+    public class GrowthContext
     {
         // Time in the game
         //public int Today { get; set; }

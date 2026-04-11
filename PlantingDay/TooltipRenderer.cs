@@ -42,7 +42,7 @@ namespace PlantingDay
 
             if (plant is null)
                 return;
-            ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Seed.Name} = {plant.Harvest?.Id}", LogLevel.Info);
+            ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Data.Seed?.Name} = {plant.Data.Harvest?.Id}", LogLevel.Info);
 
 
             var elements = TooltipBuilder.BuildTooltip(plant);
@@ -113,8 +113,10 @@ namespace PlantingDay
         {
             SpriteFont font = Game1.smallFont;
 
-            const int IconRenderSize = 32;   // draw size (old system)
-            const int IconColumnWidth = 32;   // spacing you liked
+            const int IconRenderSize = 32;  
+            const int IconColumnWidth = 32;
+            const int separatorPadding = 12;
+
 
             int width = 0;
             int height = 0;
@@ -127,7 +129,13 @@ namespace PlantingDay
             {
                 int lineHeight = font.LineSpacing;
 
-                if (el.IconTexture != null || el.IconRef.HasValue)
+                if (el.IsSeparator)
+                {
+                    height += el.PaddingTop + separatorPadding + el.PaddingBottom; // or whatever height you want
+                    continue;
+                }
+
+                if (el.IconTexture != null || el.Icon.HasValue)
                 {
                     int iconSize = IconRenderSize;
                     lineHeight = Math.Max(lineHeight, iconSize + 2);
@@ -145,7 +153,7 @@ namespace PlantingDay
                 int lineWidth = 0;
 
                 // Only add icon column width for NON-inline rows
-                if (el.InlineSegments == null && (el.IconTexture != null || el.IconRef.HasValue))
+                if (el.InlineSegments == null && (el.IconTexture != null || el.Icon.HasValue))
                     lineWidth += maxIconColumnWidth;
 
                 // Inline rows
@@ -153,7 +161,7 @@ namespace PlantingDay
                 {
                     foreach (var seg in el.InlineSegments)
                     {
-                        if (seg.IconRef.HasValue)
+                        if (seg.Icon.HasValue)
                         {
                             lineWidth += font.LineSpacing;
                         }
@@ -168,7 +176,7 @@ namespace PlantingDay
                     lineWidth += (int)font.MeasureString(el.Text).X;
                 }
 
-                width = Math.Max(width, lineWidth);
+                width = Math.Max(width, lineWidth) + 2;
             }
 
             width += 32;
@@ -203,7 +211,7 @@ namespace PlantingDay
 
                 int lineHeight = font.LineSpacing;
 
-                if (el.IconTexture != null || el.IconRef.HasValue)
+                if (el.IconTexture != null || el.Icon.HasValue)
                 {
                     int iconSize = IconRenderSize;
                     lineHeight = Math.Max(lineHeight, iconSize + 2);
@@ -214,15 +222,15 @@ namespace PlantingDay
                 //
                 if (el.IsSeparator)
                 {
-                    int lineY = drawY + font.LineSpacing / 2;
+                    int lineY = drawY + separatorPadding /2;
 
                     b.Draw(
                         Game1.staminaRect,
                         new Rectangle(drawX, lineY, width - 32, 2),
-                        Color.White * 0.35f
+                        new Color(255, 170, 110)
                     );
 
-                    drawY += font.LineSpacing + el.PaddingBottom;
+                    drawY += separatorPadding;
                     continue;
                 }
 
@@ -244,9 +252,9 @@ namespace PlantingDay
 
                     drawX += IconColumnWidth;
                 }
-                else if (el.IconRef.HasValue)
+                else if (el.Icon.HasValue)
                 {
-                    var icon = el.IconRef.Value;
+                    var icon = el.Icon.Value;
 
                     int usedWidth = DrawPaddedIcon(
                         b,
@@ -260,30 +268,6 @@ namespace PlantingDay
                     );
 
                     drawX += IconColumnWidth;
-                    //var icon = el.IconRef.Value;
-
-                    //// Compute scaled size
-                    //float scale = icon.Scale;
-                    //int iconSize = (int)(icon.Source.Width * scale);
-
-                    //// Center inside the icon column
-                    //int yOffset = drawY + (lineHeight - iconSize) / 2;
-                    //int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
-
-                    //// Draw using scale (Stardew‑style)
-                    //b.Draw(
-                    //    icon.Texture,
-                    //    new Vector2(xOffset, yOffset),
-                    //    icon.Source,
-                    //    Color.White,
-                    //    0f,
-                    //    Vector2.Zero,
-                    //    scale,
-                    //    SpriteEffects.None,
-                    //    1f
-                    //);
-
-                    //drawX += IconColumnWidth;
                 }
 
                 //
@@ -295,9 +279,9 @@ namespace PlantingDay
 
                     foreach (var seg in el.InlineSegments)
                     {
-                        if (seg.IconRef.HasValue)
+                        if (seg.Icon.HasValue)
                         {
-                            var icon = seg.IconRef.Value;
+                            var icon = seg.Icon.Value;
 
                             DrawPaddedIcon(
                                 b,

@@ -1,5 +1,6 @@
 ﻿using PlantingDay.Compatibility;
 using PlantingDay.Helpers;
+using PlantingDay.Helpers.Icons;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Framework.ModLoading;
@@ -9,7 +10,7 @@ using StardewValley.Internal;
 using StardewValley.Menus;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
-using static PlantingDay.Helpers.SeedSourceAggregator;
+using static PlantingDay.Helpers.SeedSource.SeedSourceAggregator;
 
 
 namespace PlantingDay
@@ -48,13 +49,14 @@ namespace PlantingDay
         {
             TooltipIcons.Initialize();
             PlantDatabase.Initialize();
-            MonsterDropLoader.Initialize();
 
             foreach (var plant in PlantDatabase.AllPlants)
             {
-                SeedSourceAggregator.AddSeedSourcesToPlant(plant);
-                IconRenderer_plants.InitializeIcons(plant);
+                PlantIconInitializer.InitializeIcons(plant);
             }
+        
+        
+        
             //string dataPath = ModEntry.ModHelper.DirectoryPath;
 
             //foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
@@ -65,33 +67,34 @@ namespace PlantingDay
 
         }
 
+        [EventPriority(EventPriority.Low-1)]
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
         {
 
             TooltipRenderer.DrawMenu(e.SpriteBatch);
 
-            if (Game1.activeClickableMenu is ShopMenu shop)
-            {
-                Monitor.Log("=== PIERRE SHOP DUMP ===", LogLevel.Warn);
+            //if (Game1.activeClickableMenu is ShopMenu shop)
+            //{
+            //    Monitor.Log("=== PIERRE SHOP DUMP ===", LogLevel.Warn);
 
-                foreach (var salable in shop.forSale)
-                {
-                    var item = salable as Item;
-                    if (item == null)
-                        continue;
+            //    foreach (var salable in shop.forSale)
+            //    {
+            //        var item = salable as Item;
+            //        if (item == null)
+            //            continue;
 
-                    // 1. Get the stock info (price, stock, etc.)
-                    if (!shop.itemPriceAndStock.TryGetValue(salable, out var stockInfo))
-                        continue;
+            //        // 1. Get the stock info (price, stock, etc.)
+            //        if (!shop.itemPriceAndStock.TryGetValue(salable, out var stockInfo))
+            //            continue;
 
-                    int price = stockInfo.Price;   // <-- THIS is the final price Pierre is charging
+            //        int price = stockInfo.Price;   // <-- THIS is the final price Pierre is charging
 
-                    Monitor.Log(
-                        $"{item.Name} (ID: {item.ParentSheetIndex}) - Price: {price}",
-                        LogLevel.Warn
-                    );
-                }
-            }
+            //        Monitor.Log(
+            //            $"{item.Name} (ID: {item.ParentSheetIndex}) - Price: {price}",
+            //            LogLevel.Warn
+            //        );
+            //    }
+            //}
         }
 
 
@@ -105,18 +108,14 @@ namespace PlantingDay
             if (e.Button != SButton.F5)
                 return;
 
-            ModEntry.Instance.Monitor.Log("RUN BUTTON PRESS", LogLevel.Info);
+            TooltipIcons.Initialize();
 
             //Rebuild the Plant database
-            PlantDatabase.Reset();
             PlantDatabase.Initialize();
-            MonsterDropLoader.Initialize();
 
             foreach (var plant in PlantDatabase.AllPlants)
             {
-                SeedSourceAggregator.AddSeedSourcesToPlant(plant);
-                //ModEntry.Instance.Monitor.Log($"HERE: {plant.HarvestId}", LogLevel.Info);
-                IconRenderer_plants.InitializeIcons(plant);
+                PlantIconInitializer.InitializeIcons(plant);
             }
 
             CacheForTesting.DumpPlantDataBaseToJson();
@@ -125,16 +124,18 @@ namespace PlantingDay
 
 
             //KEEP Debug to output desired database variable from a list
-            foreach (var plant in PlantDatabase.AllPlants)
-            {
-                foreach (var option in plant.PurchaseOptions)
-                {
-                    ModEntry.Instance.Monitor.Log(
-                        $"Seed: {plant.SeedId} Vendor: {option.VendorId} Price: {option.GoldPrice}",
-                        LogLevel.Warn
-                    );
-                }
-            }
+            //foreach (var plant in PlantDatabase.AllPlants)
+            //{
+            //    foreach (var option in plant.Data.PurchaseOptions)
+            //    {
+            //        ModEntry.Instance.Monitor.Log(
+            //            $"Seed: {plant.Data.SeedId} Vendor: {option.VendorId} Price: {option.GoldPrice}",
+            //            LogLevel.Warn
+            //        );
+            //    }
+            //}
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS ", LogLevel.Alert);
+
 
 
             // KEEP Shows all game shops available. Useful when needing to fix mod shops
