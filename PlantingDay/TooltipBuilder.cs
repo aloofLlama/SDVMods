@@ -1,24 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PlantingDay;
 using PlantingDay.Helpers;
-using PlantingDay.Helpers.Icons;
-using PlantingDay.Models;
+using SDVCommon.Icons;
 using PlantingDay.ToolTip_Sections;
-using StardewModdingAPI;
-using StardewValley;
-using StardewValley.GameData.Crops;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static StardewValley.Menus.CharacterCustomization;
-using static System.Net.Mime.MediaTypeNames;
+using PlantingDay.Models.Runtime;
+using PlantingDay.Models.Wrappers;
 
 
 
@@ -47,7 +33,7 @@ namespace PlantingDay
 
             list.Add(new TooltipElement { IsSeparator = true, PaddingTop = 6, PaddingBottom = 6 });
 
-            list.AddRange(GetEconomicsTooltip(plant));
+            //list.AddRange(GetEconomicsTooltip(plant));
 
             return list;
         }
@@ -82,7 +68,7 @@ namespace PlantingDay
             int paddingTop = 3,
             int paddingBottom = 3
             )
-            {
+        {
             var section = sectionBuilder()?.ToList();
             if (section == null || !SectionHasVisibleContent(section))
                 return;
@@ -102,12 +88,13 @@ namespace PlantingDay
         }
 
 
+    }
+}
 
 
 
 
-
-
+        /*
 
         //---------------
         // Economics
@@ -182,4 +169,5 @@ namespace PlantingDay
     }
 
 }
+        */
 

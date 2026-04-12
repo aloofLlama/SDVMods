@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e313b039-e59a-442c-bd5b-a29efd4825b6</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SDVCommon</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)GameData\GameObjectInfoHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HarvestInfoBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\HarvestIconInitializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\HarvestIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRegistry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\IIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\MonsterIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\PurchaseIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\SeedIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\TooltipIcons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\IdHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)RuntimeModels\HarvestInfoRuntime.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipColors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)TooltipRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
+  </ItemGroup>
+</Project>

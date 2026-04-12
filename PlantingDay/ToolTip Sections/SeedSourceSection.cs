@@ -1,11 +1,13 @@
 ﻿using PlantingDay.Helpers;
-using PlantingDay.Helpers.Icons;
+using SDVCommon.Icons;
 using PlantingDay.Helpers.SeedSource;
-using PlantingDay.Models;
-using PlantingDay.RuntimeModels;
 using StardewModdingAPI;
 using System.Collections.Generic;
 using System.Linq;
+using PlantingDay.Models.Runtime;
+using PlantingDay.Models.Wrappers;
+using SDVCommon.Helpers;
+
 
 namespace PlantingDay.ToolTip_Sections
 {
@@ -16,20 +18,21 @@ namespace PlantingDay.ToolTip_Sections
         {
             var list = new List<TooltipElement>();
 
-            // ------------------------------------------------------------
-            // 1. Build unified source list (vendors + monster drops)
-            // ------------------------------------------------------------
-            var vendors = VendorListBuilder.Build(plant);          // List<PurchaseInfoRuntime>
-            var monsterDrops = plant.MonsterDrops;                 // List<MonsterDropInfoRuntime>
+            var sources = SeedSourceAggregator.BuildFullSourceList(plant);
 
-            var sources = new List<object>();
-            sources.AddRange(vendors);
-            sources.AddRange(monsterDrops);
+            //foreach (var p in PlantDatabase.AllPlants)
+            //{
+            //    foreach (var option in p.Data.PurchaseOptions)
+            //    {
+            //        ModEntry.Instance.Monitor.Log(
+            //            $"Seed: {p.Data.SeedId} Vendor: {option.VendorName} Price: {option.GoldPrice}",
+            //            LogLevel.Warn
+            //        );
+            //    }
+            //}
 
-            // ------------------------------------------------------------
-            // 2. Convert each source into inline segments
-            // ------------------------------------------------------------
-            var segments = TooltipRenderer.BuildInlineSegments(
+
+            var segments = SDVCommon.TooltipRenderer.BuildInlineSegments(
                 sources,
                 source =>
                 {
@@ -42,9 +45,6 @@ namespace PlantingDay.ToolTip_Sections
                     return System.Array.Empty<InlineSegment>();
                 });
 
-            // ------------------------------------------------------------
-            // 3. Add seed icon at the start
-            // ------------------------------------------------------------
             if (plant.Runtime.SeedIcon != null)
             {
                 segments.Insert(0, new InlineSegment
@@ -53,9 +53,6 @@ namespace PlantingDay.ToolTip_Sections
                 });
             }
 
-            // ------------------------------------------------------------
-            // 4. Add final tooltip element
-            // ------------------------------------------------------------
             list.Add(new TooltipElement
             {
                 InlineSegments = segments

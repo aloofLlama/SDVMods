@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using PlantingDay.RuntimeModels;
+using PlantingDay.Models.Wrappers;
 
 namespace PlantingDay.Helpers.SeedSource
 {

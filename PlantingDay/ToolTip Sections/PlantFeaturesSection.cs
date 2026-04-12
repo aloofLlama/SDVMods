@@ -1,12 +1,14 @@
 ﻿using PlantingDay.Helpers;
-using PlantingDay.Helpers.Icons;
-using PlantingDay.Models;
+using SDVCommon.Icons;
 using StardewValley.GameData.Crops;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SDVData;
+using PlantingDay.Models.Runtime;
+using PlantingDay.Models.Wrappers;
 
 namespace PlantingDay.ToolTip_Sections
 {

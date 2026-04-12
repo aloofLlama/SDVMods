@@ -1,10 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using SDVData;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using StardewValley.Internal;
-using PlantingDay.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using SDVCommon.Helpers;
+using PlantingDay.Helpers;
 
 namespace PlantingDay.Helpers.SeedSource
 {
@@ -32,10 +35,16 @@ namespace PlantingDay.Helpers.SeedSource
             {
                 foreach (var entry in shop.Items)
                 {
+
+
                     // Match direct item or wildcard
                     bool directMatch = IdHelper.CanonicalItemId(entry.ItemId) == itemId;
-                    bool wildcardMatch = entry.ItemId == "ALL_ITEMS (O)" &&
-                                         ItemMatchesWildcard(itemId, entry);
+                    bool wildcardMatch =
+                        entry.ItemId == "ALL_ITEMS (O)" &&
+                        (
+                            ItemMatchesWildcard(itemId, entry) ||   // context-tag based
+                            EvaluatePerItemCondition(entry.PerItemCondition, itemId) // ITEM_ID based
+                        );
 
                     if (!directMatch && !wildcardMatch)
                         continue;
@@ -44,6 +53,7 @@ namespace PlantingDay.Helpers.SeedSource
                     var info = new PurchaseInfoData
                     {
                         VendorId = shopId,
+                        VendorName = VendorHelper.GetVendorName(shopId),
                         Condition = entry.Condition
                     };
 
@@ -55,10 +65,33 @@ namespace PlantingDay.Helpers.SeedSource
                     }
                     else
                     {
-                        // Gold price (default or explicit)
-                        info.GoldPrice = entry.Price >= 0
-                            ? entry.Price
-                            : GetDefaultShopPrice(itemId);
+                        
+                        var item = ItemRegistry.Create(IdHelper.ToGameId(itemId));
+                        if (item != null)
+                        {
+                            var output = new ItemQueryResult(item);
+
+                            // First: calculate the real game price
+                            int calculatedPrice = ShopBuilder.GetBasePrice(
+                                output,
+                                shop,
+                                entry,
+                                item,
+                                outOfSeasonPrice: false,
+                                useObjectDataPrice: entry.UseObjectDataPrice
+                            );
+
+                            // Second: check for override
+                            if (SeedPriceOverrides.Overrides.TryGetValue((itemId, shopId), out int overridePrice))
+                            {
+                                info.GoldPrice = overridePrice;
+                            }
+                            else
+                            {
+                                info.GoldPrice = calculatedPrice;
+                            }
+                        }
+                    
                     }
 
                     // Apply price modifiers
@@ -96,38 +129,6 @@ namespace PlantingDay.Helpers.SeedSource
             return results;
         }
 
-        // ------------------------------------------------------------
-        // DEFAULT PRICE CALCULATION (FAKE SHOP)
-        // ------------------------------------------------------------
-        public static int GetDefaultShopPrice(string itemId)
-        {
-            string gameId = IdHelper.ToGameId(itemId);
-            var item = ItemRegistry.Create(gameId);
-
-            if (item == null)
-                return 0;
-
-            var shopData = new ShopData();
-            var itemData = new ShopItemData
-            {
-                Id = gameId,
-                ItemId = gameId,
-                Price = -1,
-                IgnoreShopPriceModifiers = false,
-                UseObjectDataPrice = false
-            };
-
-            var output = new ItemQueryResult(item);
-
-            return ShopBuilder.GetBasePrice(
-                output,
-                shopData,
-                itemData,
-                item,
-                outOfSeasonPrice: false,
-                useObjectDataPrice: false
-            );
-        }
 
         // ------------------------------------------------------------
         // WILDCARD MATCHING
@@ -137,7 +138,12 @@ namespace PlantingDay.Helpers.SeedSource
             if (string.IsNullOrWhiteSpace(entry.PerItemCondition))
                 return false;
 
-            Item item = ItemRegistry.Create(itemId);
+            // Only handle ITEM_CONTEXT_TAG rules here.
+            // If the condition has no context-tag rules, this wildcard matcher should not apply.
+            if (!entry.PerItemCondition.Contains("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            Item item = ItemRegistry.Create(IdHelper.ToGameId(itemId));
             if (item == null)
                 return false;
 
@@ -151,7 +157,7 @@ namespace PlantingDay.Helpers.SeedSource
             foreach (var rule in rules)
             {
                 bool negated = rule.StartsWith("!");
-                string cleanRule = negated ? rule.Substring(1).Trim() : rule;
+                string cleanRule = negated ? rule[1..].Trim() : rule;
 
                 if (!cleanRule.StartsWith("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
                     continue;
@@ -160,7 +166,7 @@ namespace PlantingDay.Helpers.SeedSource
                 if (idx < 0)
                     continue;
 
-                string requiredTag = cleanRule.Substring(idx + "Target ".Length).Trim();
+                string requiredTag = cleanRule[(idx + "Target ".Length)..].Trim();
                 bool hasTag = tags.Contains(requiredTag);
 
                 if (negated && hasTag)
@@ -172,5 +178,38 @@ namespace PlantingDay.Helpers.SeedSource
 
             return true;
         }
+
+        // ------------------------------------------------------------
+        // CONDITION MATCHING
+        // ------------------------------------------------------------
+        private static bool EvaluatePerItemCondition(string? condition, string itemId)
+        {
+                if (string.IsNullOrEmpty(condition))
+                    return true;
+
+                // Example:
+                // ANY "ITEM_ID Target Cornucopia_Pansy" "ITEM_ID Target Cornucopia_Violet"
+                if (condition.StartsWith("ANY"))
+                {
+                    // Extract everything inside quotes
+                    var parts = condition.Split('"', StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var part in parts)
+                    {
+                        if (part.Contains("ITEM_ID Target"))
+                        {
+                            var target = part.Split(' ', StringSplitOptions.RemoveEmptyEntries).Last();
+                        if (IdHelper.CanonicalItemId(itemId)
+                                .Equals(IdHelper.CanonicalItemId(target), StringComparison.OrdinalIgnoreCase))
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                return false;
+            }
+
+        }
     }
-}

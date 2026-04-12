@@ -1,79 +1,44 @@
 ﻿using Newtonsoft.Json;
 using StardewModdingAPI;
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PlantingDay.Helpers
 {
     public class CacheForTesting
     {
-        public static void DumpPlantDataBaseToJson()
+        public static void DumpPlantInfoToJson()
         {
-            try
-            {
-                string json = JsonConvert.SerializeObject(
-                            PlantDatabase.AllPlants,
-                            Formatting.Indented
-                        );
+            
+            // Serialize ONLY the data portion
+            var dataOnly = PlantInfoBuilder.AllPlants
+                .Select(p => p.Data)
+                .ToList();
 
-                // Dump directly into the mod folder
-                string path = Path.Combine(
-                    ModEntry.Instance.Helper.DirectoryPath,
-                    "Cache",
-                    "PlantDatabase.json"
-                );
-
-                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-
-                File.WriteAllText(path, json);
-
-                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-
-                ModEntry.Instance.Monitor.Log($"PlantDatabase dumped to {path}", LogLevel.Info);
-            }
-            catch (Exception ex)
-            {
-                ModEntry.Instance.Monitor.Log($"Failed to dump PlantDatabase: {ex}", LogLevel.Error);
-            }
-        }
-
-        private static string GetRepoRoot()
-        {
-            // Path to the compiled DLL inside your repo
-            string assemblyPath = typeof(ModEntry).Assembly.Location;
-
-            DirectoryInfo? dir = new DirectoryInfo(assemblyPath);
-
-            while (dir != null)
-            {
-                // Look for your mod project file
-                if (File.Exists(Path.Combine(dir.FullName, "PlantingDay.csproj")))
+            string json = JsonConvert.SerializeObject(
+                dataOnly,
+                Formatting.Indented,
+                new JsonSerializerSettings
                 {
-                    // Parent of project folder = repo root
-                    return dir.Parent!.FullName;
+                    NullValueHandling = NullValueHandling.Ignore
                 }
-
-                dir = dir.Parent;
-            }
-
-            throw new Exception("Could not locate repo root");
-        }
-        private static string GetRepoCachePath()
-        {
-            string repoRoot = GetRepoRoot();
-
-            return Path.Combine(
-                repoRoot,
-                "PlantingDay_Tests",
-                "TestData",
-                "PlantDatabase.json"
             );
+
+            // Write into the mod folder under /Cache/
+            string cacheDir = Path.Combine(ModEntry.Instance.Helper.DirectoryPath, "Cache");
+            Directory.CreateDirectory(cacheDir);
+
+            string stablePath = Path.Combine(cacheDir, "PlantInfo.json");
+
+            // 1. Write stable file for tests
+            File.WriteAllText(stablePath, json);
+
+            // 2. Write timestamped snapshot for debugging
+            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string snapshotPath = Path.Combine(cacheDir, $"PlantInfo_{timestamp}.json");
+
+            File.WriteAllText(snapshotPath, json);
         }
-
-
-
     }
 }

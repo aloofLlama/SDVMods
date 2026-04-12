@@ -1,4 +1,5 @@
-﻿using PlantingDay.RuntimeModels;
+﻿using PlantingDay.Models.Runtime;
+using PlantingDay.Models.Wrappers;
 
 namespace PlantingDay.Helpers.SeedSource
 {

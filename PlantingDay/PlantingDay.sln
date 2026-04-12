@@ -5,9 +5,11 @@ VisualStudioVersion = 18.4.11626.88
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantingDay", "PlantingDay.csproj", "{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantingDay_Tests", "..\PlantingDay_Tests\PlantingDay_Tests.csproj", "{B2D13D5C-C34A-1AC5-8BAE-C201E306D855}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDVData", "..\SDVData\SDVData.csproj", "{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantingDay_Models", "..\PlantingDay_Models\PlantingDay_Models.csproj", "{2DF70A42-0336-9C21-05D2-10990CB7354C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDVData_Tests", "..\SDVData_Tests\SDVData_Tests.csproj", "{53C49DA5-C1D3-867C-DCB5-76D530E133C2}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDVCommon", "..\SDVCommon\SDVCommon.shproj", "{E313B039-E59A-442C-BD5B-A29EFD4825B6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,19 +21,23 @@ Global
 		{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B2D13D5C-C34A-1AC5-8BAE-C201E306D855}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2D13D5C-C34A-1AC5-8BAE-C201E306D855}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2D13D5C-C34A-1AC5-8BAE-C201E306D855}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2D13D5C-C34A-1AC5-8BAE-C201E306D855}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2DF70A42-0336-9C21-05D2-10990CB7354C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2DF70A42-0336-9C21-05D2-10990CB7354C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2DF70A42-0336-9C21-05D2-10990CB7354C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2DF70A42-0336-9C21-05D2-10990CB7354C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C3B4B539-9A3D-44F6-A57B-3ED77153CF02}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\SDVCommon\SDVCommon.projitems*{d0f65dd0-070f-49c7-6bb7-4039b1330af0}*SharedItemsImports = 5
+		..\SDVCommon\SDVCommon.projitems*{e313b039-e59a-442c-bd5b-a29efd4825b6}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

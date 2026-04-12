@@ -1,4 +1,5 @@
-﻿using PlantingDay.RuntimeModels;
+﻿using PlantingDay.Models.Wrappers;
+using SDVCommon.Icons;
 
 namespace PlantingDay.Helpers.Icons
 {
@@ -6,9 +7,9 @@ namespace PlantingDay.Helpers.Icons
     {
         public static void InitializeIcons(PlantInfo plant)
         {
-            // Seed + harvest icons
+            // Seed
             plant.Runtime.SeedIcon = IconRegistry.GetIcon($"seed:{plant.Data.SeedId}");
-            plant.Runtime.HarvestIcon = IconRegistry.GetIcon($"harvest:{plant.Data.HarvestId}");
+            //plant.Runtime.HarvestIcon = IconRegistry.GetIcon($"harvest:{plant.Data.HarvestId}");
 
             // Vendor currency icons
             foreach (var vendor in plant.PurchaseOptions)

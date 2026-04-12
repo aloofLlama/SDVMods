@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using PlantingDay.RuntimeModels;
+using PlantingDay.Models.Runtime;
 
 namespace PlantingDay.Helpers.SeedSource
 {
@@ -24,6 +24,7 @@ namespace PlantingDay.Helpers.SeedSource
                 "Festival_Luau_Pierre" => "Luau",
                 "Festival_EggFestival_Pierre" => "Egg Festival",
                 "Festival_StardewValleyFair_StarTokens" => "Valley Fair",
+                "Festival_FlowerDance_Pierre" => "Flower Dance",
 
                 // Collapse Desert Festival
                 _ when shopId.StartsWith("DesertFestival", StringComparison.OrdinalIgnoreCase)

@@ -1,5 +1,4 @@
 ﻿using PlantingDay.Helpers;
-using PlantingDay.Models;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -8,6 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SDVData;
+using SDVCommon.Helpers;    
+using PlantingDay.Models.Runtime;
+using PlantingDay.Models.Wrappers;
 
 namespace PlantingDay.ToolTip_Sections
 {
@@ -20,7 +23,7 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.Seasons.Count == 0)
                 return null;
 
-            var segments = TooltipRenderer.BuildInlineSegments(
+            var segments = SDVCommon.TooltipRenderer.BuildInlineSegments(
                 plant.Data.Seasons,
                 season =>
                 {

@@ -5,9 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+	
 
-
-   <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
@@ -17,22 +17,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\PlantingDay_Models\PlantingDay_Models.csproj" />
+	  <ProjectReference Include="..\SDVData\SDVData.csproj" />
 	</ItemGroup>
-
-	<ItemGroup>
-	  <Reference Include="0Harmony">
-	    <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\smapi-internal\0Harmony.dll</HintPath>
-	  </Reference>
-	</ItemGroup>
-
-	
-
 
 	<PropertyGroup>
 		<RootNamespace>PlantingDay</RootNamespace>
 	</PropertyGroup>
 
-
+	<Import Project="..\SDVCommon\SDVCommon.projitems" Label="Shared" />
 </Project>
-
