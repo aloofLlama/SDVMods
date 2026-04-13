@@ -17,6 +17,7 @@
 	"tooltip.ready_on": "{0} days on {1} {2}",
 	"tooltip.too_late": "Too late to plant [TBD fertilizer]",
 	"tooltip.regrow_qty": "{0} total harvests",
+	"tooltip.regrow_indef": "Regrows indefinitely",
 
 	// Trees
 	"tooltip.tree_ready_in_future": "Ready next {0}",
@@ -25,7 +26,7 @@
 	// Economics
 	"tooltip.price_range": "{0}-{1}g",
 	"tooltip.pierres_purchase": "{0}g",
-	"tooltip.other_shop_purchase": "{0}g  {1}",
-	"tooltip.other_shop_trade": "({0})  {1}"
+	"tooltip.other_shop_purchase": "{0}g {1}",
+	"tooltip.other_shop_trade": "({0}) {1}"
 
 }

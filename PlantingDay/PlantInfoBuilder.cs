@@ -93,55 +93,36 @@ namespace PlantingDay
         {
             foreach (var (seedId, cropData) in Game1.cropData)
             {
-                var plant = FromCrop(seedId, cropData);
-                if (plant == null)
-                    continue;
+                // Build raw data object
+                var data = new PlantInfoData
+                {
+                    SeedId = seedId,
+                    HarvestId = cropData.HarvestItemId ?? "",
+                    PlantType = PlantType.Crop,
 
-                _plants[plant.Data.SeedId] = plant;
+                    Seasons = cropData.Seasons?
+                        .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
+                        .ToList()
+                        ?? new List<SeasonId>(),
+
+                    DaysToProduce = cropData.DaysInPhase?.Sum() ?? 0,
+                    RegrowDays = cropData.RegrowDays > 0 ? cropData.RegrowDays : null,
+
+                    Trellis = cropData.IsRaised,
+                    Paddy = cropData.IsPaddyCrop,
+                    MultiSprite = cropData.TintColors?.Count ?? 0,
+                    NeedsWatering = cropData.NeedsWatering,
+                    NeedsScythe = cropData.HarvestMethod == HarvestMethod.Scythe,
+
+                    Seed = GameObjectInfoHelper.FromObject(seedId),
+                };
+
+                data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(seedId);
+                data.MonsterDrops = MonsterDropLoader.GetDropsForItem(seedId);
+
+                var plant = new PlantInfo(data);
+                _plants[data.SeedId] = plant;
             }
-        }
-
-        public static PlantInfo FromCrop(string seedId, CropData crop)
-        {
-            var seedInfo = GameObjectInfoHelper.FromObject(seedId);
-
-            var harvestId = crop.HarvestItemId ?? "";
-
-            var data = new SDVData.PlantInfoData
-            {
-                SeedId = seedId,
-                HarvestId = harvestId,
-                PlantType = PlantType.Crop,
-
-                Seasons = crop.Seasons?
-                    .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
-                    .ToList()
-                    ?? new List<SeasonId>(),
-
-                DaysToProduce = crop.DaysInPhase?.Sum() ?? 0,
-                RegrowDays = crop.RegrowDays > 0 ? crop.RegrowDays : null,
-
-                Trellis = crop.IsRaised,
-                Paddy = crop.IsPaddyCrop,
-                MultiSprite = crop.TintColors?.Count ?? 0,
-                NeedsWatering = crop.NeedsWatering,
-                NeedsScythe = crop.HarvestMethod == HarvestMethod.Scythe,
-
-                Seed = seedInfo,
-
-                //Drops = new List<DropInfo>
-                //    {
-                //    new DropInfo
-                //    {
-                //        ItemId = harvestId,
-                //        MinStack = crop.HarvestMinStack,
-                //        MaxStack = crop.HarvestMaxStack,
-                //        ExtraHarvestChance = crop.ExtraHarvestChance
-                //    }
-                //}.AsReadOnly(),
-
-            };
-            return new PlantInfo(data);
         }
 
         //-----
@@ -149,71 +130,49 @@ namespace PlantingDay
         //-------
         private static void LoadFruitTrees()
         {
-            foreach (var (saplingId, treeData) in Game1.fruitTreeData)
+            foreach (var (saplingId, fruitTreeData) in Game1.fruitTreeData)
             {
-                var plant = FromFruitTree(saplingId, treeData);
-                if (plant == null)
-                    continue;
+                // Fruit tree always has exactly one fruit entry
+                var fruitEntry = fruitTreeData.Fruit.FirstOrDefault();
 
-                //ModEntry.Instance.Monitor.Log(
-                //    $"LOAD FRUITTREE raw seed: {saplingId} -> plant seed: {plant.Seed?.Id}",
-                //    LogLevel.Info);
+                string fruitId = fruitEntry?.ItemId ?? "";
 
-                _plants[plant.Data.SeedId] = plant;
+                var harvestInfo = GameObjectInfoHelper.FromObject(fruitId);
+
+                // Patch for Uncle Iroh Approved Tea which mismatches the (O) prefix
+                if (harvestInfo == null && fruitId.StartsWith("(O)"))
+                {
+                    string cleanId = fruitId[3..]; // remove "(O)"
+                    harvestInfo = GameObjectInfoHelper.FromObject(cleanId);
+                }
+
+                var data = new PlantInfoData
+                {
+                    SeedId = saplingId,
+                    HarvestId = fruitId,
+                    PlantType = PlantType.FruitTree,
+
+                    Seed = GameObjectInfoHelper.FromObject(saplingId),
+
+                    Seasons = fruitTreeData.Seasons?
+                        .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
+                        .ToList()
+                        ?? new List<SeasonId>(),
+
+                    // Fruit trees always take 28 days to mature
+                    DaysToProduce = 28,
+
+                    // After maturity, they produce daily
+                    RegrowDays = 1,
+
+
+                };
+                data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(saplingId);
+                data.MonsterDrops = MonsterDropLoader.GetDropsForItem(saplingId);
+
+                var plant = new PlantInfo(data);
+                _plants[data.SeedId] = plant;
             }
-        }
-
-        private static PlantInfo FromFruitTree(string saplingId, FruitTreeData fruitTree)
-        {
-            // Fruit tree always has exactly one fruit entry
-            var fruitEntry = fruitTree.Fruit.FirstOrDefault();
-
-            string fruitId = fruitEntry?.ItemId ?? "";
-
-            var seedInfo = GameObjectInfoHelper.FromObject(saplingId);
-            var harvestInfo = GameObjectInfoHelper.FromObject(fruitId);
-
-            // Patch for Uncle Iroh Approved Tea which mismatches the (O) prefix
-            if (harvestInfo == null && fruitId.StartsWith("(O)"))
-            {
-                string cleanId = fruitId[3..]; // remove "(O)"
-                harvestInfo = GameObjectInfoHelper.FromObject(cleanId);
-            }
-
-            var data = new PlantInfoData
-            {
-                SeedId = saplingId,
-                HarvestId = fruitId,
-                PlantType = PlantType.FruitTree,
-
-                Seed = seedInfo,
-
-                Seasons = fruitTree.Seasons?
-                    .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
-                    .ToList()
-                    ?? new List<SeasonId>(),
-
-                // Fruit trees always take 28 days to mature
-                DaysToProduce = 28,
-
-                // After maturity, they produce daily
-                RegrowDays = 1,
-
-                //Drops = new List<DropInfo>
-                //    {
-                //    new DropInfo
-                //    {
-                //        ItemId = fruitId,
-                //        MinStack = fruitEntry?.MinStack ?? 1,
-                //        MaxStack = fruitEntry?.MaxStack ?? 1,
-                //        ExtraHarvestChance = 0f
-                //    }
-
-                //}.AsReadOnly(),
-
-            };
-            return new PlantInfo(data);
-
         }
 
         //Bushes. Try this code for accessing custom bush drops from UI Info Suite Alt 2 -> Infrastructure -> Tools:

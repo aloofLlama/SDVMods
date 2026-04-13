@@ -51,23 +51,45 @@ namespace SDVData_Tests.Helpers
 
             foreach (var plant in _plants)
             {
-                foreach (var option in plant.PurchaseOptions)
+
+                string seedId = plant.SeedId;
+                string seedName = TrimSeedName(plant.Seed?.Name ?? "null");
+
+                // CASE 1: plant has NO purchase options
+                if (plant.PurchaseOptions == null || plant.PurchaseOptions.Count == 0)
                 {
 
-                    string seedId = plant.SeedId;
+                    if (seen.Add(seedId)) // only once per seed
+                    {
+                        //output.WriteLine(
+                        //    $"[InlineData(\"{seedId}\", null, null)] // {seedName}"
+                        //);
+
+                        //create for SeedPriceOverrides
+                        output.WriteLine(
+                        $"{{ (\"{seedId}\", \"{null}\"), {null} }}, // {seedName}"
+                        );
+
+                    }
+
+                    continue;
+                }
+
+                // CASE 2: plant HAS purchase options
+                foreach (var option in plant.PurchaseOptions)
+                {
                     string vendorId = option.VendorId;
                     string price = option.GoldPrice?.ToString() ?? "null";
-                    string seedName = TrimSeedName(plant.Seed?.Name ?? "null");
 
                     if (vendorId != "Joja" &&
-                        !IsNightMarket(vendorId) &&
-                        vendorId != "IslandTrade" &&
-                        vendorId != "Raccoon" &&
-                        vendorId != "SeedShop" && 
-                        vendorId != "skellady.SBVCP_AriMarket" &&
-                        vendorId != "Sandy" &&
-                        vendorId != "skellady.SBVCP_JumanaShop" &&
-                        vendorId != "AnimalShop" &&
+                        //!IsNightMarket(vendorId) &&
+                        //vendorId != "IslandTrade" &&
+                        //vendorId != "Raccoon" &&
+                        //vendorId != "SeedShop" && 
+                        //vendorId != "skellady.SBVCP_AriMarket" &&
+                        //vendorId != "Sandy" &&
+                        //vendorId != "skellady.SBVCP_JumanaShop" &&
+                        //vendorId != "AnimalShop" &&
                         //!seedId.Contains("slimerrain.uncleirohapprovedtea", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("slimerrain.grainsoverhullcp", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("skellady.SBVCP", StringComparison.OrdinalIgnoreCase) &&
@@ -78,9 +100,9 @@ namespace SDVData_Tests.Helpers
 
                         if (seen.Add(key)) // only true the FIRST time
                         {
-                            output.WriteLine(
-                            $"[InlineData(\"{seedId}\", \"{vendorId}\", {price})] //{seedName}"
-                            );
+                            //output.WriteLine(
+                            //$"[InlineData(\"{seedId}\", \"{vendorId}\", {price})] //{seedName}"
+                            //);
 
                             //create for SeedPriceOverrides
                             //output.WriteLine(

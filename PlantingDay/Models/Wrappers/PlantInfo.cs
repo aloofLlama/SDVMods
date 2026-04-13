@@ -12,21 +12,24 @@ namespace PlantingDay.Models.Wrappers
         public SDVData.PlantInfoData Data { get; }
         public PlantInfoRuntime Runtime { get; }
 
+        public List<PurchaseInfoRuntime> PurchaseOptions { get; }
+        public List<MonsterDropInfoRuntime> MonsterDrops { get; }
+
         public PlantInfo(SDVData.PlantInfoData data)
         {
             Data = data;
             Runtime = new PlantInfoRuntime(data);
-        }
 
-        public List<PurchaseInfoRuntime> PurchaseOptions =>
-                Data.PurchaseOptions
-                    .Select(d => new PurchaseInfoRuntime(d))
-                    .ToList();
+            PurchaseOptions = data.PurchaseOptions
+                .Select(d => new PurchaseInfoRuntime(d))
+                .ToList();
 
-        public List<MonsterDropInfoRuntime> MonsterDrops =>
-            Data.MonsterDrops
+            MonsterDrops = data.MonsterDrops
                 .Select(d => new MonsterDropInfoRuntime(d))
                 .ToList();
+        }
+
+
 
     }
 

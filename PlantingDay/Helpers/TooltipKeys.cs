@@ -16,6 +16,7 @@ namespace PlantingDay.Helpers
         public const string ReadyOn = "tooltip.ready_on";
         public const string TooLate = "tooltip.too_late";
         public const string RegrowQty = "tooltip.regrow_qty";
+        public const string RegrowIndef = "tooltip.regrow_indef";
 
         // Tree growth
         public const string TreeReadyInFuture = "tooltip.tree_ready_in_future";

@@ -275,7 +275,7 @@ namespace SDVData_Tests
         [InlineData("skellady.SBVCP_CyclamenSeeds", "skellady.SBVCP_JumanaShop", 30)] //CyclamenSeeds
         [InlineData("skellady.SBVCP_HyacinthSeeds", "skellady.SBVCP_JumanaShop", 30)] //HyacinthSeeds
         [InlineData("skellady.SBVCP_RoyalAnemoneSeeds", "skellady.SBVCP_JumanaShop", 40)] //RoyalAnemoneSeeds
-        [InlineData("skellady.SBVCP_SpeedwellSeeds", "skellady.SBVCP_JumanaShop", 60)] //SpeedwellSeeds **MANUALLY CORRECTED
+        [InlineData("skellady.SBVCP_SpeedwellSeeds", "skellady.SBVCP_JumanaShop", 30)] //SpeedwellSeeds **MANUALLY CORRECTED
         [InlineData("skellady.SBVCP_WildMustardSeeds", "skellady.SBVCP_JumanaShop", 40)] //WildMustardSeeds
 
         public void Sunberry_Jumana_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
@@ -397,7 +397,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_WasabiRootSeeds", "Festival_EggFestival_Pierre", 100)] //WasabiRootSeeds
         [InlineData("Cornucopia_LicoriceRootSeeds", "Dwarf", 100)] //LicoriceRootSeeds
         [InlineData("Cornucopia_WormwoodSeeds", "Dwarf", 100)] //WormwoodSeeds
-        [InlineData("Cornucopia_Soybeans", "Traveler", 195)] //Soybeans actual 195-1000 ***ARE THERE ANY OTHER MISSING SEEDS WITH NO PURCHASE OPTIONS IN THE JSON
+        [InlineData("Cornucopia_Soybeans", "Traveler", 195)] //Soybeans actual 195-1000 
 
         public void Misc_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {

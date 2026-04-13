@@ -29,6 +29,7 @@ namespace PlantingDay.ToolTip_Sections
 
             GrowthContext growth = BuildGrowthContext(plant);
 
+            list.AddRange(CropsYearround(plant, growth, harvestIcon));
             list.AddRange(CropsOutOfSeason(plant, growth, harvestIcon));
             list.AddRange(CropsReadyThisSeason(plant, growth, harvestIcon));
             list.AddRange(CropsReadyNextSeason(plant, growth, harvestIcon));
@@ -128,6 +129,35 @@ namespace PlantingDay.ToolTip_Sections
         // Crops
         // -------------------------
 
+        private static List<TooltipElement> CropsYearround(
+            PlantInfo plant, GrowthContext growth, Icon? harvestIcon)
+        {
+            var list = new List<TooltipElement>();
+
+            if (plant.Data.PlantType != PlantType.Crop ||
+                plant.Data.Seasons.Count != 4)
+                return list;
+
+            list.Add(new TooltipElement
+            {
+                Icon = harvestIcon,
+                Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.DaysToProduce),
+                    plant.Data.DaysToProduce)
+            });
+
+            if (plant.Data.RegrowDays > 0)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Spiral,
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowIndef))
+                    
+                });
+            }
+
+            return list;
+        }
+
         private static List<TooltipElement> CropsOutOfSeason(
             PlantInfo plant, GrowthContext growth, Icon? harvestIcon)
         {
@@ -164,6 +194,7 @@ namespace PlantingDay.ToolTip_Sections
 
             if (plant.Data.PlantType != PlantType.Crop ||
                 !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
+                plant.Data.Seasons.Count == 4 ||
                 growth.ReadyDay > 28)
                 return list;
 
@@ -197,6 +228,7 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.PlantType != PlantType.Crop ||
                 !plant.Data.Seasons.Contains(growth.CurrentSeason) ||
                 !plant.Data.Seasons.Contains(growth.NextSeason) ||
+                plant.Data.Seasons.Count == 4 ||
                 growth.ReadyDay < 28)
                 return list;
 

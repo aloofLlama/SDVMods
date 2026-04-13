@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using PlantingDay;
+using SDVCommon.Helpers;
 using SDVCommon.Icons;
+using StardewModdingAPI;
 using StardewValley;
 
 namespace SDVCommon.Icons.IconProviders
@@ -9,20 +12,27 @@ namespace SDVCommon.Icons.IconProviders
     {
         public bool CanHandle(string id)
         {
+            ModEntry.Instance.Monitor.Log($"[PurchaseIconProvider] CanHandle? id='{id}'", LogLevel.Warn);
+
             return id.StartsWith("item:", System.StringComparison.OrdinalIgnoreCase);
         }
 
         public Icon? LoadIcon(string id)
         {
+            ModEntry.Instance.Monitor.Log($"[PurchaseIconProvider] LoadIcon called with id='{id}'", LogLevel.Warn);
+
             try
             {
                 // Extract canonical item ID
-                string tradeItemId = id["item:".Length..];
+                string canonicalId = id["item:".Length..];
 
-                if (string.IsNullOrWhiteSpace(tradeItemId))
+                if (string.IsNullOrWhiteSpace(canonicalId))
                     return null;
 
-                Item item = ItemRegistry.Create(tradeItemId);
+                // Convert canonical → game ID
+                string gameId = IdHelper.ToGameId(canonicalId);
+
+                Item item = ItemRegistry.Create(gameId);
                 if (item == null)
                     return null;
 

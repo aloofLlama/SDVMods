@@ -68,7 +68,7 @@ namespace PlantingDay.Helpers.SeedSource
                         {
                             MonsterName = monsterName,
                             DropChance = chance,
-                            // IconRef assigned later in PlantDatabase.Initialize()
+                            // Icon assigned later 
                         });
                     }
                 }

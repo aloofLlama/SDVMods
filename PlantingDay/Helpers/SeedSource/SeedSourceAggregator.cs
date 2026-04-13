@@ -15,6 +15,7 @@ namespace PlantingDay.Helpers.SeedSource
         /// </summary>
         public static List<object> BuildFullSourceList(PlantInfo plant)
         {
+
             var list = new List<object>();
 
             // 1. Sorted vendor list (Pierre → Gold → Trade → Night Market)

@@ -35,8 +35,6 @@ namespace PlantingDay.Helpers.SeedSource
             {
                 foreach (var entry in shop.Items)
                 {
-
-
                     // Match direct item or wildcard
                     bool directMatch = IdHelper.CanonicalItemId(entry.ItemId) == itemId;
                     bool wildcardMatch =
@@ -65,7 +63,6 @@ namespace PlantingDay.Helpers.SeedSource
                     }
                     else
                     {
-                        
                         var item = ItemRegistry.Create(IdHelper.ToGameId(itemId));
                         if (item != null)
                         {
@@ -81,17 +78,24 @@ namespace PlantingDay.Helpers.SeedSource
                                 useObjectDataPrice: entry.UseObjectDataPrice
                             );
 
-                            // Second: check for override
-                            if (SeedPriceOverrides.Overrides.TryGetValue((itemId, shopId), out int overridePrice))
+                            // Second: check for override (per vendor)
+                            if (SeedDataOverrides.Overrides.TryGetValue((itemId, shopId), out var ov))
                             {
-                                info.GoldPrice = overridePrice;
+                                // Vendor override only if provided
+                                if (!string.IsNullOrEmpty(ov.VendorId))
+                                    info.VendorId = ov.VendorId;
+
+                                // Price override only if provided
+                                if (ov.Price.HasValue)
+                                    info.GoldPrice = ov.Price.Value;
+                                else
+                                    info.GoldPrice = calculatedPrice;
                             }
                             else
                             {
                                 info.GoldPrice = calculatedPrice;
                             }
                         }
-                    
                     }
 
                     // Apply price modifiers
@@ -124,6 +128,21 @@ namespace PlantingDay.Helpers.SeedSource
 
                     results.Add(info);
                 }
+            }
+
+            //
+            // Fallback: seeds with NO purchase options (Soybeans, Lentils, etc.)
+            //
+            if (results.Count == 0 &&
+                SeedDataOverrides.Overrides.TryGetValue((itemId, null), out var fallbackOv))
+            {
+                results.Add(new PurchaseInfoData
+                {
+                    VendorId = fallbackOv.VendorId ?? "",
+                    VendorName = VendorHelper.GetVendorName(fallbackOv.VendorId ?? ""),
+                    GoldPrice = fallbackOv.Price,
+                    Condition = null
+                });
             }
 
             return results;

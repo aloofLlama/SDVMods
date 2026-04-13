@@ -1,5 +1,6 @@
 ﻿using PlantingDay.Models.Runtime;
 using PlantingDay.Models.Wrappers;
+using StardewModdingAPI;
 
 namespace PlantingDay.Helpers.SeedSource
 {
@@ -32,14 +33,14 @@ namespace PlantingDay.Helpers.SeedSource
                 .ThenBy(v => v.Data.VendorName)
                 .ToList();
 
-            //ModEntry.Instance.Monitor.Log("=== SORTED VENDORS ===", LogLevel.Warn);
-            //foreach (var v in sortedVendors)
-            //{
-            //    ModEntry.Instance.Monitor.Log(
-            //        $"Vendor: {v.VendorName}, Price={v.GoldPrice}, Trade={v.TradeAmount}, IsNightMarket={VendorHelper.IsNightMarket(v)}",
-            //        LogLevel.Warn
-            //        );
-            //}
+            ModEntry.Instance.Monitor.Log("=== SORTED VENDORS ===", LogLevel.Warn);
+            foreach (var v in sorted)
+            {
+                ModEntry.Instance.Monitor.Log(
+                    $"Vendor: {v.Data.VendorName}, Price={v.Data.GoldPrice}, Trade={v.Data.TradeAmount}, IsNightMarket={VendorHelper.IsNightMarket(v.Data.VendorId)}",
+                    LogLevel.Warn
+                    );
+            }
 
             return sorted;
         }
