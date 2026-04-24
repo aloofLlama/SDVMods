@@ -18,6 +18,7 @@ public class TooltipElement
     public Texture2D? IconTexture { get; set; }   // dynamic item icons
     public Icon? Icon { get; set; }         // static UI icons
 
+
     // Layout
     public int PaddingTop { get; set; } = 2;
     public int PaddingBottom { get; set; } = 2;

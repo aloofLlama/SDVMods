@@ -16,7 +16,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRegistry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\IIconProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\MonsterIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\OBSMonsterIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\PurchaseIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\SeedIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\TooltipIcons.cs" />
@@ -24,8 +24,5 @@
     <Compile Include="$(MSBuildThisFileDirectory)RuntimeModels\HarvestInfoRuntime.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipColors.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)TooltipRenderer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Helpers\" />
   </ItemGroup>
 </Project>

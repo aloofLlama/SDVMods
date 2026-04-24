@@ -12,15 +12,11 @@ namespace SDVCommon.Icons.IconProviders
     {
         public bool CanHandle(string id)
         {
-            ModEntry.Instance.Monitor.Log($"[PurchaseIconProvider] CanHandle? id='{id}'", LogLevel.Warn);
-
             return id.StartsWith("item:", System.StringComparison.OrdinalIgnoreCase);
         }
 
         public Icon? LoadIcon(string id)
         {
-            ModEntry.Instance.Monitor.Log($"[PurchaseIconProvider] LoadIcon called with id='{id}'", LogLevel.Warn);
-
             try
             {
                 // Extract canonical item ID

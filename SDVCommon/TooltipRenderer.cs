@@ -13,48 +13,6 @@ namespace SDVCommon
 
     public static class TooltipRenderer
     {
-        //public static void DrawMenu(SpriteBatch spriteBatch)
-        //{
-        //    if (!Context.IsWorldReady)
-        //        return;
-
-        //    Item? hovered = GetHoveredItemFromAnyMenu();
-        //    if (hovered is not StardewValley.Object obj)
-        //        return;
-
-
-
-            // Use the correct key format O:#### to see if the item is in the plant library
-            //string lookupKey = obj.ItemId;
-
-            //var plant = PlantDatabase.LookupFromKey(lookupKey);
-
-            //if (plant is null)
-            //    return;
-            ////ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Data.Seed?.Name} = {plant.Data.Harvest?.Id}", LogLevel.Info);
-
-
-            //var elements = TooltipBuilder.BuildTooltip(plant);
-
-            //DrawTooltip(spriteBatch, elements);
-
-            //foreach (var p in plant.PurchaseOptions)
-            //{
-            //    ModEntry.Instance.Monitor.Log(
-            //        $"Item: {plant.Id} Vendor: {p.VendorId} Price: {p.GoldPrice}",
-            //        LogLevel.Info
-            //    );
-            //}
-            //ModEntry.Instance.Monitor.Log(
-            //    $"Plant {plant.Id} has {plant.PurchaseOptions.Count} purchase options.",
-            //    LogLevel.Info
-                //);
-
-       // }
-
-        //--------------
-        // Get the item to draw the tooltip about
-        //--------------
 
         public static Item? GetHoveredItemFromAnyMenu()
         {
@@ -103,9 +61,9 @@ namespace SDVCommon
             SpriteFont font = Game1.smallFont;
 
             const int IconRenderSize = 32;  
-            const int IconColumnWidth = 32;
+            const int IconColumnWidth = 34;
             const int separatorPadding = 12;
-
+            const int inlineIconWidthPadding = 6;
 
             int width = 0;
             int height = 0;
@@ -152,7 +110,7 @@ namespace SDVCommon
                     {
                         if (seg.Icon.HasValue)
                         {
-                            lineWidth += font.LineSpacing;
+                            lineWidth += font.LineSpacing + inlineIconWidthPadding;
                         }
                         if (!string.IsNullOrEmpty(seg.Text))
                         {
@@ -283,7 +241,7 @@ namespace SDVCommon
                                 lineHeight
                             );
 
-                            xCursor += lineHeight;
+                            xCursor += lineHeight + inlineIconWidthPadding;
                         }
                         if (!string.IsNullOrEmpty(seg.Text))
                         {
@@ -344,30 +302,34 @@ namespace SDVCommon
 
             for (int i = 0; i < list.Count; i++)
             {
-                // Build ONCE
                 var segs = buildSegments(list[i]).ToList();
 
-                // Skip empty
                 if (segs.Count == 0)
                     continue;
 
-                // Add segments
                 result.AddRange(segs);
 
-                // Add separator if not last
-                if (i < list.Count - 1)
+                // Look ahead: does the next item produce segments?
+                for (int j = i + 1; j < list.Count; j++)
                 {
-                    result.Add(new InlineSegment
+                    var nextSegs = buildSegments(list[j]);
+                    if (nextSegs != null && nextSegs.Any())
                     {
-                        Text = separator,
-                        Color = TooltipColors.Muted,
-                        Bold = false
-                    });
+                        result.Add(new InlineSegment
+                        {
+                            Text = separator,
+                            Color = TooltipColors.Muted,
+                            Bold = false
+                        });
+                        break;
+                    }
                 }
             }
 
             return result;
+        
         }
+
         private static int DrawPaddedIcon(
              SpriteBatch b,
              Texture2D texture,

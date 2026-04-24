@@ -27,6 +27,8 @@
 	"tooltip.price_range": "{0}-{1}g",
 	"tooltip.pierres_purchase": "{0}g",
 	"tooltip.other_shop_purchase": "{0}g {1}",
-	"tooltip.other_shop_trade": "({0}) {1}"
+	"tooltip.other_shop_trade": "({0}) {1}",
+	"tooltip.buy_year_2": "Y2"
+
 
 }

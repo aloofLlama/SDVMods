@@ -62,13 +62,13 @@ namespace PlantingDay
 
         }
 
-        [EventPriority(EventPriority.Low - 1)]
+        [EventPriority(EventPriority.Low-1)]
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
         {
             if (!Context.IsWorldReady)
                 return;
 
-            Item? hovered = SDVCommon.TooltipRenderer.GetHoveredItemFromAnyMenu();
+            Item? hovered = TooltipRenderer.GetHoveredItemFromAnyMenu();
             if (hovered is not StardewValley.Object obj)
                 return;
 
@@ -86,32 +86,8 @@ namespace PlantingDay
 
             var elements = TooltipBuilder.BuildTooltip(plant);
 
-            SDVCommon.TooltipRenderer.DrawTooltip(e.SpriteBatch, elements);
+            TooltipRenderer.DrawTooltip(e.SpriteBatch, elements);
 
-            //SDVFramework.TooltipRenderer.DrawMenu(e.SpriteBatch);
-
-            //if (Game1.activeClickableMenu is ShopMenu shop)
-            //{
-            //    Monitor.Log("=== PIERRE SHOP DUMP ===", LogLevel.Warn);
-
-            //    foreach (var salable in shop.forSale)
-            //    {
-            //        var item = salable as Item;
-            //        if (item == null)
-            //            continue;
-
-            //        // 1. Get the stock info (price, stock, etc.)
-            //        if (!shop.itemPriceAndStock.TryGetValue(salable, out var stockInfo))
-            //            continue;
-
-            //        int price = stockInfo.Price;   // <-- THIS is the final price Pierre is charging
-
-            //        Monitor.Log(
-            //            $"{item.Name} (ID: {item.ParentSheetIndex}) - Price: {price}",
-            //            LogLevel.Warn
-            //        );
-            //    }
-            //}
         }
 
 
@@ -181,7 +157,7 @@ namespace PlantingDay
 
             foreach (var plant in PlantInfoBuilder.AllPlants)
             {
-                // seed, monster drop, trade currency icons
+                // seed, trade currency icons
                 PlantIconInitializer.InitializeIcons(plant);
 
             }
@@ -191,6 +167,8 @@ namespace PlantingDay
             }
 
             CacheForTesting.DumpPlantInfoToJson();
+
+
 
         }
 

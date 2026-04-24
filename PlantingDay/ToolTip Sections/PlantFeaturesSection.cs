@@ -25,7 +25,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Trellis,
+                    Icon = TooltipIcons.Get(IconKey.Trellis),
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.RequiresTrellis)
                     ),
@@ -38,7 +38,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Watercan,
+                    Icon = TooltipIcons.Get(IconKey.Watercan),
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.NoWatering)
                     ),
@@ -51,7 +51,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Scythe,
+                    Icon = TooltipIcons.Get(IconKey.Scythe),
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.HarvestWithScythe)
                     ),
@@ -63,7 +63,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Rainbow,
+                    Icon = TooltipIcons.Get(IconKey.Rainbow),
                     Text = string.Format(ModEntry.ModHelper.Translation
                         .Get(TooltipKeys.MultiSprite),
                         plant.Data.MultiSprite

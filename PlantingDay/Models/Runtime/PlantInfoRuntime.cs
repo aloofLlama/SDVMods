@@ -18,15 +18,15 @@ public class PlantInfoRuntime
     //public Icon? HarvestIcon { get; set; }
 
 
-    public class PurchaseInfo
-    {
-        public Icon? CurrencyIcon { get; set; }
-    }
+    //public class PurchaseInfo
+    //{
+    //    public Icon? CurrencyIcon { get; set; }
+    //}
 
 
-    public class MonsterDropInfo
-    {
-        public Icon? MonsterIcon { get; set; }
-    }
+    //public class MonsterDropInfo
+    //{
+    //    public Icon? MonsterIcon { get; set; }
+    //}
 
 }

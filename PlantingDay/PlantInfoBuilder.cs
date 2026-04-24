@@ -1,17 +1,10 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PlantingDay.Compatibility;
-using PlantingDay.Helpers;
+﻿using PlantingDay.Helpers;
 using PlantingDay.Helpers.SeedSource;
 using PlantingDay.Models.Wrappers;
-using SDVData;
 using SDVCommon.GameData;
+using SDVData;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.GameData;
-using StardewValley.GameData.Buffs;
 using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 
@@ -40,16 +33,11 @@ namespace PlantingDay
             LoadFruitTrees();
             //LoadBushes(); // if you add this later
 
-            // Populate purchase info, monster drops
             foreach (var plant in _plants.Values)
             {
                 string seedId = plant.Data.SeedId;
 
-                plant.Data.PurchaseOptions =
-                    PurchaseDataBuilder.GetPurchaseInfo(seedId);
 
-                plant.Data.MonsterDrops =
-                    MonsterDropLoader.GetDropsForItem(seedId);
 
             }
 
@@ -80,10 +68,6 @@ namespace PlantingDay
         {
             return _plants.TryGetValue(key, out var info) ? info : null;
         }
-
-
-
-
 
         //-------
         // Crops
@@ -116,9 +100,21 @@ namespace PlantingDay
 
                     Seed = GameObjectInfoHelper.FromObject(seedId),
                 };
-
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(seedId);
                 data.MonsterDrops = MonsterDropLoader.GetDropsForItem(seedId);
+
+                //// Apply Monster Drop Overrides
+                //if (SeedOverrides.MonsterDrops.TryGetValue(seedId, out var overrideList))
+                //{
+                //    data.MonsterDrops = overrideList
+                //        .Select(m => new MonsterDropInfoData
+                //        {
+                //            MonsterName = m.Monster,
+                //            DropChance = (float)m.Chance
+                //        })
+                //        .ToList();
+                //}
+
 
                 var plant = new PlantInfo(data);
                 _plants[data.SeedId] = plant;
@@ -169,6 +165,20 @@ namespace PlantingDay
                 };
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(saplingId);
                 data.MonsterDrops = MonsterDropLoader.GetDropsForItem(saplingId);
+
+                //// Apply Monster Drop Overrides
+                //if (SeedOverrides.MonsterDrops.TryGetValue(saplingId, out var overrideList))
+                //{
+                //    data.MonsterDrops = overrideList
+                //        .Select(m => new MonsterDropInfoData
+                //        {
+                //            MonsterName = m.Monster,
+                //            DropChance = (float)m.Chance
+                //        })
+                //        .ToList();
+                //}
+
+
 
                 var plant = new PlantInfo(data);
                 _plants[data.SeedId] = plant;

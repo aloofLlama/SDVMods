@@ -22,10 +22,6 @@
         public List<MonsterDropInfoData> MonsterDrops { get; set; } = new();
 
         public ItemInfo? Seed { get; set; } = new ItemInfo();
-        //public ItemInfo? Harvest { get; set; } = new ItemInfo();
-
-        //public IconRef? SeedIconRef { get; set; }
-        //public IconRef? HarvestIconRef { get; set; }
     }
 
     public enum PlantType { Crop, FruitTree, Bush, Unknown }

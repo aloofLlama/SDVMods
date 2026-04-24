@@ -44,7 +44,7 @@ namespace SDVData_Tests.Helpers
          * 2. Paste the output into the SeedPriceOverrides test class, or inside the test method that needs it.
          */
         [Fact]
-        public void GenerateInlineDataForSeeds()
+        public void GenerateInlinePriceDataForSeeds()
         {
             output.WriteLine($"Plant count: {_plants.Count}");
             var seen = new HashSet<string>();
@@ -53,27 +53,27 @@ namespace SDVData_Tests.Helpers
             {
 
                 string seedId = plant.SeedId;
-                string seedName = TrimSeedName(plant.Seed?.Name ?? "null");
+                string seedName = TestHelpers.TrimSeedName(plant.Seed?.Name ?? "null");
 
                 // CASE 1: plant has NO purchase options
-                if (plant.PurchaseOptions == null || plant.PurchaseOptions.Count == 0)
-                {
+                //if (plant.PurchaseOptions == null || plant.PurchaseOptions.Count == 0)
+                //{
 
-                    if (seen.Add(seedId)) // only once per seed
-                    {
-                        //output.WriteLine(
-                        //    $"[InlineData(\"{seedId}\", null, null)] // {seedName}"
-                        //);
+                //    if (seen.Add(seedId)) // only once per seed
+                //    {
+                //        output.WriteLine(
+                //        $"[InlineData(\"{seedId}\", null, null)] // {seedName}"
+                //        );
 
-                        //create for SeedPriceOverrides
-                        output.WriteLine(
-                        $"{{ (\"{seedId}\", \"{null}\"), {null} }}, // {seedName}"
-                        );
+                //        //create for SeedPriceOverrides
+                //        //output.WriteLine(
+                //        //$"{{ (\"{seedId}\", \"{null}\"), {null} }}, // {seedName}"
+                //        //);
 
-                    }
+                //    }
 
-                    continue;
-                }
+                //    continue;
+                //}
 
                 // CASE 2: plant HAS purchase options
                 foreach (var option in plant.PurchaseOptions)
@@ -81,25 +81,33 @@ namespace SDVData_Tests.Helpers
                     string vendorId = option.VendorId;
                     string price = option.GoldPrice?.ToString() ?? "null";
 
-                    if (vendorId != "Joja" &&
-                        //!IsNightMarket(vendorId) &&
+                    if (//vendorId != "Joja" &&
+                        //!TestHelpers.IsNightMarket(vendorId) &&
                         //vendorId != "IslandTrade" &&
                         //vendorId != "Raccoon" &&
-                        //vendorId != "SeedShop" && 
+                        vendorId == "SeedShop"
                         //vendorId != "skellady.SBVCP_AriMarket" &&
                         //vendorId != "Sandy" &&
                         //vendorId != "skellady.SBVCP_JumanaShop" &&
                         //vendorId != "AnimalShop" &&
+                        //vendorId == "Traveler" &&
+                        //
                         //!seedId.Contains("slimerrain.uncleirohapprovedtea", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("slimerrain.grainsoverhullcp", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("skellady.SBVCP", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("Cornucopia", StringComparison.OrdinalIgnoreCase) &&
-                        !IsVanillaSeedId(seedId))
+                        //
+                        //!TestHelpers.IsVanillaSeedId(seedId)
+                        //
+                        )
                     {
                         string key = $"{seedId}:{vendorId}";
 
                         if (seen.Add(key)) // only true the FIRST time
                         {
+                            //---
+                            // SEED PRICE TESTS
+                            //------
                             //output.WriteLine(
                             //$"[InlineData(\"{seedId}\", \"{vendorId}\", {price})] //{seedName}"
                             //);
@@ -109,28 +117,51 @@ namespace SDVData_Tests.Helpers
                             //$"{{ (\"{seedId}\", \"{vendorId}\"), {price} }}, // {seedName}"
                             //);
 
+
+
+
                         }
                     }
                 }
             }
         }
-        
 
-        // Filter to vanilla seeds and fruit tree saplings
-        private static bool IsVanillaSeedId(string seedId) => int.TryParse(seedId, out _);
-
-        private static bool IsNightMarket(string vendorId) =>
-            vendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase);
-
-        public static string TrimSeedName(string raw)
+        [Fact]
+        public void GenerateInlineConditionDataForSeeds()
         {
-            var parts = raw.Split('_');
-            if (parts.Length < 2)
-                return raw;
+            var seen = new HashSet<string>();
 
-            //return $"{parts[^2]}_{parts[^1]}";
-            return $"{parts[^1]}";
+            foreach (var plant in _plants)
+            {
+                string seedId = plant.SeedId;
+                string seedName = TestHelpers.TrimSeedName(plant.Seed?.Name ?? "null");
+
+                foreach (var option in plant.PurchaseOptions)
+                {
+                    string vendorId = option.VendorId;
+
+                    bool allVendorEntriesYear2Plus =
+                        plant.PurchaseOptions
+                            .Where(o => o.VendorId == vendorId)
+                            .All(o => TestHelpers.GetMinYearForVendor(o) >= 2);
+
+                    if (vendorId == "SeedShop" && allVendorEntriesYear2Plus)
+                    {
+                        string key = $"{seedId}:{vendorId}";
+                        if (!seen.Add(key))
+                            continue;
+
+                        output.WriteLine(
+                            $"[InlineData(\"{seedId}\")] //{seedName}"
+                        );
+                    }
+                }
+            }
         }
+
+
+
+
 
 
 

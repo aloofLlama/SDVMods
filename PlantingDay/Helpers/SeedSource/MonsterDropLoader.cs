@@ -1,4 +1,6 @@
-﻿using StardewValley;
+﻿using SDVData;
+using StardewModdingAPI;
+using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,9 +50,9 @@ namespace PlantingDay.Helpers.SeedSource
         /// Return all monsters that drop the given seed item.
         /// Produces MonsterDropInfoData entries for PlantInfoData.
         /// </summary>
-        public static List<SDVData.MonsterDropInfoData> GetDropsForItem(string seedId)
+        public static List<MonsterDropInfoData> GetDropsForItem(string seedId)
         {
-            var result = new List<SDVData.MonsterDropInfoData>();
+            var result = new List<MonsterDropInfoData>();
 
             if (_monsterDropTable is null)
                 return result;
@@ -60,18 +62,41 @@ namespace PlantingDay.Helpers.SeedSource
 
             foreach (var (monsterName, drops) in _monsterDropTable)
             {
-                foreach (var (dropId, chance) in drops)
+                // collect all chances for this monster + item
+                var chances = drops
+                    .Where(d => d.itemId == itemId)
+                    .Select(d => d.chance)
+                    .ToList();
+
+                if (chances.Count == 0)
+                    continue;
+
+                // combine independent probabilities
+                float effectiveChance = 1f;
+                foreach (var c in chances)
+                    effectiveChance *= (1f - c);
+
+                effectiveChance = 1f - effectiveChance;
+
+                result.Add(new MonsterDropInfoData
                 {
-                    if (dropId == itemId)
+                    MonsterName = monsterName,
+                    DropChance = effectiveChance
+                });
+            }
+
+            // Apply overrides
+            if (SeedOverrides.MonsterDrops.TryGetValue(seedId, out var overrideList))
+            {
+
+                return overrideList
+                    .Select(m => new MonsterDropInfoData
                     {
-                        result.Add(new SDVData.MonsterDropInfoData
-                        {
-                            MonsterName = monsterName,
-                            DropChance = chance,
-                            // Icon assigned later 
-                        });
-                    }
-                }
+                        MonsterName = m.Monster,
+                        DropChance = (float)m.Chance
+                    })
+                    .ToList();
+
             }
 
             return result;

@@ -1,11 +1,4 @@
-﻿using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StardewValley.GameData.Objects;
-
+﻿
 namespace SDVCommon.Helpers
 {
     public static class IdHelper
@@ -43,31 +36,6 @@ namespace SDVCommon.Helpers
 
 
 
-        //public static string NormalizeItemId(string raw)
-        //{
-        //    if (string.IsNullOrWhiteSpace(raw))
-        //        return "";
-
-        //    raw = raw.Trim();
-
-        //    // Strip (X)### → ###
-        //    if (raw.StartsWith("(") && raw.Contains(')'))
-        //    {
-        //        int close = raw.IndexOf(')');
-        //        return raw.Substring(close + 1);
-        //    }
-
-        //    // Strip X:### → ###
-        //    int colonIndex = raw.IndexOf(':');
-        //    if (colonIndex > 0)
-        //        return raw.Substring(colonIndex + 1);
-
-        //    // Already numeric
-        //    if (int.TryParse(raw, out _))
-        //        return raw;
-
-        //    return raw;
-        //}
     }
 
 

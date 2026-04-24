@@ -15,7 +15,7 @@ namespace SDVCommon.Icons
         {
             Providers.Add(new SeedIconProvider());
             Providers.Add(new HarvestIconProvider());
-            Providers.Add(new MonsterIconProvider());
+            //Providers.Add(new MonsterIconProvider());
             Providers.Add(new PurchaseIconProvider());
 
             // Later:
@@ -37,13 +37,13 @@ namespace SDVCommon.Icons
 
                 if (provider.CanHandle(id))
                 {
-                    ModEntry.Instance.Monitor.Log($"[Can Handle] {id}", LogLevel.Warn);
+                    //ModEntry.Instance.Monitor.Log($"[Can Handle] {id}", LogLevel.Warn);
                     var icon = provider.LoadIcon(id);
                     Cache[id] = icon;
                     return icon;
                 }
-                else
-                    ModEntry.Instance.Monitor.Log($"[Can't Handle] {id}", LogLevel.Warn);
+                else { }
+                    //ModEntry.Instance.Monitor.Log($"[Can't Handle] {id}", LogLevel.Warn);
 
             }
 

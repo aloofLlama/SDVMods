@@ -27,7 +27,7 @@ namespace SDVCommon.Icons.IconProviders
                 return null;
 
             // Render the icon
-            var tex = SDVCommon.Icons.IconRenderer.RenderItemIcon(item, 16);
+            var tex = IconRenderer.RenderItemIcon(item, 16);
             return new Icon(
                 tex,
                 new Rectangle(0, 0, tex.Width, tex.Height),

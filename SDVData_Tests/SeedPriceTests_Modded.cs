@@ -30,7 +30,7 @@ namespace SDVData_Tests
         //2 Bushes not yet supported
         public void UncleIrohTea_Pierre_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -65,7 +65,7 @@ namespace SDVData_Tests
         [InlineData("slimerrain.grainsoverhullcp_Sorghum_Seeds", "SeedShop", 10)] //Sorghum_Seeds *MANUALLY CORRECTED
         public void GrainsOverhull_Pierre_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -207,7 +207,7 @@ namespace SDVData_Tests
 
         public void Cornucopia_Pierre_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -241,7 +241,7 @@ namespace SDVData_Tests
         [InlineData("skellady.SBVCP_CarobSapling", "skellady.SBVCP_AriMarket", 5000)] //CarobSapling
         public void Sunberry_Ari_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -280,7 +280,7 @@ namespace SDVData_Tests
 
         public void Sunberry_Jumana_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -324,7 +324,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_YlangYlangSapling", "Sandy", 3000)] //YlangYlangSapling
         public void Cornucopia_Sandy_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -362,7 +362,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_MelaleucaLeavesSapling", "AnimalShop", 4000)] //Cornucopia_MelaleucaLeavesSapling
         public void Cornucopia_Marnie_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -401,7 +401,7 @@ namespace SDVData_Tests
 
         public void Misc_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);

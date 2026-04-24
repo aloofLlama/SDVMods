@@ -1,6 +1,10 @@
-﻿using System;
-using System.Linq;
-using PlantingDay.Models.Runtime;
+﻿using PlantingDay.Models.Runtime;
+using PlantingDay.Models.Wrappers;
+using SDVCommon.Helpers;
+using StardewModdingAPI;
+using StardewValley;
+using StardewValley.GameData.Shops;
+using static SDVData.PurchaseInfoData;
 
 namespace PlantingDay.Helpers.SeedSource
 {
@@ -18,7 +22,7 @@ namespace PlantingDay.Helpers.SeedSource
                 "AnimalShop" => "Marnie",
                 "IslandTrade" => "Island Trader",
                 "DesertTrade" => "Desert Trader",
-                "Traveler" => "Traveling Cart",
+                //"Traveler" => "Traveling Cart",
 
                 // Festivals
                 "Festival_Luau_Pierre" => "Luau",
@@ -26,22 +30,22 @@ namespace PlantingDay.Helpers.SeedSource
                 "Festival_StardewValleyFair_StarTokens" => "Valley Fair",
                 "Festival_FlowerDance_Pierre" => "Flower Dance",
 
-                // Collapse Desert Festival
+                // Remove Desert Festival header
                 _ when shopId.StartsWith("DesertFestival", StringComparison.OrdinalIgnoreCase)
                     => string.Join(", ",
                         shopId.Split(',')
                               .Select(id => id.Replace("DesertFestival_", ""))
                     ),
 
-                // Collapse Night Market (all boats)
-                _ when shopId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase)
-                    => "Night Market",
+                //// Collapse Night Market (all boats)
+                //_ when shopId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase)
+                //    => "Night Market",
 
                 // Sunberry
                 "skellady.SBVCP_AriMarket" => "Ari",
                 "skellady.SBVCP_JumanaShop" => "Jumana",
 
-                _ => shopId // fallback for modded shops
+                _ => shopId // fallback
             };
         }
 
@@ -50,56 +54,189 @@ namespace PlantingDay.Helpers.SeedSource
         // ------------------------------------------------------------
         public static string VendorKey(PurchaseInfoRuntime info)
         {
-            var id = info.Data.VendorId;
-
-            if (IsPierre(id))
-                return "SeedShop";
-
-            if (IsNightMarket(id))
-                return "NightMarket";
-
-            if (IsDesertFestival(id))
-                return "DesertFestival";
-
-            return id;
+            return GetVendorType(info.Data.VendorId) switch
+            {
+                VendorType.Pierre => "SeedShop",
+                VendorType.NightMarket => "NightMarket",
+                VendorType.DesertFestival => "DesertFestival",
+                _ => info.Data.VendorId
+            };
         }
 
         // ------------------------------------------------------------
         // SORTING KEY (used by VendorListBuilder)
         // ------------------------------------------------------------
-        public static int SortKey(PurchaseInfoRuntime info)
+        public static int SortKey(PurchaseInfoRuntime v)
         {
-            var data = info.Data;
-
-            // 0 — Pierre always first
-            if (IsPierre(data.VendorId))
-                return 0;
-
-            // 1 — Gold vendors
-            if (data.GoldPrice.HasValue)
-                return 1;
-
-            // 3 — Trade vendors
-            if (data.TradeAmount > 0)
-                return 3;
-
-            // 2 — Everything else
-            return 2;
+            return GetVendorType(v.Data.VendorId) switch
+            {
+                VendorType.Pierre => 0,
+                //VendorType.NightMarket => 4, // always last
+                //VendorType.TravelingCart => 1, // gold vendor
+                VendorType.ValleyFair => 3, // trade vendor
+                VendorType.DesertFestival => 3,
+                _ => v.Data.GoldPrice.HasValue ? 1 : 2
+            };
         }
 
         // ------------------------------------------------------------
         // CLASSIFICATION HELPERS
         // ------------------------------------------------------------
-        public static bool IsPierre(string vendorId) =>
-            vendorId == "SeedShop";
+        public static VendorType GetVendorType(string vendorId)
+        {
+            if (vendorId == "SeedShop")
+                return VendorType.Pierre;
 
-        public static bool IsNightMarket(string vendorId) =>
-            vendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase);
+            if (vendorId.Contains ("Joja", StringComparison.OrdinalIgnoreCase))
+                return VendorType.Joja;
 
-        public static bool IsValleyFair(string vendorId) =>
-            vendorId.Contains("StardewValleyFair_StarTokens", StringComparison.OrdinalIgnoreCase);
+            if (vendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase))
+                return VendorType.NightMarket;
 
-        public static bool IsDesertFestival(string vendorId) =>
-            vendorId.Contains("DesertFestival", StringComparison.OrdinalIgnoreCase);
+            if (vendorId.Contains("Traveler", StringComparison.OrdinalIgnoreCase))
+                return VendorType.TravelingCart;
+
+            if (vendorId.Contains("DesertFestival", StringComparison.OrdinalIgnoreCase))
+                return VendorType.DesertFestival;
+
+            if (vendorId.Contains("StardewValleyFair_StarTokens", StringComparison.OrdinalIgnoreCase))
+                return VendorType.ValleyFair;
+
+            return VendorType.Other;
+        }
+
+
+        // ------------------------------------------------------------
+        // Wildcard matching
+        // ------------------------------------------------------------
+        public static bool ItemMatchesWildcard(string itemId, ShopItemData entry)
+        {
+            if (string.IsNullOrWhiteSpace(entry.PerItemCondition))
+                return false;
+
+            if (!entry.PerItemCondition.Contains("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            Item item = ItemRegistry.Create(IdHelper.ToGameId(itemId));
+            if (item == null)
+                return false;
+
+            var tags = item.GetContextTags();
+
+            var rules = entry.PerItemCondition
+                .Split(',')
+                .Select(r => r.Trim())
+                .Where(r => r.Length > 0);
+
+            foreach (var rule in rules)
+            {
+                bool negated = rule.StartsWith("!");
+                string cleanRule = negated ? rule[1..].Trim() : rule;
+
+                if (!cleanRule.StartsWith("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                int idx = cleanRule.IndexOf("Target ", StringComparison.OrdinalIgnoreCase);
+                if (idx < 0)
+                    continue;
+
+                string requiredTag = cleanRule[(idx + "Target ".Length)..].Trim();
+                bool hasTag = tags.Contains(requiredTag);
+
+                if (negated && hasTag)
+                    return false;
+
+                if (!negated && !hasTag)
+                    return false;
+            }
+
+            return true;
+        }
+
+        // ------------------------------------------------------------
+        // Condition matching
+        // ------------------------------------------------------------
+        public static bool EvaluatePerItemCondition(string? condition, string itemId)
+        {
+            if (string.IsNullOrEmpty(condition))
+                return true;
+
+            if (condition.StartsWith("ANY"))
+            {
+                var parts = condition.Split('"', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var part in parts)
+                {
+                    if (part.Contains("ITEM_ID Target"))
+                    {
+                        var target = part.Split(' ', StringSplitOptions.RemoveEmptyEntries).Last();
+                        if (IdHelper.CanonicalItemId(itemId)
+                                .Equals(IdHelper.CanonicalItemId(target), StringComparison.OrdinalIgnoreCase))
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+
+            return false;
+        }
+
+        // ------------------------------------------------------------
+        // Random Pool matching (Traveling Cart stock pool)
+        // ------------------------------------------------------------
+        public static bool MatchesRandomPool(string itemId, string? entryItemId)
+        {
+            if (string.IsNullOrEmpty(entryItemId))
+                return false;
+
+            if (!entryItemId.Contains("{{Random:", StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            int start = entryItemId.IndexOf(':');
+            int end = entryItemId.IndexOf("}}");
+
+            if (start < 0 || end < 0)
+                return false;
+
+            string inner = entryItemId.Substring(start + 1, end - start - 1);
+            string[] parts = inner.Split(',');
+
+            foreach (var p in parts)
+            {
+                string candidate = p.Trim();
+                if (IdHelper.CanonicalItemId(candidate)
+                        .Equals(IdHelper.CanonicalItemId(itemId), StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+        public static int GetMinYear(PlantInfo plant)
+        {
+            int minYear = int.MaxValue;
+
+            foreach (var opt in plant.PurchaseOptions)
+            {
+                var cond = opt.Data.Condition;
+                if (string.IsNullOrWhiteSpace(cond))
+                    continue;
+
+                var tokens = cond.Split(',', ' ', '\t');
+
+                for (int i = 0; i < tokens.Length - 1; i++)
+                {
+                    if (tokens[i] == "YEAR" && int.TryParse(tokens[i + 1], out int y))
+                    {
+                        minYear = Math.Min(minYear, y);
+                    }
+                }
+            }
+
+            ModEntry.Instance.Monitor.Log($"Seed: {plant.Data.SeedId} Min year {minYear}", LogLevel.Info);
+            return minYear == int.MaxValue ? 1 : minYear;
+        }
+
+
     }
 }

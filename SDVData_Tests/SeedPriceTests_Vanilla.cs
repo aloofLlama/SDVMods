@@ -1,6 +1,5 @@
 using SDVData;
 using SDVData_Tests.Helpers;
-using System.Numerics;
 
 namespace  SDVData_Tests
 {
@@ -55,7 +54,7 @@ namespace  SDVData_Tests
         //Grapes disabled by other mods
         public void Pierre_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants); 
@@ -113,7 +112,7 @@ namespace  SDVData_Tests
         [InlineData("498", "skellady.SBVCP_AriMarket", 50)] //Winter Seeds
         public void Ari_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -147,7 +146,7 @@ namespace  SDVData_Tests
         [InlineData("494", "Sandy", 20)] //Beet Seeds
         public void Sandy_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -183,7 +182,7 @@ namespace  SDVData_Tests
         [InlineData("425", "skellady.SBVCP_JumanaShop", 200)] //Fairy Seeds
         public void Jumana_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
@@ -217,7 +216,7 @@ namespace  SDVData_Tests
         [InlineData("347", "Traveler", 1000)] //Rare Seed
         public void Misc_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
-            // Get all plants with this seedId (some appear twice in your snapshot)
+            // Get all plants with this seedId 
             var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
 
             Assert.NotEmpty(matchingPlants);
