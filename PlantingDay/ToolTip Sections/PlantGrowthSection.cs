@@ -5,6 +5,7 @@ using PlantingDay.Models.Wrappers;
 using SDVCommon;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
+using SDVCommon.Tooltip;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;

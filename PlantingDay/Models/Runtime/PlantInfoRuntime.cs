@@ -15,18 +15,5 @@ public class PlantInfoRuntime
 
     // Runtime-only icons (Texture2D, Rectangle, etc.)
     public Icon? SeedIcon { get; set; }
-    //public Icon? HarvestIcon { get; set; }
-
-
-    //public class PurchaseInfo
-    //{
-    //    public Icon? CurrencyIcon { get; set; }
-    //}
-
-
-    //public class MonsterDropInfo
-    //{
-    //    public Icon? MonsterIcon { get; set; }
-    //}
 
 }

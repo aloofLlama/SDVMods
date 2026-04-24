@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using SDVCommon.Icons;
 
-namespace SDVCommon.RuntimeModels
+namespace SDVCommon.Models.Runtime
 {
     public class HarvestInfoRuntime
     {

@@ -1,11 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PlantingDay.Helpers;
-using PlantingDay.Models.Runtime;
+using SDVCommon.Helpers;
+using SDVCommon.Tooltip;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
-using SDVCommon.Helpers;
 
 
 namespace SDVCommon
@@ -13,48 +12,6 @@ namespace SDVCommon
 
     public static class TooltipRenderer
     {
-
-        public static Item? GetHoveredItemFromAnyMenu()
-        {
-            IClickableMenu menu = Game1.activeClickableMenu;
-            if (menu == null)
-                return null;
-
-            switch (menu)
-            {
-                // Inventory (GameMenu → InventoryPage)
-                case GameMenu gm:
-                    var invPage = gm.pages
-                        .OfType<StardewValley.Menus.InventoryPage>()
-                        .FirstOrDefault();
-
-                    //Item? hovered = invPage?.hoveredItem;
-                    //if (hovered is not null)
-                    //{
-                    //    this.Monitor.Log($"Hover item QID: {hovered.QualifiedItemId}", LogLevel.Info);
-
-                    //}
-
-                    return invPage?.hoveredItem;
-
-                // Chests, Fridges, Dressers, Junimo Chests, etc.
-                case StardewValley.Menus.ItemGrabMenu chest:
-                    return chest.hoveredItem;
-
-                // Pierre’s shop, Traveling Cart, Krobus, Qi, etc.
-                case StardewValley.Menus.ShopMenu shop:
-                    return shop.hoveredItem as Item;
-
-                default:
-                    return null;
-
-            }
-        }
-
-        //--------------
-        // Creating the display
-        //--------------
-
 
         public static void DrawTooltip(SpriteBatch b, List<TooltipElement> elements)
         {
@@ -78,7 +35,7 @@ namespace SDVCommon
 
                 if (el.IsSeparator)
                 {
-                    height += el.PaddingTop + separatorPadding + el.PaddingBottom; // or whatever height you want
+                    height += el.PaddingTop + separatorPadding + el.PaddingBottom;
                     continue;
                 }
 
@@ -123,7 +80,7 @@ namespace SDVCommon
                     lineWidth += (int)font.MeasureString(el.Text).X;
                 }
 
-                width = Math.Max(width, lineWidth) + 2;
+                width = Math.Max(width, lineWidth) + el.PaddingRight;
             }
 
             width += 32;
@@ -353,38 +310,6 @@ namespace SDVCommon
             return drawW;
         }
 
-        //private static int DrawPaddedIcon(
-        //    SpriteBatch b,
-        //    Texture2D texture,
-        //    Rectangle source,
-        //    float scale,
-        //    int boxSize,
-        //    int x,
-        //    int y,
-        //    int lineHeight
-        //)
-        //{
-        //    // Scale based on source size, not box size
-        //    int drawW = (int)(source.Width * scale);
-        //    int drawH = (int)(source.Height * scale);
-
-        //    // If the icon is larger than the box, clamp it
-        //    float max = Math.Max(drawW, drawH);
-        //    if (max > boxSize)
-        //    {
-        //        float shrink = boxSize / max;
-        //        drawW = (int)(drawW * shrink);
-        //        drawH = (int)(drawH * shrink);
-        //    }
-
-        //    // Center inside the box
-        //    int xOffset = x + (boxSize - drawW) / 2;
-        //    int yOffset = y + (lineHeight - drawH) / 2;
-
-        //    b.Draw(texture, new Rectangle(xOffset, yOffset, drawW, drawH), source, Color.White);
-
-        //    return drawW;
-        //}
 
     }
 }

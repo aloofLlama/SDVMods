@@ -102,7 +102,7 @@ namespace SDVCommon.Icons
             // Economics
             Add(IconKey.StarToken, Sheet("Cursors"), new Rectangle(338, 400, 8, 8), 8, 2f);
             Add(IconKey.GoldStar, Sheet("Cursors"), new Rectangle(346, 400, 8, 8), 8, 2f);
-            Add(IconKey.LittleCoin, Sheet("Cursors"), new Rectangle(290, 414, 6, 6), 6, 1f);
+            Add(IconKey.LittleCoin, Sheet("Cursors"), new Rectangle(193, 373, 9, 9), 9, 2f);
             Add(IconKey.NightStars, Sheet("Cursors1_6"), new Rectangle(337, 375, 11, 11), 11, 2f);
             Add(IconKey.TravelingCart, Sheet("Cursors"), new Rectangle(192, 1411, 20, 20), 20, 1.5f);
 

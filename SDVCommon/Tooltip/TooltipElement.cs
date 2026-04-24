@@ -4,8 +4,7 @@ using SDVCommon.Helpers;
 using SDVCommon.Icons;
 
 
-namespace PlantingDay.Models.Runtime;
-
+namespace SDVCommon.Tooltip;
 
 public class TooltipElement
 {
@@ -22,6 +21,8 @@ public class TooltipElement
     // Layout
     public int PaddingTop { get; set; } = 2;
     public int PaddingBottom { get; set; } = 2;
+    public int PaddingRight { get; set; } = 4;
+
 
     public List<InlineSegment>? InlineSegments { get; set; }
     public bool IsSeparator { get; set; } = false;

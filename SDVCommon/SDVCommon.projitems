@@ -11,18 +11,24 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)GameData\GameObjectInfoHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HarvestInfoBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\HoveredItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipBuildHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\HarvestIconInitializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\HarvestIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRegistry.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\IIconProvider.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\OBSMonsterIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\PurchaseIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\SeedIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\TooltipIcons.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\IdHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)RuntimeModels\HarvestInfoRuntime.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\HarvestInfoRuntime.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipColors.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)TooltipRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Wrappers\HarvestInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tooltip\TooltipElement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Tooltip\TooltipRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Tooltip\" />
   </ItemGroup>
 </Project>

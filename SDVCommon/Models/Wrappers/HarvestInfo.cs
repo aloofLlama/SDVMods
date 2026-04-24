@@ -1,12 +1,8 @@
-﻿using SDVCommon.RuntimeModels;
+﻿using SDVCommon.Models.Runtime;
 using SDVData;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PlantingDay.Models.Wrappers
+
+namespace SDVCommon.Models.Wrappers
 {
     public class HarvestInfo
     {
@@ -20,3 +16,4 @@ namespace PlantingDay.Models.Wrappers
         }
     }
 }
+

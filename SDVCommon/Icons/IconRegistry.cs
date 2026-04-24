@@ -1,5 +1,4 @@
-﻿using PlantingDay;
-using SDVCommon.Icons.IconProviders;
+﻿using SDVCommon.Icons.IconProviders;
 using StardewModdingAPI;
 using System.Collections.Generic;
 

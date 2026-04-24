@@ -1,15 +1,9 @@
 ﻿using PlantingDay.Helpers;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using SDVData;
-using SDVCommon.Helpers;    
-using PlantingDay.Models.Runtime;
+using SDVCommon.Helpers;
+using SDVCommon.Tooltip;
 using PlantingDay.Models.Wrappers;
 
 namespace PlantingDay.ToolTip_Sections

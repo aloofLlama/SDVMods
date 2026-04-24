@@ -43,10 +43,6 @@ namespace PlantingDay
 
             _isInitialized = true;
 
-            ModEntry.Instance.Monitor.Log(
-                "Plant Database Initialized",
-                LogLevel.Alert);
-
 
 
             // KEEP Debug to output desired database variable

@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PlantingDay;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using StardewModdingAPI;

@@ -233,7 +233,6 @@ namespace PlantingDay.Helpers.SeedSource
                 }
             }
 
-            ModEntry.Instance.Monitor.Log($"Seed: {plant.Data.SeedId} Min year {minYear}", LogLevel.Info);
             return minYear == int.MaxValue ? 1 : minYear;
         }
 

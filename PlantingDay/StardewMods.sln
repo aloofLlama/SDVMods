@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDVData_Tests", "..\SDVData
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDVCommon", "..\SDVCommon\SDVCommon.shproj", "{E313B039-E59A-442C-BD5B-A29EFD4825B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarvestHelper", "..\HarvestHelper\HarvestHelper.csproj", "{5135E47C-B6D4-44FD-9079-BA9A869D6A98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +31,10 @@ Global
 		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5135E47C-B6D4-44FD-9079-BA9A869D6A98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5135E47C-B6D4-44FD-9079-BA9A869D6A98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5135E47C-B6D4-44FD-9079-BA9A869D6A98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5135E47C-B6D4-44FD-9079-BA9A869D6A98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 		SolutionGuid = {C3B4B539-9A3D-44F6-A57B-3ED77153CF02}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\SDVCommon\SDVCommon.projitems*{5135e47c-b6d4-44fd-9079-ba9a869d6a98}*SharedItemsImports = 5
 		..\SDVCommon\SDVCommon.projitems*{d0f65dd0-070f-49c7-6bb7-4039b1330af0}*SharedItemsImports = 5
 		..\SDVCommon\SDVCommon.projitems*{e313b039-e59a-442c-bd5b-a29efd4825b6}*SharedItemsImports = 13
 	EndGlobalSection

@@ -1,6 +1,6 @@
-﻿using PlantingDay.Models.Wrappers;
-using SDVData;
+﻿using SDVData;
 using StardewValley;
+using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +8,8 @@ using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 using StardewModdingAPI;
 using SDVCommon.GameData;
-
+using SDVCommon.Models.Wrappers;
+using SObject = StardewValley.Object;
 
 
 namespace SDVCommon
@@ -27,8 +28,8 @@ namespace SDVCommon
             if (_isInitialized)
                 return;
 
-            LoadFromCrops();
-            LoadFromFruitTrees();
+            LoadFromObjectData();
+            //LoadFromFruitTrees();
             //LoadFromCustomBushes(); // future
 
             // Deduplicate automatically because dictionary keyed by HarvestId
@@ -44,27 +45,54 @@ namespace SDVCommon
         }
 
 
-        private static void LoadFromCrops()
-        {
-            foreach (var (_, cropData) in Game1.cropData)
-            {
-                string harvestId = cropData.HarvestItemId ?? "";
-                AddHarvestIfMissing(harvestId);
-            }
-        }
+        //private static void LoadFromCrops()
+        //{
+        //    foreach (var (_, cropData) in Game1.cropData)
+        //    {
+        //        string harvestId = cropData.HarvestItemId ?? "";
+        //        AddHarvestIfMissing(harvestId);
+        //    }
+        //}
 
-        private static void LoadFromFruitTrees()
+        //private static void LoadFromFruitTrees()
+        //{
+        //    foreach (var (_, treeData) in Game1.fruitTreeData)
+        //    {
+        //        var fruitEntry = treeData.Fruit.FirstOrDefault();
+        //        if (fruitEntry == null)
+        //            continue;
+
+        //        string harvestId = fruitEntry.ItemId ?? "";
+        //        AddHarvestIfMissing(harvestId);
+        //    }
+        //}
+
+        private static void LoadFromObjectData()
         {
-            foreach (var (_, treeData) in Game1.fruitTreeData)
+            foreach (var (id, obj) in Game1.objectData)
             {
-                var fruitEntry = treeData.Fruit.FirstOrDefault();
-                if (fruitEntry == null)
+                if (_harvests.ContainsKey(id))
                     continue;
 
-                string harvestId = fruitEntry.ItemId ?? "";
-                AddHarvestIfMissing(harvestId);
+                // Include by category
+                if (obj.Category is SObject.FruitsCategory
+                                or SObject.VegetableCategory
+                                or SObject.flowersCategory
+                                or SObject.GreensCategory)
+                {
+                    AddHarvestIfMissing(id);
+                    continue;
+                }
+
+                // Include by context tags (modded produce)
+                //if (obj.ContextTags?.Contains("cornucopia_crop_produce") == true ||
+                //    obj.ContextTags?.Contains("forage_item") == true)
+                //{
+                //    AddHarvestIfMissing(id);
+                //}
             }
         }
+
 
         //Only need one copy if there are multiple sources, so only add if it has not already been added
         private static void AddHarvestIfMissing(string harvestId)
@@ -82,7 +110,8 @@ namespace SDVCommon
             var data = new HarvestInfoData
             {
                 HarvestId = harvestId,
-                HarvestItem = itemInfo
+                Harvest = itemInfo,
+                Price = itemInfo.Price,
             };
 
             _harvests[harvestId] = new HarvestInfo(data);
