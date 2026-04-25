@@ -9,7 +9,7 @@ using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
 
 
-namespace PlantingDay
+namespace PlantingDay.Services
 {
 
     public static class PlantInfoBuilder

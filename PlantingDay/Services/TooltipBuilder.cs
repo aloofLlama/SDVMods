@@ -10,7 +10,7 @@ using SDVCommon.Helpers;
 
 
 
-namespace PlantingDay
+namespace PlantingDay.Services
 {
     public static class TooltipBuilder
     {

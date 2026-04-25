@@ -9,10 +9,7 @@ namespace SDVCommon.Icons
     {
         public static void InitializeIcons(HarvestInfo harvest)
         {
-            // Seed + harvest icons
-
             harvest.Runtime.HarvestIcon = IconRegistry.GetIcon($"harvest:{harvest.Data.HarvestId}");
-
         }
     }
 }

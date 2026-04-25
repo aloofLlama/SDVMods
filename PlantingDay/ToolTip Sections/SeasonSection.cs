@@ -17,7 +17,7 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.Seasons.Count == 0)
                 return null;
 
-            var segments = SDVCommon.TooltipRenderer.BuildInlineSegments(
+            var segments = TooltipBuildHelper.BuildInlineSegments(
                 plant.Data.Seasons,
                 season =>
                 {

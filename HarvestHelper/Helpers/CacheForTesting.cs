@@ -35,10 +35,10 @@ namespace HarvestHelper.Helpers
             File.WriteAllText(stablePath, json);
 
             // 2. Write timestamped snapshot for debugging
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string snapshotPath = Path.Combine(cacheDir, $"HarvestInfo_{timestamp}.json");
+            //string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            //string snapshotPath = Path.Combine(cacheDir, $"HarvestInfo_{timestamp}.json");
 
-            File.WriteAllText(snapshotPath, json);
+            //File.WriteAllText(snapshotPath, json);
         }
     }
 }

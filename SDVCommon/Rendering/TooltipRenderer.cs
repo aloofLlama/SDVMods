@@ -46,34 +46,48 @@ namespace SDVCommon
                     maxIconColumnWidth = Math.Max(maxIconColumnWidth, IconColumnWidth);
                 }
 
-                height += el.PaddingTop + lineHeight + el.PaddingBottom;
+                int lineCount = 1;
+
+                if (el.InlineSegments != null)
+                {
+                    lineCount = 1 + el.InlineSegments.Count(s => s.IsLineBreak);
+                }
+
+                height += el.PaddingTop + lineHeight * lineCount + el.PaddingBottom;
             }
 
-            //
             // PASS 2 — Measure width
-            //
             foreach (var el in elements)
             {
                 int lineWidth = 0;
 
-                // Only add icon column width for NON-inline rows
-                if (el.InlineSegments == null && (el.IconTexture != null || el.Icon.HasValue))
+                // Always account for icon column if there's an icon
+                if (el.IconTexture != null || el.Icon.HasValue)
                     lineWidth += maxIconColumnWidth;
 
-                // Inline rows
                 if (el.InlineSegments != null)
                 {
+                    int currentLineWidth = 0;
+                    int maxLineWidth = 0;
+
                     foreach (var seg in el.InlineSegments)
                     {
+                        if (seg.IsLineBreak)
+                        {
+                            maxLineWidth = Math.Max(maxLineWidth, currentLineWidth);
+                            currentLineWidth = 0;
+                            continue;
+                        }
+
                         if (seg.Icon.HasValue)
-                        {
-                            lineWidth += font.LineSpacing + inlineIconWidthPadding;
-                        }
+                            currentLineWidth += font.LineSpacing + inlineIconWidthPadding;
+
                         if (!string.IsNullOrEmpty(seg.Text))
-                        {
-                            lineWidth += (int)font.MeasureString(seg.Text).X;
-                        }
+                            currentLineWidth += (int)font.MeasureString(seg.Text).X;
                     }
+
+                    maxLineWidth = Math.Max(maxLineWidth, currentLineWidth);
+                    lineWidth += maxLineWidth;
                 }
                 else if (!string.IsNullOrEmpty(el.Text))
                 {
@@ -183,6 +197,18 @@ namespace SDVCommon
 
                     foreach (var seg in el.InlineSegments)
                     {
+                        // NEW: handle explicit line breaks
+                        if (seg.IsLineBreak)
+                        {
+                            // Move to next line
+                            drawY += lineHeight;
+
+                            // Reset X cursor to start of text column
+                            xCursor = drawX;
+
+                            continue;
+                        }
+
                         if (seg.Icon.HasValue)
                         {
                             var icon = seg.Icon.Value;
@@ -192,7 +218,7 @@ namespace SDVCommon
                                 icon.Texture,
                                 icon.Source,
                                 icon.Scale,
-                                lineHeight, 
+                                lineHeight,
                                 xCursor,
                                 drawY,
                                 lineHeight
@@ -200,6 +226,7 @@ namespace SDVCommon
 
                             xCursor += lineHeight + inlineIconWidthPadding;
                         }
+
                         if (!string.IsNullOrEmpty(seg.Text))
                         {
                             if (seg.Bold)
@@ -248,44 +275,6 @@ namespace SDVCommon
         //-----------------
 
 
-        // Put multiple segments on the same line with separators (e.g., seasons)
-        public static List<InlineSegment> BuildInlineSegments<T>(
-            IEnumerable<T> items,
-            Func<T, IEnumerable<InlineSegment>> buildSegments,
-            string separator = " • ")
-        {
-            var result = new List<InlineSegment>();
-            var list = items.ToList();
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                var segs = buildSegments(list[i]).ToList();
-
-                if (segs.Count == 0)
-                    continue;
-
-                result.AddRange(segs);
-
-                // Look ahead: does the next item produce segments?
-                for (int j = i + 1; j < list.Count; j++)
-                {
-                    var nextSegs = buildSegments(list[j]);
-                    if (nextSegs != null && nextSegs.Any())
-                    {
-                        result.Add(new InlineSegment
-                        {
-                            Text = separator,
-                            Color = TooltipColors.Muted,
-                            Bold = false
-                        });
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        
-        }
 
         private static int DrawPaddedIcon(
              SpriteBatch b,

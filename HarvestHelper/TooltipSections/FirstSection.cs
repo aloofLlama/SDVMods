@@ -6,7 +6,7 @@ using StardewValley;
 
 namespace HarvestHelper.TooltipSections
 {
-    internal class FirstSection
+    public static class FirstSection
     {
         public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
         {

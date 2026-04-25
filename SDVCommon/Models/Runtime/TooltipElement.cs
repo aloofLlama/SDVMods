@@ -19,6 +19,7 @@ public class TooltipElement
 
 
     // Layout
+    public bool IsLineBreak { get; set; }
     public int PaddingTop { get; set; } = 2;
     public int PaddingBottom { get; set; } = 2;
     public int PaddingRight { get; set; } = 4;
@@ -35,6 +36,7 @@ public struct InlineSegment
     public string Text;
     public Color Color;
     public bool Bold;
+    public bool IsLineBreak;
 }
 
 

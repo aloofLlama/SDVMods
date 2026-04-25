@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using PlantingDay.Services;
 using StardewModdingAPI;
 using System;
 using System.IO;
@@ -31,14 +32,14 @@ namespace PlantingDay.Helpers
 
             string stablePath = Path.Combine(cacheDir, "PlantInfo.json");
 
-            // 1. Write stable file for tests
-            File.WriteAllText(stablePath, json);
+            //// 1. Write stable file for tests
+            //File.WriteAllText(stablePath, json);
 
-            // 2. Write timestamped snapshot for debugging
-            string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string snapshotPath = Path.Combine(cacheDir, $"PlantInfo_{timestamp}.json");
+            //// 2. Write timestamped snapshot for debugging
+            //string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            //string snapshotPath = Path.Combine(cacheDir, $"PlantInfo_{timestamp}.json");
 
-            File.WriteAllText(snapshotPath, json);
+            //File.WriteAllText(snapshotPath, json);
         }
     }
 }

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using SDVCommon.Tooltip;
+using Microsoft.Xna.Framework;
+
 
 namespace SDVCommon.Helpers
 {
@@ -56,6 +58,158 @@ namespace SDVCommon.Helpers
             foreach (var element in section)
                 AddIfNotNull(list, element);
         }
+
+        // Put multiple segments on the same line with separators (e.g., seasons)
+        public static List<InlineSegment> BuildInlineSegments<T>(
+            IEnumerable<T> items,
+            Func<T, IEnumerable<InlineSegment>> buildSegments,
+            string separator = " • ")
+        {
+            var result = new List<InlineSegment>();
+            var list = items.ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                var segs = buildSegments(list[i]).ToList();
+
+                if (segs.Count == 0)
+                    continue;
+
+                result.AddRange(segs);
+
+                // Look ahead: does the next item produce segments?
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    var nextSegs = buildSegments(list[j]);
+                    if (nextSegs != null && nextSegs.Any())
+                    {
+                        result.Add(new InlineSegment
+                        {
+                            Text = separator,
+                            Color = TooltipColors.Muted,
+                            Bold = false
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return result;
+
+        }
+
+
+        public static List<InlineSegment> BuildWrappedSegmentBlock(
+            List<InlineSegment> startSegments,
+            List<InlineSegment> collapsibleSegments,
+            List<InlineSegment> endSegments,
+            int wrapSize,
+            int maxRows)
+        {
+            var unified = new List<InlineSegment>();
+            unified.AddRange(startSegments);
+            unified.AddRange(collapsibleSegments);
+            unified.AddRange(endSegments);
+
+            int S = startSegments.Count;
+            int C = collapsibleSegments.Count;
+            int E = endSegments.Count;
+
+            int maxCapacity = wrapSize * maxRows;
+            int total = S + C + E;
+
+            // collapse only if we truly overflow
+            if (total > maxCapacity)
+            {
+                // we must reserve 1 slot for the "+X known" segment
+                int collapsibleFit = Math.Max(0, maxCapacity - S - E - 1);
+
+                // how many get collapsed
+                int collapsedCount = C - collapsibleFit;
+
+                // rebuild unified list
+                unified.Clear();
+                unified.AddRange(startSegments);
+
+                // explicit knowns that still fit
+                if (collapsibleFit > 0)
+                    unified.AddRange(collapsibleSegments.Take(collapsibleFit));
+
+                // collapsed segment (only if there’s something to collapse)
+                if (collapsedCount > 0)
+                {
+                    unified.Add(new InlineSegment
+                    {
+                        Text = $"+{collapsedCount} known",
+                        Color = Color.SlateGray
+                        //Color = TooltipColors.Deemphasize //switch back after relaunch
+                    });
+                }
+
+                // unknowns
+                unified.AddRange(endSegments);
+            }
+
+            return WrapWithCommas(unified, wrapSize, maxRows);
+        }
+
+        private static List<InlineSegment> WrapWithCommas(
+            List<InlineSegment> segments,
+            int wrapSize,
+            int maxRows)
+        {
+            var result = new List<InlineSegment>();
+
+            int index = 0;
+            int row = 0;
+
+            while (index < segments.Count && row < maxRows)
+            {
+                if (row > 0)
+                    result.Add(new InlineSegment { IsLineBreak = true });
+
+                int itemsThisRow = 0;
+
+                while (index < segments.Count && itemsThisRow < wrapSize)
+                {
+                    result.Add(segments[index]);
+                    itemsThisRow++;
+                    index++;
+
+                    if (itemsThisRow < wrapSize && index < segments.Count)
+                    {
+                        result.Add(new InlineSegment
+                        {
+                            Text = ", ",
+                            Color = result.Last().Color   // ← match previous segment
+                        });
+                    }
+                }
+
+                row++;
+            }
+
+            return result;
+        }
+
+
+        private static void AppendEndSegments(List<InlineSegment> result, List<InlineSegment> endSegments)
+        {
+            if (endSegments.Count == 0)
+                return;
+
+            // Insert comma before the first end segment
+            result.Add(new InlineSegment
+            {
+                Text = ", ",
+                Color = TooltipColors.Normal
+            });
+
+            result.AddRange(endSegments);
+        }
+
+
+
 
 
     }

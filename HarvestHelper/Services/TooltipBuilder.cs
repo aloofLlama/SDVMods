@@ -9,7 +9,7 @@ using SDVCommon.Helpers;
 
 
 
-namespace HarvestHelper
+namespace HarvestHelper.Services
 {
     public static class TooltipBuilder
     {
@@ -18,10 +18,11 @@ namespace HarvestHelper
             var list = new List<TooltipElement>();
 
             list.AddRange(FirstSection.Build(harvest, obj));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => GiftLovesSection.Build(harvest, obj));
+
             //list.AddRange(PlantGrowthSection.Build(plant));
 
             ////list.Add(new TooltipElement { IsSeparator = true, PaddingTop = 3, PaddingBottom = 3 });
-            //AddSectionWithSeparator(list, () => PlantFeaturesSection.Build(plant));
             //AddSectionWithSeparator(list, () => SeedSourceSection.Build(plant));
 
 

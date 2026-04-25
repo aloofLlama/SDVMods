@@ -12,6 +12,7 @@ using SDVCommon.Icons;
 using SDVCommon.Helpers;
 using SDVData;
 using PlantingDay.Helpers.Icons;
+using PlantingDay.Services;
 
 
 namespace PlantingDay
@@ -124,7 +125,7 @@ namespace PlantingDay
             //}
 
 
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
+            //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
 
 
 
@@ -169,8 +170,7 @@ namespace PlantingDay
 
             CacheForTesting.DumpPlantInfoToJson();
 
-            ModEntry.Instance.Monitor.Log(
-                "Plant Database Initialized",
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] Plant Database Initialized",
                 LogLevel.Alert);
 
 

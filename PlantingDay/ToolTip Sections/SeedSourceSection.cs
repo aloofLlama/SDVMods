@@ -11,7 +11,7 @@ using StardewValley;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SDVCommon.Tooltip; 
+using SDVCommon.Tooltip;
 
 
 namespace PlantingDay.ToolTip_Sections
@@ -37,7 +37,7 @@ namespace PlantingDay.ToolTip_Sections
             var rareDrops = plant.MonsterDrops.Where(IsRare).ToList();
             bool hasMultipleRareDrops = rareDrops.Count > 1;
 
-            var segments = TooltipRenderer.BuildInlineSegments(
+            var segments = TooltipBuildHelper.BuildInlineSegments(
                 sources,
                 source =>
                 {
@@ -87,7 +87,7 @@ namespace PlantingDay.ToolTip_Sections
             }
 
 
-                list.Add(new TooltipElement
+            list.Add(new TooltipElement
             {
                 InlineSegments = segments
             });

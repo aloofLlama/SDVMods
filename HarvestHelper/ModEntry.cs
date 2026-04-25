@@ -1,14 +1,17 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using HarvestHelper.Helpers;
+using HarvestHelper.Services;
+using Microsoft.Xna.Framework.Graphics;
+using SDVCommon;
+using SDVCommon.Helpers;
+using SDVCommon.Icons;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Services;
+using SDVData;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
-using SDVCommon;
-using SDVCommon.Helpers;
-using SDVCommon.Models.Wrappers;
-using SDVCommon.Icons;
-using SDVData;
-using HarvestHelper.Helpers;
+using SDVCommon.Models.Runtime;
 
 
 namespace HarvestHelper
@@ -25,25 +28,25 @@ namespace HarvestHelper
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
+            SDVCommonLog.Initialize(this.Monitor);
 
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
 
+            helper.Events.Input.ButtonPressed += GiftDetection.OnButtonPressed;
+            helper.Events.Input.ButtonReleased += GiftDetection.OnButtonReleased;
+
             helper.Events.Input.ButtonPressed += OnButtonPressed;
-        }
-
-
-        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
-        {
 
         }
+
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            InitializeAll();
+            Initializer.InitializeAll(ModHelper);
         }
+
+
 
         [EventPriority(EventPriority.Low - 1)]
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
@@ -56,14 +59,14 @@ namespace HarvestHelper
                 return;
 
 
-
             string lookupKey = obj.ItemId;
-            ModEntry.Instance.Monitor.Log($"CHECK ID {lookupKey}", LogLevel.Info);
-
+            //ModEntry.Instance.Monitor.Log($"CHECK ID {lookupKey}", LogLevel.Info);
 
             var harvest = HarvestInfoBuilder.LookupFromKey(lookupKey);
 
-            if (harvest is null)
+            if (harvest is null ||
+                !HarvestCategories.IsDesiredCategory(obj.Category)
+                )
                 return;
 
             //ModEntry.Instance.Monitor.Log($"CHECK ID {harvest.Data.HarvestId} price ", LogLevel.Info);
@@ -75,11 +78,6 @@ namespace HarvestHelper
 
         }
 
-
-
-
-
-
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
             // Only run when the player presses F5
@@ -87,7 +85,7 @@ namespace HarvestHelper
                 return;
             HarvestInfoBuilder.Reset();
 
-            InitializeAll();
+            Initializer.InitializeAll(ModHelper);
 
             //KEEP Debug to output desired database variable from a list
             //foreach (var plant in PlantInfoBuilder.AllPlants)
@@ -102,30 +100,27 @@ namespace HarvestHelper
             //}
 
 
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
+            //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
 
 
-        }
-
-        private static void InitializeAll()
-        {
-            TooltipIcons.Initialize();
-            HarvestInfoBuilder.Initialize();
-
-
-            foreach (var harvest in HarvestInfoBuilder.AllHarvests)
+            if (Game1.player.ActiveObject is StardewValley.Object obj)
             {
-                HarvestIconInitializer.InitializeIcons(harvest);
+                SDVCommonLog.Log($"[GIFT DEBUG] UNKNOWN LOVED-BY for item {obj.QualifiedItemId}:", LogLevel.Alert);
+
+                foreach (var npc in GiftHelper.GetUnknownLovedBy(obj))
+                {
+                    SDVCommonLog.Log($"[GIFT DEBUG] UNKNOWN: {npc.Name}", LogLevel.Alert);
+                }
+            }
+            else
+            {
+                SDVCommonLog.Log("[GIFT DEBUG] No held object — hold the item and press F5 again.", LogLevel.Alert);
             }
 
-            CacheForTesting.DumpHarvestInfoToJson();
-
-            ModEntry.Instance.Monitor.Log(
-                "Harvest Database Initialized",
-                LogLevel.Alert);
-
 
         }
+
+
 
 
     }
