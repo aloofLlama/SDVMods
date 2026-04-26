@@ -1,15 +1,19 @@
-﻿using SDVData;
+﻿using SDVCommon.GameData;
+using SDVCommon.Helpers;
+using SDVCommon.Models.Wrappers;
+using SDVData;
+using StardewModdingAPI;
 using StardewValley;
+using StardewValley.GameData.Crops;
+using StardewValley.GameData.FruitTrees;
+using StardewValley.GameData.Objects;
 using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using StardewValley.GameData.Crops;
-using StardewValley.GameData.FruitTrees;
-using StardewModdingAPI;
-using SDVCommon.GameData;
-using SDVCommon.Models.Wrappers;
-using SDVCommon.Helpers;
+using SObject = StardewValley.Object;
+
+
 
 namespace SDVCommon
 {
@@ -32,6 +36,7 @@ namespace SDVCommon
         public static void Reset()
         {
             _isInitialized = false;
+            _harvests.Clear();
         }
 
         public static HarvestInfo? LookupFromKey(string key)
@@ -45,9 +50,9 @@ namespace SDVCommon
             foreach (var (id, obj) in Game1.objectData)
             {
                 // Include by category
-                if (HarvestCategories.IsDesiredCategory(obj.Category))
+                if (HarvestCategories.IsDesiredCategory(obj))
                 {
-                    AddHarvestIfMissing(id);
+                    AddHarvestIfMissing(id, obj);
                     continue;
                 }
 
@@ -56,7 +61,7 @@ namespace SDVCommon
 
 
         //Only need one copy if there are multiple sources, so only add if it has not already been added
-        private static void AddHarvestIfMissing(string harvestId)
+        private static void AddHarvestIfMissing(string harvestId, ObjectData obj)
         {
             if (string.IsNullOrEmpty(harvestId))
                 return;
@@ -68,14 +73,43 @@ namespace SDVCommon
             if (itemInfo == null)
                 return;
 
+            bool shipOne = IsShipOneCandidate(harvestId, obj);
+
+            // Mono/Poly shipping achievements come from the seed data
+            var seedData = GameObjectInfoHelper.GetSeedDataForHarvest(harvestId);
+            bool shipMono = seedData?.CountForMonoculture == true;
+            bool shipPoly = seedData?.CountForPolyculture == true;
+
+            //SDVCommonLog.Log($"SHIP: {harvestId} {shipOne} {shipMono} {shipPoly}", LogLevel.Info);
+
+
             var data = new HarvestInfoData
             {
                 HarvestId = harvestId,
                 Harvest = itemInfo,
                 Price = itemInfo.Price,
+                ShipOne = shipOne,
+                ShipMonoCulture = shipMono,
+                ShipPolyCulture = shipPoly
             };
 
             _harvests[harvestId] = new HarvestInfo(data);
+        }
+
+        public static bool IsShipOneCandidate(string itemId, ObjectData data)
+        {
+            // Exclusions (same as LookupAnything and vanilla)
+            if (data.Type == "Arch"
+                || data.Type == "Fish"
+                || data.Type == "Mineral"
+                || data.Type == "Cooking")
+                return false;
+
+            // Only items the game considers "basic shipped"
+            if (!SObject.isPotentialBasicShipped(itemId, data.Category, data.Type))
+                return false;
+
+            return true;
         }
     }
 }

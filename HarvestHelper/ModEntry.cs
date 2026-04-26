@@ -63,9 +63,17 @@ namespace HarvestHelper
             //ModEntry.Instance.Monitor.Log($"CHECK ID {lookupKey}", LogLevel.Info);
 
             var harvest = HarvestInfoBuilder.LookupFromKey(lookupKey);
+            string canonicalId = IdHelper.CanonicalItemId(obj.QualifiedItemId);
+
+            if (!Game1.objectData.TryGetValue(canonicalId, out var data))
+            {
+                return;
+            }
+
+            //var data = Game1.objectData[obj.ItemId];
 
             if (harvest is null ||
-                !HarvestCategories.IsDesiredCategory(obj.Category)
+                !HarvestCategories.IsDesiredCategory(data)
                 )
                 return;
 
@@ -102,20 +110,6 @@ namespace HarvestHelper
 
             //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
 
-
-            if (Game1.player.ActiveObject is StardewValley.Object obj)
-            {
-                SDVCommonLog.Log($"[GIFT DEBUG] UNKNOWN LOVED-BY for item {obj.QualifiedItemId}:", LogLevel.Alert);
-
-                foreach (var npc in GiftHelper.GetUnknownLovedBy(obj))
-                {
-                    SDVCommonLog.Log($"[GIFT DEBUG] UNKNOWN: {npc.Name}", LogLevel.Alert);
-                }
-            }
-            else
-            {
-                SDVCommonLog.Log("[GIFT DEBUG] No held object — hold the item and press F5 again.", LogLevel.Alert);
-            }
 
 
         }

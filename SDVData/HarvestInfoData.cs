@@ -12,7 +12,10 @@ namespace SDVData
         public int Price { get; set; }
         public ItemInfo? Harvest { get; set; } = new ItemInfo();
 
-
+        // Shipping Achievements
+        public bool ShipOne { get; set; }
+        public bool ShipPolyCulture { get; set; }
+        public bool ShipMonoCulture { get; set; }
 
         // Future expansion: artisan goods, cooking, loved-by, etc.
         //public List<ArtisanProductInfo> ArtisanProducts { get; set; } = new();

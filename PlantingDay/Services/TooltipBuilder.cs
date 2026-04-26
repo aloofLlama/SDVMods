@@ -1,12 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PlantingDay.Helpers;
-using SDVCommon.Icons;
-using PlantingDay.ToolTip_Sections;
 using PlantingDay.Models.Runtime;
 using PlantingDay.Models.Wrappers;
-using SDVCommon.Tooltip;
+using PlantingDay.ToolTip_Sections;
+using PlantingDay.TooltipSections;
 using SDVCommon.Helpers;
+using SDVCommon.Icons;
+using SDVCommon.Tooltip;
 
 
 
@@ -20,16 +21,10 @@ namespace PlantingDay.Services
 
             TooltipBuildHelper.AddIfNotNull(list, SeasonSection.Build(plant));
             list.AddRange(PlantGrowthSection.Build(plant));
-
-            //list.Add(new TooltipElement { IsSeparator = true, PaddingTop = 3, PaddingBottom = 3 });
             TooltipBuildHelper.AddSectionWithSeparator(list, () => PlantFeaturesSection.Build(plant));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedSourceSection.Build(plant));
-
-            ////NOT YET REFACTORED BELOW HERE. PULLING EACH SECTION TO OWN FILE
-
-            list.Add(new TooltipElement { IsSeparator = true, PaddingTop = 6, PaddingBottom = 6 });
-
-            //list.AddRange(GetEconomicsTooltip(plant));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => HarvestEconomicsSection.Build(plant));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => InventorySection.Build(plant));
 
             return list;
         }

@@ -6,6 +6,14 @@
 	//"tooltip.other_shop_trade": "({0}) {1}",
 
 	//Gifts
-	"tooltip.unknown_gift": "({0} unknown)"
+
+	//cooking
+	"tooltip.cooking": "Cooking: {0}%",
+
+	//Misc
+	"tooltip.owned": "Own: {0}",
+	"tooltip.qty_known": "{0} known",
+	"tooltip.qty_unknown": "({0})"
+
 
 }

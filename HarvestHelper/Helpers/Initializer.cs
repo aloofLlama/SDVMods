@@ -1,4 +1,5 @@
 ﻿using SDVCommon;
+using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Services;
@@ -16,13 +17,19 @@ namespace HarvestHelper.Helpers
         public static void InitializeAll(IModHelper helper)
         {
             TooltipIcons.Initialize();
+            GameObjectInfoHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
             GiftKnowledgeService.Initialize(helper);
-            //GiftDetection.Initialize(helper);
+            CookingInfoBuilder.BuildAll();
 
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)
             {
-                HarvestIconInitializer.InitializeIcons(harvest);
+                IconInitializers.HarvestIcons(harvest);
+            }
+
+            foreach (var recipe in CookingInfoBuilder.AllRecipes)
+            {
+                IconInitializers.CookingIcons(recipe);
             }
 
             CacheForTesting.DumpHarvestInfoToJson();

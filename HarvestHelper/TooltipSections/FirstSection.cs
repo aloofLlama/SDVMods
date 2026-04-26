@@ -18,10 +18,10 @@ namespace HarvestHelper.TooltipSections
             list.Add(new TooltipElement
             {
                 Icon = TooltipIcons.Get(IconKey.LittleCoin),
-                Text = string.Format(ModEntry.ModHelper.Translation
-                        .Get(TooltipKeys.Price),
-                        realPrice
-                    ),
+                //Text = string.Format(ModEntry.ModHelper.Translation
+                   //     .Get(TooltipKeys.Price),
+                       Text = $"{realPrice}",
+                    //),
             });
 
             return list;

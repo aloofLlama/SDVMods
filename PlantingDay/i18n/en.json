@@ -28,7 +28,13 @@
 	"tooltip.pierres_purchase": "{0}g",
 	"tooltip.other_shop_purchase": "{0}g {1}",
 	"tooltip.other_shop_trade": "({0}) {1}",
-	"tooltip.buy_year_2": "Y2"
+	"tooltip.buy_year_2": "Y2",
+	"tooltip.basic_price": "{0}g",
+
+	//Misc
+	"tooltip.owned": "Own: {0}"
+
+
 
 
 }

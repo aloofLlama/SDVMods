@@ -60,7 +60,7 @@ namespace SDVCommon.Helpers
         }
 
         // Put multiple segments on the same line with separators (e.g., seasons)
-        public static List<InlineSegment> BuildInlineSegments<T>(
+        public static List<InlineSegment> BuildInlineSegmentswithSeparators<T>(
             IEnumerable<T> items,
             Func<T, IEnumerable<InlineSegment>> buildSegments,
             string separator = " • ")
@@ -86,7 +86,7 @@ namespace SDVCommon.Helpers
                         result.Add(new InlineSegment
                         {
                             Text = separator,
-                            Color = TooltipColors.Muted,
+                            TextColor = TooltipColors.Muted,
                             Bold = false
                         });
                         break;
@@ -97,6 +97,46 @@ namespace SDVCommon.Helpers
             return result;
 
         }
+
+        public static List<InlineSegment> BuildInlineSegmentsWithCommas<T>(
+    IEnumerable<T> items,
+    Func<T, IEnumerable<InlineSegment>> buildSegments)
+        {
+            var result = new List<InlineSegment>();
+            var list = items.ToList();
+
+            for (int i = 0; i < list.Count; i++)
+            {
+                // Build segments for this item
+                var segs = buildSegments(list[i]).ToList();
+
+                if (segs.Count == 0)
+                    continue;
+
+                // Add the segments
+                result.AddRange(segs);
+
+                // Look ahead: does the next item produce segments?
+                for (int j = i + 1; j < list.Count; j++)
+                {
+                    var nextSegs = buildSegments(list[j]);
+                    if (nextSegs != null && nextSegs.Any())
+                    {
+                        // Add comma matching previous segment color
+                        result.Add(new InlineSegment
+                        {
+                            Text = ", ",
+                            TextColor = result.Last().TextColor,   // inherit color
+                            Bold = false
+                        });
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
+
 
 
         public static List<InlineSegment> BuildWrappedSegmentBlock(
@@ -141,7 +181,7 @@ namespace SDVCommon.Helpers
                     unified.Add(new InlineSegment
                     {
                         Text = $"+{collapsedCount} known",
-                        Color = Color.SlateGray
+                        TextColor = Color.SlateGray
                         //Color = TooltipColors.Deemphasize //switch back after relaunch
                     });
                 }
@@ -181,7 +221,7 @@ namespace SDVCommon.Helpers
                         result.Add(new InlineSegment
                         {
                             Text = ", ",
-                            Color = result.Last().Color   // ← match previous segment
+                            TextColor = result.Last().TextColor   // ← match previous segment
                         });
                     }
                 }
@@ -202,7 +242,7 @@ namespace SDVCommon.Helpers
             result.Add(new InlineSegment
             {
                 Text = ", ",
-                Color = TooltipColors.Normal
+                
             });
 
             result.AddRange(endSegments);

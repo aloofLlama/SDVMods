@@ -231,12 +231,12 @@ namespace SDVCommon
                         {
                             if (seg.Bold)
                             {
-                                b.DrawString(font, seg.Text, new Vector2(xCursor + 1, drawY), seg.Color);
-                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
+                                b.DrawString(font, seg.Text, new Vector2(xCursor + 1, drawY), seg.TextColor);
+                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.TextColor);
                             }
                             else
                             {
-                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.Color);
+                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.TextColor);
                             }
 
                             xCursor += (int)font.MeasureString(seg.Text).X;

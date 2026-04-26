@@ -1,5 +1,7 @@
 ﻿using SDVData;
 using StardewValley;
+using StardewValley.GameData.Objects;
+using StardewValley.GameData.Crops;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -36,5 +38,41 @@ namespace SDVCommon.GameData
                 Type = obj.Type
             };
         }
+
+        //---------------
+        //Convert between Harvest and Seed Ids
+        //---------------
+        public static readonly Dictionary<string, string> _harvestToSeed = new();
+
+        public static void BuildHarvestToSeedMap()
+        {
+            // Crops
+            foreach (var (seedId, cropData) in Game1.cropData)
+            {
+                string harvestId = cropData.HarvestItemId;
+                if (!string.IsNullOrEmpty(harvestId))
+                    _harvestToSeed[harvestId] = seedId;
+            }
+
+            // Fruit trees
+            foreach (var (saplingId, treeData) in Game1.fruitTreeData)
+            {
+                var fruit = treeData.Fruit.FirstOrDefault();
+                if (fruit != null && !string.IsNullOrEmpty(fruit.ItemId))
+                    _harvestToSeed[fruit.ItemId] = saplingId;
+            }
+        }
+
+        public static CropData? GetSeedDataForHarvest(string harvestId)
+        {
+            if (_harvestToSeed.TryGetValue(harvestId, out string? seedId))
+            {
+                if (Game1.cropData.TryGetValue(seedId, out var seedData))
+                    return seedData;
+            }
+
+            return null;
+        }
+
     }
 }

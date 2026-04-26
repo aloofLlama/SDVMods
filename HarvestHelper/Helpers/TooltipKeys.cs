@@ -11,7 +11,12 @@ namespace HarvestHelper.Helpers
         //public const string BuyYear2 = "tooltip.buy_year_2";
 
         //Gifts
-        public const string UnknownGift = "tooltip.unknown_gift";
+
+        //Misc
+        public const string Owned = "tooltip.owned";
+        public const string Qty_Known = "tooltip.qty_known";
+        public const string Qty_Unknown = "tooltip.qty_unknown";
+
 
 
     }

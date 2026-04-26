@@ -1,4 +1,7 @@
 ﻿
+using StardewValley;
+using StardewValley.GameData.Objects;
+
 namespace SDVCommon.Helpers
 {
     public static class IdHelper
@@ -32,6 +35,8 @@ namespace SDVCommon.Helpers
                 return new string(id.Where(char.IsDigit).ToArray());
             ;
         }
+
+
 
 
 

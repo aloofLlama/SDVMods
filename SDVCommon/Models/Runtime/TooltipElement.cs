@@ -30,13 +30,13 @@ public class TooltipElement
 }
 
 // Supports putting multiple items with different formatting on the same line.
-public struct InlineSegment
+public class InlineSegment
 {
-    public Icon? Icon;
-    public string Text;
-    public Color Color;
-    public bool Bold;
-    public bool IsLineBreak;
+    public Icon? Icon { get; set; }
+    public string Text { get; set; } = "";
+    public Color TextColor { get; set; } = TooltipColors.Normal;
+    public bool Bold { get; set; }
+    public bool IsLineBreak { get; set; }
 }
 
 

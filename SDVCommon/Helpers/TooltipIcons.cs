@@ -52,6 +52,10 @@ namespace SDVCommon.Icons
 
         //Other
         Heart,
+        Plate,
+
+        //Achievements
+        ShipBin,
     }
 
     public static class TooltipIcons
@@ -78,13 +82,13 @@ namespace SDVCommon.Icons
             LoadSheet("Debris", "Tilesheets/Debris");
             LoadSheet("Furniture", "Tilesheets/Furniture");
             LoadSheet("WizardFurniture", "Tilesheets/wizard_furniture");
+            LoadSheet("Craftables", "TileSheets/Craftables");
             LoadSheet("DustSprite", "Characters/Monsters/Dust Spirit");
             LoadSheet("Grub", "Characters/Monsters/Grub");
             LoadSheet("MagmaDuggy", "Characters/Monsters/Magma Duggy");
             LoadSheet("Hothead", "Characters/Monsters/Hot Head");
             LoadSheet("Mummy", "Characters/Monsters/Mummy");
             LoadSheet("Serpent", "Characters/Monsters/Serpent");
-            //LoadSheet("PurpleSlime", "Characters/Monsters/Purple Slime");
 
 
 
@@ -105,7 +109,7 @@ namespace SDVCommon.Icons
             // Economics
             Add(IconKey.StarToken, Sheet("Cursors"), new Rectangle(338, 400, 8, 8), 8, 2f);
             Add(IconKey.GoldStar, Sheet("Cursors"), new Rectangle(346, 400, 8, 8), 8, 2f);
-            Add(IconKey.LittleCoin, Sheet("Cursors"), new Rectangle(193, 373, 9, 9), 9, 2f);
+            Add(IconKey.LittleCoin, Sheet("Cursors"), new Rectangle(193, 373, 9, 9), 9, 1.8f);
             Add(IconKey.NightStars, Sheet("Cursors1_6"), new Rectangle(337, 375, 11, 11), 11, 2f);
             Add(IconKey.TravelingCart, Sheet("Cursors"), new Rectangle(192, 1411, 20, 20), 20, 1.5f);
 
@@ -120,6 +124,12 @@ namespace SDVCommon.Icons
 
             // Other
             Add(IconKey.Heart, Sheet("Cursors"), new Rectangle(211, 428, 7, 6), 7, 2.5f);
+            Add(IconKey.Plate, Sheet("Objects"), new Rectangle(16, 128, 16, 16), 16, 1.5f);
+
+
+            //Achievements
+            Add(IconKey.ShipBin, Sheet("Craftables"), new Rectangle(0, 1001, 16, 22), 22, 1.2f);
+
         }
 
         //

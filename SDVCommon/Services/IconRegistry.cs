@@ -14,8 +14,8 @@ namespace SDVCommon.Icons
         {
             Providers.Add(new SeedIconProvider());
             Providers.Add(new HarvestIconProvider());
-            //Providers.Add(new MonsterIconProvider());
             Providers.Add(new PurchaseIconProvider());
+            Providers.Add(new CookingIconProvider());
 
             // Later:
             // Providers.Add(new ArtisanGoodIconProvider());

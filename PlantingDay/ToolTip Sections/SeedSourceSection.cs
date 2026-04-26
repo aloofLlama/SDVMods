@@ -37,7 +37,7 @@ namespace PlantingDay.ToolTip_Sections
             var rareDrops = plant.MonsterDrops.Where(IsRare).ToList();
             bool hasMultipleRareDrops = rareDrops.Count > 1;
 
-            var segments = TooltipBuildHelper.BuildInlineSegments(
+            var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
                 sources,
                 source =>
                 {
@@ -73,7 +73,7 @@ namespace PlantingDay.ToolTip_Sections
                 segments.Add(new InlineSegment
                 {
                     Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.BuyYear2),
-                    Color = TooltipColors.Normal
+                    
                 });
             }
 
@@ -95,41 +95,6 @@ namespace PlantingDay.ToolTip_Sections
             return list;
         }
 
-        //public static List<TooltipElement> Build(PlantInfo plant)
-        //{
-        //    var list = new List<TooltipElement>();
-
-        //    // Unified vendor + monster list (already sorted)
-        //    var sources = SeedSourceBuilder.Build(plant);
-
-        //    var segments = TooltipRenderer.BuildInlineSegments(
-        //        sources,
-        //        source =>
-        //        {
-        //            if (source is PurchaseInfoRuntime vendor)
-        //                return BuildVendorSegments(vendor) ?? Array.Empty<InlineSegment>();
-
-        //            if (source is MonsterDropInfoRuntime drop)
-        //                return BuildMonsterSegments(plant) ?? Array.Empty<InlineSegment>();
-
-        //            return Array.Empty<InlineSegment>();
-        //        });
-
-        //    if (plant.Runtime.SeedIcon != null)
-        //    {
-        //        segments.Insert(0, new InlineSegment
-        //        {
-        //            Icon = plant.Runtime.SeedIcon
-        //        });
-        //    }
-
-        //    list.Add(new TooltipElement
-        //    {
-        //        InlineSegments = segments
-        //    });
-
-        //    return list;
-        //}
 
         //──────────────────────────────────────────────
         // Vendor → InlineSegments
@@ -149,7 +114,7 @@ namespace PlantingDay.ToolTip_Sections
                             Text = string.Format(
                                 ModEntry.ModHelper.Translation.Get(TooltipKeys.PierresPurchase),
                                 data.GoldPrice),
-                            Color = TooltipColors.Normal
+                            
                         }
                     };
 
@@ -167,7 +132,7 @@ namespace PlantingDay.ToolTip_Sections
                                     data.GoldPrice,
                                     data.VendorName),
 
-                            Color = TooltipColors.Normal
+                            
                         }
                     };
 
@@ -201,7 +166,7 @@ namespace PlantingDay.ToolTip_Sections
                                     ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopPurchase),
                                     data.GoldPrice,
                                     data.VendorName),
-                                Color = TooltipColors.Normal
+                                
                             }
                         };
                     }
@@ -218,7 +183,7 @@ namespace PlantingDay.ToolTip_Sections
                                     ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
                                     data.TradeAmount.ToString(),
                                     data.VendorName),
-                                Color = TooltipColors.Normal
+                                
                             }
                         };
                     }
@@ -238,7 +203,7 @@ namespace PlantingDay.ToolTip_Sections
                 {
                     Icon = drop.MonsterIcon,
                     Text = FormatChance(drop.Data.DropChance),
-                    Color = TooltipColors.Normal
+                    
                 }
             };
         }
@@ -266,7 +231,7 @@ namespace PlantingDay.ToolTip_Sections
                 {
                     Icon = drop.MonsterIcon,
                     Text = isLast ? "rare" : "",
-                    Color = TooltipColors.Normal
+                    
                 });
             }
 

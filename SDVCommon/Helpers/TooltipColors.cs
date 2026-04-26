@@ -14,8 +14,10 @@ namespace SDVCommon.Helpers
         public static readonly Color Muted = Color.Gray;
         public static readonly Color Warning = Color.DarkRed;
         public static readonly Color Trellis = Color.Orange;
-        public static readonly Color Paddy = Color.CornflowerBlue;
         public static readonly Color Separator = new(188,148,60);
+
+        //Plant
+        public static readonly Color Paddy = Color.CornflowerBlue;
 
 
         //seasons

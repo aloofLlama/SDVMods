@@ -25,7 +25,7 @@ namespace HarvestHelper.TooltipSections
                 .Select(name => new InlineSegment
                 {
                     Text = name,
-                    Color = TooltipColors.Normal
+                    
                 })
                 .ToList();
 
@@ -36,10 +36,10 @@ namespace HarvestHelper.TooltipSections
                 end.Add(new InlineSegment
                 {
                     Text = string.Format(
-                        ModEntry.ModHelper.Translation.Get(TooltipKeys.UnknownGift),
+                        ModEntry.ModHelper.Translation.Get(TooltipKeys.Qty_Unknown),
                         unknown
                     ),
-                    Color = TooltipColors.Muted
+                    TextColor = TooltipColors.Muted
                 });
             }
 

@@ -43,12 +43,11 @@ public static class GiftHelper
     {
         string itemId = $"(O){item.ParentSheetIndex}";
 
-        foreach (var npc in GetLovedBy(item))
-        {
-            if (GiftKnowledgeService.TryGetKnownTaste(itemId, npc.Name, out var taste) &&
-                taste == GiftTaste.Love)
-                yield return npc;
-        }
+        return GetLovedBy(item)
+            .Where(npc =>
+                GiftKnowledgeService.TryGetKnownTaste(itemId, npc.Name, out var taste)
+                && taste == GiftTaste.Love)
+            .OrderBy(npc => npc.displayName); // alphabetical
     }
 
     public static IEnumerable<NPC> GetUnknownLovedBy(Item item)

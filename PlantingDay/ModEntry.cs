@@ -165,7 +165,7 @@ namespace PlantingDay
             }
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)
             {
-                HarvestIconInitializer.InitializeIcons(harvest);
+                IconInitializers.HarvestIcons(harvest);
             }
 
             CacheForTesting.DumpPlantInfoToJson();

@@ -29,11 +29,16 @@ namespace PlantingDay.Helpers
 
 
         //Economics
+        public const string BasicPrice = "tooltip.basic_price";
         public const string PriceRange = "tooltip.price_range";
         public const string PierresPurchase = "tooltip.pierres_purchase";
         public const string OtherShopPurchase = "tooltip.other_shop_purchase";
         public const string OtherShopTrade = "tooltip.other_shop_trade";
         public const string BuyYear2 = "tooltip.buy_year_2";
+
+        //Misc
+        public const string Owned = "tooltip.owned";
+
 
 
     }

@@ -17,7 +17,7 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.Seasons.Count == 0)
                 return null;
 
-            var segments = TooltipBuildHelper.BuildInlineSegments(
+            var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
                 plant.Data.Seasons,
                 season =>
                 {
@@ -26,7 +26,7 @@ namespace PlantingDay.ToolTip_Sections
                     return new[] { new InlineSegment
                     {
                         Text = SeasonHelper.Translate(season),
-                        Color = color,
+                        TextColor = color,
                         Bold = bold }
                     };
                 }

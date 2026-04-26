@@ -9,12 +9,19 @@
     <Import_RootNamespace>SDVCommon</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\AchievementHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\InventoryHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\HarvestCategories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SDVCommonLog.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GiftDetection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectInfoHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\CookingIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\CookingInfoRuntime.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\GiftTaste.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Data\GiftKnowledgeData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Wrappers\CookingInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CookingRecipeService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CookingInfoBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\GiftKnowledgeService.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Services\HarvestInfoBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GiftHelper.cs" />
@@ -37,7 +44,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TooltipRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="$(MSBuildThisFileDirectory)Models\Runtime\" />
     <Folder Include="$(MSBuildThisFileDirectory)Rendering\" />
   </ItemGroup>
 </Project>
