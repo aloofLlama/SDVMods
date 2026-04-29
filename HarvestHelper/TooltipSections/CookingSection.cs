@@ -82,28 +82,81 @@ namespace HarvestHelper.TooltipSections
             else
             {
                 //
-                // CASE B: 5 OR MORE KNOWN → "X known, Y unknown"
+                // CASE B: 5 OR MORE KNOWN → "X known Y unknown" (no comma)
                 //
-                knownUnknownCombined = TooltipBuildHelper.BuildInlineSegmentsWithCommas(
-                    new[]
-                    {
-                        new { Count = known, Key = TooltipKeys.Qty_Known, Color = TooltipColors.Normal },
-                        new { Count = unknown, Key = TooltipKeys.Qty_Unknown, Color = TooltipColors.Muted }
-                    },
-                    x =>
-                    {
-                        if (x.Count == 0)
-                            return Enumerable.Empty<InlineSegment>();
+                knownUnknownCombined = new List<InlineSegment>();
 
-                        return new[]
-                        {
-                            new InlineSegment
-                            {
-                                Text = string.Format(ModEntry.ModHelper.Translation.Get(x.Key), x.Count),
-                                TextColor = x.Color
-                            }
-                        };
+                if (known > 0)
+                {
+                    knownUnknownCombined.Add(new InlineSegment
+                    {
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.Qty_Known),
+                            known
+                        ),
+                        TextColor = TooltipColors.Normal
                     });
+                }
+
+                if (unknown > 0)
+                {
+                    // add a space if both segments exist
+                    if (known > 0)
+                    {
+                        knownUnknownCombined.Add(new InlineSegment
+                        {
+                            Text = " ",
+                            TextColor = TooltipColors.Normal
+                        });
+                    }
+
+                    knownUnknownCombined.Add(new InlineSegment
+                    {
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.Qty_Unknown),
+                            unknown
+                        ),
+                        TextColor = TooltipColors.Muted
+                    });
+                }
+                //
+                // CASE B: 5 OR MORE KNOWN → "X known Y unknown" (no comma)
+                //
+                knownUnknownCombined = new List<InlineSegment>();
+
+                if (known > 0)
+                {
+                    knownUnknownCombined.Add(new InlineSegment
+                    {
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.Qty_Known),
+                            known
+                        ),
+                        TextColor = TooltipColors.Normal
+                    });
+                }
+
+                if (unknown > 0)
+                {
+                    // add a space if both segments exist
+                    if (known > 0)
+                    {
+                        knownUnknownCombined.Add(new InlineSegment
+                        {
+                            Text = " ",
+                            TextColor = TooltipColors.Normal
+                        });
+                    }
+
+                    knownUnknownCombined.Add(new InlineSegment
+                    {
+                        Text = string.Format(
+                            ModEntry.ModHelper.Translation.Get(TooltipKeys.Qty_Unknown),
+                            unknown
+                        ),
+                        TextColor = TooltipColors.Muted
+                    });
+                }
             }
 
             //var knownIconSegments = CookingRecipeService

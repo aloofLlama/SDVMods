@@ -1,9 +1,11 @@
-﻿using HarvestHelper.Helpers;
+﻿using HarvestHelper.Compatibility;
+using HarvestHelper.Helpers;
 using HarvestHelper.Services;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
+using SDVCommon.Models.Runtime;
 using SDVCommon.Models.Wrappers;
 using SDVCommon.Services;
 using SDVData;
@@ -11,7 +13,9 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
-using SDVCommon.Models.Runtime;
+using StardewValley.Menus;
+using HarmonyLib;
+
 
 
 namespace HarvestHelper
@@ -21,6 +25,9 @@ namespace HarvestHelper
         public static ModEntry Instance { get; private set; } = null!;
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
+
+        //Temp for debug gift detection
+        private static Dictionary<string, int> _prevGifts = new();
 
         public override void Entry(IModHelper helper)
         {
@@ -33,12 +40,48 @@ namespace HarvestHelper
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
 
-            helper.Events.Input.ButtonPressed += GiftDetection.OnButtonPressed;
-            helper.Events.Input.ButtonReleased += GiftDetection.OnButtonReleased;
-
             helper.Events.Input.ButtonPressed += OnButtonPressed;
 
+            //Temp for debug gift detection
+            //helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+
+            // Initialize shared gift knowledge
+            GiftKnowledgeService.Initialize(helper);
+
+            // Harmony patch for perfect gift detection
+            var harmony = new Harmony(ModManifest.UniqueID);
+            harmony.Patch(
+                original: AccessTools.Method(typeof(NPC), nameof(NPC.receiveGift)),
+                postfix: new HarmonyMethod(typeof(GiftPatch), nameof(GiftPatch.Postfix))
+            );
+
         }
+
+        ////Temp for debug gift detection
+        //private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+        //{
+        //    if (!Context.IsWorldReady)
+        //        return;
+
+        //    foreach (var pair in Game1.player.friendshipData.Pairs)
+        //    {
+        //        string npc = pair.Key;
+        //        Friendship data = pair.Value;
+        //        int gifts = data.GiftsToday;
+
+        //        if (_prevGifts.TryGetValue(npc, out int oldGifts))
+        //        {
+        //            if (gifts != oldGifts)
+        //            {
+        //                Monitor.Log(
+        //                    $"[GIFT-TRACE] Delta detected on tick {Game1.ticks}: {npc} GiftsToday {oldGifts} → {gifts}",
+        //                    LogLevel.Warn);
+        //            }
+        //        }
+
+        //        _prevGifts[npc] = gifts;
+        //    }
+        //}
 
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
@@ -54,7 +97,8 @@ namespace HarvestHelper
             if (!Context.IsWorldReady)
                 return;
 
-            Item? hovered = HoveredItem.GetFromInventory();
+            //Item? hovered = HoveredItem.GetFromInventory();
+            Item? hovered = HoveredItem.GetFromAnyMenu();
             if (hovered is not StardewValley.Object obj)
                 return;
 

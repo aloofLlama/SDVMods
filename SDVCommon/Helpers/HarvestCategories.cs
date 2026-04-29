@@ -59,14 +59,15 @@ namespace SDVCommon.Helpers
             {
                if (obj.Type == "Arch" || // Artifacts (Bone Flute, Ancient Doll, Golden Mask, etc.)
                     obj.Type == "Basic" || //vinegar, pearl, etc
-                    obj.Type == "Crafting" ||   //coffee, field snack
-                    obj.Type == "0" //SDV Expanded items e.g. trasurechest, grampleton chicken
+                    //obj.Type == "Crafting" ||   //coffee, field snack
+                    obj.Type == "0" || //SDV Expanded items e.g. trasurechest, grampleton chicken
+                    obj.Type == "Fish" //algae, seaweed, cave jelly, etc (not actual fish, which are category 1
                     )
                     return true;
             }    
             
-            // SPECIAL CASE: acorn, maple seed
-            if (obj.Type == "Crafting" && category == SObject.SeedsCategory)
+            // acorn, maple seed, coffee, brick floor, torches
+            if (obj.Type == "Crafting")
                 return true;
 
 

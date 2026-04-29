@@ -2,9 +2,7 @@
 using StardewValley;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Crops;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SDVCommon.Helpers;
 
 
 namespace SDVCommon.GameData
@@ -35,13 +33,11 @@ namespace SDVCommon.GameData
                 Price = obj.Price,
                 Category = obj.Category,
                 Edibility = obj.Edibility,
-                Type = obj.Type
+                Type = obj.Type,
+                ContextTags = obj.ContextTags?.ToList()
             };
         }
 
-        //---------------
-        //Convert between Harvest and Seed Ids
-        //---------------
         public static readonly Dictionary<string, string> _harvestToSeed = new();
 
         public static void BuildHarvestToSeedMap()
@@ -63,16 +59,8 @@ namespace SDVCommon.GameData
             }
         }
 
-        public static CropData? GetSeedDataForHarvest(string harvestId)
-        {
-            if (_harvestToSeed.TryGetValue(harvestId, out string? seedId))
-            {
-                if (Game1.cropData.TryGetValue(seedId, out var seedData))
-                    return seedData;
-            }
 
-            return null;
-        }
+
 
     }
 }

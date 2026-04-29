@@ -24,6 +24,8 @@ namespace PlantingDay.Services
             TooltipBuildHelper.AddSectionWithSeparator(list, () => PlantFeaturesSection.Build(plant));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedSourceSection.Build(plant));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => HarvestEconomicsSection.Build(plant));
+            
+            //Keep inventory at bottom
             TooltipBuildHelper.AddSectionWithSeparator(list, () => InventorySection.Build(plant));
 
             return list;

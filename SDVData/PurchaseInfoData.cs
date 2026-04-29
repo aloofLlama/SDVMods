@@ -11,10 +11,15 @@ namespace SDVData
         {
             Pierre,
             Joja,
+            Oasis,
+            Marnie,
             NightMarket,
             TravelingCart,
             DesertFestival,
             ValleyFair,
+            JojaEmporium, //From SDV Expanded
+            Ari, //From Sunberry
+            Jumana, //From Sunberry
             Other
         }
 

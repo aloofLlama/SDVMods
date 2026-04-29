@@ -73,10 +73,13 @@ namespace SDVCommon
             if (itemInfo == null)
                 return;
 
+            GameObjectInfoHelper._harvestToSeed.TryGetValue(harvestId, out string? seedId);
+
+
             bool shipOne = IsShipOneCandidate(harvestId, obj);
 
             // Mono/Poly shipping achievements come from the seed data
-            var seedData = GameObjectInfoHelper.GetSeedDataForHarvest(harvestId);
+            var seedData = IdHelper.GetSeedDataForHarvest(harvestId);
             bool shipMono = seedData?.CountForMonoculture == true;
             bool shipPoly = seedData?.CountForPolyculture == true;
 
@@ -86,8 +89,8 @@ namespace SDVCommon
             var data = new HarvestInfoData
             {
                 HarvestId = harvestId,
+                SeedId = seedId,
                 Harvest = itemInfo,
-                Price = itemInfo.Price,
                 ShipOne = shipOne,
                 ShipMonoCulture = shipMono,
                 ShipPolyCulture = shipPoly

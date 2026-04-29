@@ -18,8 +18,11 @@ namespace SDVCommon.Helpers
             {
                 // Inventory (GameMenu → InventoryPage)
                 case GameMenu gm:
+                    if (gm.currentTab != GameMenu.inventoryTab)
+                        return null;
+
                     var invPage = gm.pages
-                        .OfType<StardewValley.Menus.InventoryPage>()
+                        .OfType<InventoryPage>()
                         .FirstOrDefault();
 
                     return invPage?.hoveredItem;
@@ -44,8 +47,11 @@ namespace SDVCommon.Helpers
             {
                 // Inventory (GameMenu → InventoryPage)
                 case GameMenu gm:
+                    if (gm.currentTab != GameMenu.inventoryTab)
+                        return null;
+
                     var invPage = gm.pages
-                        .OfType<StardewValley.Menus.InventoryPage>()
+                        .OfType<InventoryPage>()
                         .FirstOrDefault();
 
                     return invPage?.hoveredItem;

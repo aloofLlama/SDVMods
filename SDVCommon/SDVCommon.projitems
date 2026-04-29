@@ -13,7 +13,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\InventoryHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\HarvestCategories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\SDVCommonLog.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GiftDetection.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\OBSGiftDetection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectInfoHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\CookingIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\CookingInfoRuntime.cs" />

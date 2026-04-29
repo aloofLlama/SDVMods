@@ -103,7 +103,7 @@ namespace SDVCommon
             //
             // Position tooltip
             //
-            int x = Game1.getMouseX() - width + 32;
+            int x = Game1.getMouseX() - width -32;  //dad have +32 it covered the sprite in shipping
             int y = Game1.getMouseY() + 32;
 
             if (x < 0)

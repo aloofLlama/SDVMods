@@ -233,22 +233,6 @@ namespace SDVCommon.Helpers
         }
 
 
-        private static void AppendEndSegments(List<InlineSegment> result, List<InlineSegment> endSegments)
-        {
-            if (endSegments.Count == 0)
-                return;
-
-            // Insert comma before the first end segment
-            result.Add(new InlineSegment
-            {
-                Text = ", ",
-                
-            });
-
-            result.AddRange(endSegments);
-        }
-
-
 
 
 

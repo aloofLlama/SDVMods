@@ -30,6 +30,9 @@ namespace PlantingDay.Helpers.SeedSource
                 "Festival_StardewValleyFair_StarTokens" => "Valley Fair",
                 "Festival_FlowerDance_Pierre" => "Flower Dance",
 
+                // Modded Shops
+                "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor" => "Junimo Woods",
+
                 // Remove Desert Festival header
                 _ when shopId.StartsWith("DesertFestival", StringComparison.OrdinalIgnoreCase)
                     => string.Join(", ",

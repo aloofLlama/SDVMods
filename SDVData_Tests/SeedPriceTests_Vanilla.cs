@@ -45,12 +45,12 @@ namespace  SDVData_Tests
         [InlineData("455", "SeedShop", 50)]  // Spangle Seeds
         [InlineData("431", "SeedShop", 200)] // Sunflower Seeds *Manually corrected from 100
         [InlineData("425", "SeedShop", 200)] // Fairy Seeds
-        [InlineData("628", "SeedShop", 1700)] // Cherry Sapling
-        [InlineData("629", "SeedShop", 1000)] // Apricot Sapling
-        [InlineData("630", "SeedShop", 2000)] // Orange Sapling
-        [InlineData("631", "SeedShop", 3000)] // Peach Sapling
-        [InlineData("632", "SeedShop", 3000)] // Pomegranate Sapling
-        [InlineData("633", "SeedShop", 2000)] // Apple Sapling
+        [InlineData("628", "SeedShop", 3400)] // Cherry Sapling
+        [InlineData("629", "SeedShop", 2000)] // Apricot Sapling
+        [InlineData("630", "SeedShop", 4000)] // Orange Sapling
+        [InlineData("631", "SeedShop", 6000)] // Peach Sapling
+        [InlineData("632", "SeedShop", 6000)] // Pomegranate Sapling
+        [InlineData("633", "SeedShop", 4000)] // Apple Sapling
         //Grapes disabled by other mods
         public void Pierre_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
@@ -214,6 +214,7 @@ namespace  SDVData_Tests
         //[InlineData("485", "Traveler", 0)] //Red Cabbage Seeds *N/A - only listed separately for game special consideration
         [InlineData("433", "Traveler", 2500)] //Coffee Bean
         [InlineData("347", "Traveler", 1000)] //Rare Seed
+
         public void Misc_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
             // Get all plants with this seedId 
@@ -241,6 +242,42 @@ namespace  SDVData_Tests
 
             Assert.Equal(expectedPrice, prices.Single());
         }
+
+        [Theory]
+        [InlineData("499", "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor", 8000)] //Ancient Seeds
+        [InlineData("347", "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor", 1500)] //Rare Seed
+        [InlineData("495", "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor", 65)] //Spring Seeds
+        [InlineData("496", "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor", 90)] //Summer Seeds
+        [InlineData("497", "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor", 100)] //Fall Seeds
+        [InlineData("498", "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor", 120)] //Winter Seeds
+        public void JunimoVillage_VanillaSeedPrices(string seedId, string vendorId, int expectedPrice)
+        {
+            // Get all plants with this seedId 
+            var matchingPlants = _plants.Where(p => p.SeedId == seedId).ToList();
+
+            Assert.NotEmpty(matchingPlants);
+
+            // Collect ALL matching vendor entries across all duplicates
+            var options = matchingPlants
+                .SelectMany(p => p.PurchaseOptions)
+                .Where(o => o.VendorId == vendorId)
+                .ToList();
+
+            Assert.NotEmpty(options); // vendor must exist
+
+            // Extract all prices
+            var prices = options
+                .Select(o => o.GoldPrice)
+                .Distinct()
+                .ToList();
+
+            // If multiple prices exist → fail
+            Assert.True(prices.Count == 1,
+                $"Seed {seedId} at {vendorId} has inconsistent prices: {string.Join(", ", prices)}");
+
+            Assert.Equal(expectedPrice, prices.Single());
+        }
+
 
     }
 

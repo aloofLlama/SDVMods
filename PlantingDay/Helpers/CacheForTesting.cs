@@ -33,7 +33,7 @@ namespace PlantingDay.Helpers
             string stablePath = Path.Combine(cacheDir, "PlantInfo.json");
 
             //// 1. Write stable file for tests
-            //File.WriteAllText(stablePath, json);
+            File.WriteAllText(stablePath, json);
 
             //// 2. Write timestamped snapshot for debugging
             //string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");

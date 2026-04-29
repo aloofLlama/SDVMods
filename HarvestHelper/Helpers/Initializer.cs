@@ -4,11 +4,6 @@ using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Services;
 using StardewModdingAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HarvestHelper.Helpers
 {
@@ -19,7 +14,7 @@ namespace HarvestHelper.Helpers
             TooltipIcons.Initialize();
             GameObjectInfoHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
-            GiftKnowledgeService.Initialize(helper);
+            //GiftKnowledgeService.Initialize(helper); moved to modentry with harmony patch
             CookingInfoBuilder.BuildAll();
 
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)

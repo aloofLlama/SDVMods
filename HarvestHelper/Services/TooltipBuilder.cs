@@ -22,9 +22,11 @@ namespace HarvestHelper.Services
             list.AddRange(FirstSection.Build(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => GiftLovesSection.Build(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => ShipmentSection.Build(harvest, obj));
-            TooltipBuildHelper.AddSectionWithSeparator(list, () => InventorySection.Build(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.Build(harvest));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedmakerSection.Build(harvest, obj));
 
+            //keep inventory at bottom
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => InventorySection.Build(harvest, obj));
             return list;
         }
 

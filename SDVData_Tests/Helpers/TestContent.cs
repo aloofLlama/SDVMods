@@ -81,16 +81,18 @@ namespace SDVData_Tests.Helpers
                     string vendorId = option.VendorId;
                     string price = option.GoldPrice?.ToString() ?? "null";
 
-                    if (//vendorId != "Joja" &&
-                        //!TestHelpers.IsNightMarket(vendorId) &&
-                        //vendorId != "IslandTrade" &&
-                        //vendorId != "Raccoon" &&
-                        vendorId == "SeedShop"
-                        //vendorId != "skellady.SBVCP_AriMarket" &&
-                        //vendorId != "Sandy" &&
-                        //vendorId != "skellady.SBVCP_JumanaShop" &&
-                        //vendorId != "AnimalShop" &&
-                        //vendorId == "Traveler" &&
+                    if (vendorId != "Joja" &&
+                        !TestHelpers.IsNightMarket(vendorId) &&
+                        vendorId != "IslandTrade" &&
+                        vendorId != "Raccoon" &&
+                        vendorId != "SeedShop" &&
+                        vendorId != "skellady.SBVCP_AriMarket" &&
+                        vendorId != "Sandy" &&
+                        vendorId != "skellady.SBVCP_JumanaShop" &&
+                        vendorId != "AnimalShop" &&
+                        vendorId != "Traveler" &&
+                        //vendorId == "FlashShifter.StardewValleyExpandedCP_ZoeyVendor"
+                        vendorId == "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor"
                         //
                         //!seedId.Contains("slimerrain.uncleirohapprovedtea", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("slimerrain.grainsoverhullcp", StringComparison.OrdinalIgnoreCase) &&
@@ -108,9 +110,9 @@ namespace SDVData_Tests.Helpers
                             //---
                             // SEED PRICE TESTS
                             //------
-                            //output.WriteLine(
-                            //$"[InlineData(\"{seedId}\", \"{vendorId}\", {price})] //{seedName}"
-                            //);
+                            output.WriteLine(
+                            $"[InlineData(\"{seedId}\", \"{vendorId}\", {price})] //{seedName}"
+                            );
 
                             //create for SeedPriceOverrides
                             //output.WriteLine(

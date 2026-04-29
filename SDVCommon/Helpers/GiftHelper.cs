@@ -11,7 +11,6 @@ public static class GiftHelper
         foreach (var npc in Utility.getAllCharacters())
         {
 
-
             // Skip monsters, pets, horses, festival NPCs, etc.
             if (npc is not NPC realNpc)
                 continue;
@@ -41,7 +40,7 @@ public static class GiftHelper
 
     public static IEnumerable<NPC> GetKnownLovedBy(Item item)
     {
-        string itemId = $"(O){item.ParentSheetIndex}";
+        string itemId = item.QualifiedItemId;
 
         return GetLovedBy(item)
             .Where(npc =>
@@ -52,7 +51,7 @@ public static class GiftHelper
 
     public static IEnumerable<NPC> GetUnknownLovedBy(Item item)
     {
-        string itemId = $"(O){item.ParentSheetIndex}";
+        string itemId = item.QualifiedItemId;
 
         foreach (var npc in GetLovedBy(item))
         {

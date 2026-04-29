@@ -17,7 +17,7 @@ namespace HarvestHelper.TooltipSections
         {
             var list = new List<TooltipElement>();
             string harvestId = harvest.Data.HarvestId;
-            int owned = InventoryHelper.CountInInventory(harvestId);
+            int owned = InventoryHelper.CountOwned(harvestId);
 
             list.Add(new TooltipElement
             {

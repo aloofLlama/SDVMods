@@ -29,13 +29,15 @@ namespace SDVCommon.Helpers
 
         public static bool NeedsMonoCultureShipped(HarvestInfo harvest)
         {
+            // Not a monoculture crop
             if (!harvest.Data.ShipMonoCulture)
-                return false; // not eligible
+                return false;
 
-            if (Game1.player.basicShipped.TryGetValue(harvest.Data.HarvestId, out int count))
-                return count < 300;
+            // Achievement already earned
+            if (Game1.player.achievements.Contains(32))
+                return false;
 
-            return true; // never shipped
+            return true;
         }
 
         public static bool NeedsPolyCultureShipped(HarvestInfo harvest)

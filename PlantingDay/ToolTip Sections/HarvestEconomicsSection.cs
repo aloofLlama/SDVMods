@@ -32,7 +32,7 @@ namespace PlantingDay.ToolTip_Sections
                 return list; // no harvest info found
 
             var harvestIcon = harvestInfo.Runtime.HarvestIcon;
-            int harvestPrice = harvestInfo.Data.Price;
+            int harvestPrice = EconomicsHelper.GetHarvestSellPriceFromSeed(plant.Data.SeedId);
 
             list.Add(new TooltipElement
             {

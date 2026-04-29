@@ -18,7 +18,7 @@ namespace PlantingDay.TooltipSections
         {
             var list = new List<TooltipElement>();
             string plantId = plant.Data.SeedId;
-            int owned = InventoryHelper.CountInInventory(plantId);
+            int owned = InventoryHelper.CountOwned(plantId);
 
             list.Add(new TooltipElement
             {

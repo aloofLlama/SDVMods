@@ -109,7 +109,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_BarleySeeds", "SeedShop", 10)] //BarleySeeds
         [InlineData("Cornucopia_BlackBeansSeeds", "SeedShop", 60)] //BlackBeansSeeds
         [InlineData("Cornucopia_BuckwheatSeeds", "SeedShop", 10)] //BuckwheatSeeds
-        [InlineData("Cornucopia_ButternutSquashSeeds", "SeedShop", 180)] //ButternutSquashSeeds
+        [InlineData("Cornucopia_ButternutSquashSeeds", "SeedShop", 60)] //ButternutSquashSeeds
         [InlineData("Cornucopia_CabbageSeeds", "SeedShop", 70)] //CabbageSeeds
         [InlineData("Cornucopia_CanaryMelonSeeds", "SeedShop", 450)] //CanaryMelonSeeds
         [InlineData("Cornucopia_CanolaFlowerSeeds", "SeedShop", 100)] //CanolaFlowerSeeds
@@ -180,30 +180,30 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_RoseFallSeeds", "SeedShop", 200)] //RoseFallSeeds
         [InlineData("Cornucopia_RoseWinterSeeds", "SeedShop", 200)] //RoseWinterSeeds
         [InlineData("Cornucopia_VioletSeeds", "SeedShop", 20)] //VioletSeeds
-        [InlineData("Cornucopia_AvocadoSapling", "SeedShop", 4000)] //AvocadoSapling
-        [InlineData("Cornucopia_CocoaPodSapling", "SeedShop", 2500)] //CocoaPodSapling
-        [InlineData("Cornucopia_PearSapling", "SeedShop", 2750)] //PearSapling
-        [InlineData("Cornucopia_PistachioSapling", "SeedShop", 1874)] //PistachioSapling
-        [InlineData("Cornucopia_AlmondSapling", "SeedShop", 1874)] //AlmondSapling
-        [InlineData("Cornucopia_CashewSapling", "SeedShop", 2000)] //CashewSapling
-        [InlineData("Cornucopia_FigSapling", "SeedShop", 2000)] //FigSapling
-        [InlineData("Cornucopia_GrapefruitSapling", "SeedShop", 3000)] //GrapefruitSapling
-        [InlineData("Cornucopia_LemonSapling", "SeedShop", 1000)] //LemonSapling
-        [InlineData("Cornucopia_LimeSapling", "SeedShop", 1000)] //LimeSapling
-        [InlineData("Cornucopia_NectarineSapling", "SeedShop", 3000)] //NectarineSapling
-        [InlineData("Cornucopia_PecanSapling", "SeedShop", 2500)] //PecanSapling
-        [InlineData("Cornucopia_PersimmonSapling", "SeedShop", 3500)] //PersimmonSapling
-        [InlineData("Cornucopia_PomeloSapling", "SeedShop", 1700)] //PomeloSapling
-        [InlineData("Cornucopia_UmeSapling", "SeedShop", 1000)] //UmeSapling
-        [InlineData("Cornucopia_WalnutSapling", "SeedShop", 1874)] //WalnutSapling
-        [InlineData("Cornucopia_YuzuSapling", "SeedShop", 1000)] //YuzuSapling
-        [InlineData("Cornucopia_CamphorLeavesSapling", "SeedShop", 2000)] //CamphorLeavesSapling
-        [InlineData("Cornucopia_CinnamonSticksSapling", "SeedShop", 3000)] //CinnamonSticksSapling
-        [InlineData("Cornucopia_EucalyptusLeavesSapling", "SeedShop", 2750)] //EucalyptusLeavesSapling
-        [InlineData("Cornucopia_NutmegSapling", "SeedShop", 2000)] //NutmegSapling
-        [InlineData("Cornucopia_JasmineSapling", "SeedShop", 1500)] //JasmineSapling
-        [InlineData("Cornucopia_MagnoliaSapling", "SeedShop", 1250)] //MagnoliaSapling
-        [InlineData("Cornucopia_WisteriaSapling", "SeedShop", 1250)] //WisteriaSapling
+        [InlineData("Cornucopia_AvocadoSapling", "SeedShop", 8000)] //AvocadoSapling
+        [InlineData("Cornucopia_CocoaPodSapling", "SeedShop", 5000)] //CocoaPodSapling
+        [InlineData("Cornucopia_PearSapling", "SeedShop", 5500)] //PearSapling
+        [InlineData("Cornucopia_PistachioSapling", "SeedShop", 3748)] //PistachioSapling
+        [InlineData("Cornucopia_AlmondSapling", "SeedShop", 3748)] //AlmondSapling
+        [InlineData("Cornucopia_CashewSapling", "SeedShop", 4000)] //CashewSapling
+        [InlineData("Cornucopia_FigSapling", "SeedShop", 4000)] //FigSapling
+        [InlineData("Cornucopia_GrapefruitSapling", "SeedShop", 6000)] //GrapefruitSapling
+        [InlineData("Cornucopia_LemonSapling", "SeedShop", 2000)] //LemonSapling
+        [InlineData("Cornucopia_LimeSapling", "SeedShop", 2000)] //LimeSapling
+        [InlineData("Cornucopia_NectarineSapling", "SeedShop", 6000)] //NectarineSapling
+        [InlineData("Cornucopia_PecanSapling", "SeedShop", 5000)] //PecanSapling
+        [InlineData("Cornucopia_PersimmonSapling", "SeedShop", 7000)] //PersimmonSapling
+        [InlineData("Cornucopia_PomeloSapling", "SeedShop", 3400)] //PomeloSapling
+        [InlineData("Cornucopia_UmeSapling", "SeedShop", 2000)] //UmeSapling
+        [InlineData("Cornucopia_WalnutSapling", "SeedShop", 3748)] //WalnutSapling
+        [InlineData("Cornucopia_YuzuSapling", "SeedShop", 2000)] //YuzuSapling
+        [InlineData("Cornucopia_CamphorLeavesSapling", "SeedShop", 4000)] //CamphorLeavesSapling
+        [InlineData("Cornucopia_CinnamonSticksSapling", "SeedShop", 6000)] //CinnamonSticksSapling
+        [InlineData("Cornucopia_EucalyptusLeavesSapling", "SeedShop", 5500)] //EucalyptusLeavesSapling
+        [InlineData("Cornucopia_NutmegSapling", "SeedShop", 4000)] //NutmegSapling
+        [InlineData("Cornucopia_JasmineSapling", "SeedShop", 3000)] //JasmineSapling
+        [InlineData("Cornucopia_MagnoliaSapling", "SeedShop",2500)] //MagnoliaSapling
+        [InlineData("Cornucopia_WisteriaSapling", "SeedShop", 2500)] //WisteriaSapling
 
         public void Cornucopia_Pierre_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {
@@ -397,7 +397,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_WasabiRootSeeds", "Festival_EggFestival_Pierre", 100)] //WasabiRootSeeds
         [InlineData("Cornucopia_LicoriceRootSeeds", "Dwarf", 100)] //LicoriceRootSeeds
         [InlineData("Cornucopia_WormwoodSeeds", "Dwarf", 100)] //WormwoodSeeds
-        [InlineData("Cornucopia_Soybeans", "Traveler", 195)] //Soybeans actual 195-1000 
+        //[InlineData("Cornucopia_Soybeans", "Traveler", 195)] //Soybeans actual 195-1000 
 
         public void Misc_ModdedSeedPrices(string seedId, string vendorId, int expectedPrice)
         {

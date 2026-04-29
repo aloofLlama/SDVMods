@@ -11,7 +11,7 @@
 	"tooltip.cooking": "Cooking: {0}%",
 
 	//Misc
-	"tooltip.owned": "Own: {0}",
+	"tooltip.owned": "qty: {0}",
 	"tooltip.qty_known": "{0} known",
 	"tooltip.qty_unknown": "({0})"
 

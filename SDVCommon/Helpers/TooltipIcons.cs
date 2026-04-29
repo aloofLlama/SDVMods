@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
 
@@ -90,9 +91,6 @@ namespace SDVCommon.Icons
             LoadSheet("Mummy", "Characters/Monsters/Mummy");
             LoadSheet("Serpent", "Characters/Monsters/Serpent");
 
-
-
-
             //
             // Register icons
             //
@@ -143,6 +141,74 @@ namespace SDVCommon.Icons
 
         private static void Add(IconKey key, Texture2D tex, Rectangle rect, int size, float scale)
             => _icons[key] = new Icon(tex, rect, size, scale);
+
+
+        public static Icon GetIconForGameObject(string qualifiedId)
+        {
+            Texture2D sheet;
+            int iconx;
+            int icony;
+            int x;
+            int y;
+            int size;
+            float scale = 2f;
+
+            switch (qualifiedId)
+            {
+                //
+                // BIG CRAFTABLES (BC)
+                //
+                case var id when id.StartsWith("(BC)"):
+                    {
+                        int bcId = int.Parse(id.AsSpan(4));
+                        sheet = Sheet("Craftables");
+
+                        iconx = 16;
+                        icony = 32;
+
+                        const int cols = 8; // Craftables sheet is 8 across
+
+                        int col = bcId % cols;
+                        int row = bcId / cols;
+
+                        x = col * iconx;
+                        y = row * icony;
+
+                        size = icony; // 32px tall
+                        break;
+                    }
+
+                //
+                // OBJECTS (O)
+                //
+                case var id when id.StartsWith("(O)"):
+                    {
+                        int objId = int.Parse(id.AsSpan(3));
+                        sheet = Sheet("Objects");
+
+                        iconx = 16;
+                        icony = 16;
+
+                        const int cols = 24; // springobjects is 24 across
+
+                        int col = objId % cols;
+                        int row = objId / cols;
+
+                        x = col * iconx;
+                        y = row * icony;
+
+                        size = iconx; // 16px
+                        break;
+                    }
+
+                default:
+                    throw new NotSupportedException($"Unsupported QualifiedItemId: {qualifiedId}");
+            }
+
+            Rectangle rect = new Rectangle(x, y, iconx, icony);
+            return new Icon(sheet, rect, size, scale);
+        }
+
     }
 }
 

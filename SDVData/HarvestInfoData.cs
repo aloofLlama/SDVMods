@@ -9,7 +9,7 @@ namespace SDVData
     public class HarvestInfoData
     {
         public string HarvestId { get; set; } = "";
-        public int Price { get; set; }
+        public string? SeedId { get; set; } = "";
         public ItemInfo? Harvest { get; set; } = new ItemInfo();
 
         // Shipping Achievements

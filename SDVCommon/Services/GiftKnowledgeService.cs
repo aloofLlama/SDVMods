@@ -1,7 +1,8 @@
-﻿using StardewModdingAPI;
+﻿using SDVCommon.Helpers;
 using SDVCommon.Models.Data;
-using SDVCommon.Helpers;
 using SDVCommon.Models.Runtime;
+using StardewModdingAPI;
+using StardewValley;
 
 
 namespace SDVCommon.Services
@@ -23,9 +24,6 @@ namespace SDVCommon.Services
         {
             _helper.Data.WriteGlobalData(DataKey, _data);
 
-            //SDVCommonLog.Log($"[GIFT] KnownTastes count: {_data.KnownTastes.Count}", LogLevel.Alert);
-
-
         }
 
         // ⭐ Accept enum
@@ -36,12 +34,6 @@ namespace SDVCommon.Services
                 npcDict = new Dictionary<string, string>();
                 _data.KnownTastes[itemId] = npcDict;
             }
-
-            SDVCommonLog.Log(
-                $"[GIFT] Learned taste: {npcName} → {itemId} = {taste}",
-                LogLevel.Alert
-            );
-
 
             // ⭐ Store enum as string
             npcDict[npcName] = taste.ToString();
