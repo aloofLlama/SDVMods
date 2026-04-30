@@ -1,7 +1,10 @@
-﻿using PlantingDay.Helpers;
+﻿using PlantingDay.Compatibility;
+using PlantingDay.Helpers;
 using PlantingDay.Helpers.SeedSource;
 using PlantingDay.Models.Wrappers;
+using SDVCommon.Compatibility;
 using SDVCommon.GameData;
+using SDVCommon.Helpers;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -31,7 +34,7 @@ namespace PlantingDay.Services
 
             LoadCrops();
             LoadFruitTrees();
-            //LoadBushes(); // if you add this later
+            LoadCustomBushes();
 
             foreach (var plant in _plants.Values)
             {
@@ -181,25 +184,74 @@ namespace PlantingDay.Services
             }
         }
 
-        //Bushes. Try this code for accessing custom bush drops from UI Info Suite Alt 2 -> Infrastructure -> Tools:
-        // Custom Bush saplings and vanilla tea sapling
-        //    if (
-        //      ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi)
-        //      && customBushApi.TryGetDrops(item.QualifiedItemId, out IList<ICustomBushDrop>? drops)
-        //      && drops.Count > 0
-        //    )
-        //    {
-        //      return ItemRegistry.Create<SObject>(drops[0].ItemId);
-        //    }
+        private static void LoadCustomBushes()
+        {
+            var api = CustomBushCompat.Api;
 
-        //    // Vanilla tea sapling fallback (no Custom Bush mod)
-        //    if (item.QualifiedItemId == "(O)251")
-        //    {
-        //      return ItemRegistry.Create<SObject>("(O)614");
-        //    }
+            if (api == null)
+            {
+                //LoadVanillaTeaBush();
+                return;
+            }
+
+            foreach (var (qualifiedId, objData) in Game1.objectData)
+            {
+                // Log raw objectData key
+                ModEntry.Instance.Monitor.Log($"ONE {qualifiedId}", LogLevel.Alert);
+
+                // Convert to CustomBush key: add (O) if missing
+                string cbKey = IdHelper.ToQualifiedId(qualifiedId);
+
+                // Try to get drops using the qualified ID
+                if (!api.TryGetDrops(cbKey, out var drops) || drops.Count == 0)
+                    continue;
+
+                // If we get here, Custom Bush recognized the bush
+                ModEntry.Instance.Monitor.Log($"TWO {cbKey}", LogLevel.Alert);
+
+                string harvestId = drops[0].ItemId;
+
+                var data = new PlantInfoData
+                {
+                    SeedId = qualifiedId,
+                    HarvestId = harvestId,
+                    PlantType = PlantType.Bush,
+                    Seed = GameObjectInfoHelper.FromObject(qualifiedId),
+                    Seasons = new() { SeasonId.Spring, SeasonId.Summer, SeasonId.Fall },
+                    DaysToProduce = 20,
+                    RegrowDays = 1
+                };
+
+                data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(qualifiedId);
+                data.MonsterDrops = MonsterDropLoader.GetDropsForItem(qualifiedId);
+
+                _plants[data.SeedId] = new PlantInfo(data);
+            }
+
+            //LoadVanillaTeaBush();
+        }
+
+
+        //        private static void LoadCustomBush()
+        //        {
+
+        //            if (
+        //              ApiManager.GetApi(ModCompat.CustomBush, out ICustomBushApi? customBushApi)
+        //              && customBushApi.TryGetDrops(item.QualifiedItemId, out IList<ICustomBushDrop>? drops)
+        //              && drops.Count > 0
+        //            )
+        //            {
+        //              return ItemRegistry.Create<SObject>(drops[0].ItemId);
+        //            }
+
+        //            // Vanilla tea sapling fallback (no Custom Bush mod)
+        //            if (item.QualifiedItemId == "(O)251")
+        //            {
+        //              return ItemRegistry.Create<SObject>("(O)614");
+        //            }
 
         //return null;
-        //  }
+        //          }
 
 
 

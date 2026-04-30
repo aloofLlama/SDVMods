@@ -59,7 +59,7 @@ namespace HarvestHelper.TooltipSections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.GetIconForGameObject("(BC)25"), //seedmaker
+                Icon = TooltipIcons.GetIconForGameObject("(BC)25", 1.4f), //seedmaker
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
                     owned)
             });

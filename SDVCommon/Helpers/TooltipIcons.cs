@@ -143,7 +143,7 @@ namespace SDVCommon.Icons
             => _icons[key] = new Icon(tex, rect, size, scale);
 
 
-        public static Icon GetIconForGameObject(string qualifiedId)
+        public static Icon GetIconForGameObject(string qualifiedId, float scale)
         {
             Texture2D sheet;
             int iconx;
@@ -151,7 +151,6 @@ namespace SDVCommon.Icons
             int x;
             int y;
             int size;
-            float scale = 2f;
 
             switch (qualifiedId)
             {

@@ -30,8 +30,6 @@ namespace PlantingDay.Helpers.SeedSource
                 "Festival_StardewValleyFair_StarTokens" => "Valley Fair",
                 "Festival_FlowerDance_Pierre" => "Flower Dance",
 
-                // Modded Shops
-                "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor" => "Junimo Woods",
 
                 // Remove Desert Festival header
                 _ when shopId.StartsWith("DesertFestival", StringComparison.OrdinalIgnoreCase)
@@ -40,9 +38,8 @@ namespace PlantingDay.Helpers.SeedSource
                               .Select(id => id.Replace("DesertFestival_", ""))
                     ),
 
-                //// Collapse Night Market (all boats)
-                //_ when shopId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase)
-                //    => "Night Market",
+                // Expanded
+                "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor" => "Junimo Woods",
 
                 // Sunberry
                 "skellady.SBVCP_AriMarket" => "Ari",
@@ -69,18 +66,18 @@ namespace PlantingDay.Helpers.SeedSource
         // ------------------------------------------------------------
         // SORTING KEY (used by VendorListBuilder)
         // ------------------------------------------------------------
-        public static int SortKey(PurchaseInfoRuntime v)
-        {
-            return GetVendorType(v.Data.VendorId) switch
-            {
-                VendorType.Pierre => 0,
-                //VendorType.NightMarket => 4, // always last
-                //VendorType.TravelingCart => 1, // gold vendor
-                VendorType.ValleyFair => 3, // trade vendor
-                VendorType.DesertFestival => 3,
-                _ => v.Data.GoldPrice.HasValue ? 1 : 2
-            };
-        }
+        //public static int SortKey(PurchaseInfoRuntime v)
+        //{
+        //    return GetVendorType(v.Data.VendorId) switch
+        //    {
+        //        VendorType.Pierre => 0,
+        //        //VendorType.NightMarket => 4, // always last
+        //        //VendorType.TravelingCart => 1, // gold vendor
+        //        VendorType.ValleyFair => 3, // trade vendor
+        //        VendorType.DesertFestival => 3,
+        //        _ => v.Data.GoldPrice.HasValue ? 1 : 2
+        //    };
+        //}
 
         // ------------------------------------------------------------
         // CLASSIFICATION HELPERS
@@ -92,6 +89,9 @@ namespace PlantingDay.Helpers.SeedSource
 
             if (vendorId.Contains ("Joja", StringComparison.OrdinalIgnoreCase))
                 return VendorType.Joja;
+
+            if (vendorId.Contains("FlashShifter.StardewValleyExpandedCP_ZoeyVendor", StringComparison.OrdinalIgnoreCase))
+                return VendorType.JojaEmporium;
 
             if (vendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase))
                 return VendorType.NightMarket;

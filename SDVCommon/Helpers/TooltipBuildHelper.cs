@@ -180,9 +180,9 @@ namespace SDVCommon.Helpers
                 {
                     unified.Add(new InlineSegment
                     {
+                        //TODO abstract the specific text out so the collapse can be used in other situations
                         Text = $"+{collapsedCount} known",
-                        TextColor = Color.SlateGray
-                        //Color = TooltipColors.Deemphasize //switch back after relaunch
+                        TextColor = TooltipColors.Deemphasize
                     });
                 }
 

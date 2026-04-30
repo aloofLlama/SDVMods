@@ -16,20 +16,51 @@ namespace HarvestHelper.TooltipSections
         {
             var list = new List<TooltipElement>();
 
-            var known = GiftHelper.GetKnownLovedBy(obj)
-                .Select(npc => npc.displayName)
+            // Build sorted collapsible segments (known)
+            var collapsible = GiftHelper.GetKnownLovedBy(obj)
+                .Select(npc => new
+                {
+                    Npc = npc,
+                    Maxed = GiftHelper.IsMaxHearts(npc)
+                })
+                .OrderBy(x => x.Maxed)                 // non‑maxed first
+                .ThenBy(x => x.Npc.displayName)        // alphabetical
+                .Select(x => new InlineSegment
+                {
+                    Text = x.Npc.displayName,
+                    TextColor = x.Maxed ? TooltipColors.Normal : Color.MediumPurple
+                })
                 .ToList();
+
+
+            //var known = GiftHelper.GetKnownLovedBy(obj)
+            //    .Select(npc => npc.displayName)
+            //    .ToList();
 
             var unknown = GiftHelper.GetUnknownLovedBy(obj).Count();
 
-            // Build collapsible segments (known)
-            var collapsible = known
-                .Select(name => new InlineSegment
-                {
-                    Text = name,
-                    
-                })
-                .ToList();
+            //// Build collapsible segments (known)
+            //var collapsible = GiftHelper.GetKnownLovedBy(obj)
+            //    .Select(npc =>
+            //    {
+            //        bool maxed = GiftHelper.IsMaxHearts(npc);
+
+            //        return new InlineSegment
+            //        {
+            //            Text = npc.displayName,
+            //            TextColor = maxed ? TooltipColors.Normal : Color.MediumPurple
+            //        };
+            //    })
+            //    .ToList();
+
+            //var collapsible = known
+            //    .Select(name => new InlineSegment
+            //    {
+            //        Text = name,
+            //        TextColor = TooltipColors.Normal
+
+            //    })
+            //    .ToList();
 
             // Build always-append segments (unknown)
             var end = new List<InlineSegment>();

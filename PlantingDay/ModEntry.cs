@@ -20,7 +20,6 @@ namespace PlantingDay
     public class ModEntry : Mod
     {
         public static ModEntry Instance { get; private set; } = null!;
-        public static ICustomBushApi? CustomBushApi { get; private set; }
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
 
@@ -49,7 +48,7 @@ namespace PlantingDay
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            InitializeAll();
+            Initializer.InitializeAll(ModHelper);
 
         
 
@@ -105,7 +104,7 @@ namespace PlantingDay
             PlantInfoBuilder.Reset();
             HarvestInfoBuilder.Reset();
 
-            InitializeAll();
+            Initializer.InitializeAll(ModHelper);
 
 
 
@@ -149,34 +148,6 @@ namespace PlantingDay
 
         }
 
-        private static void InitializeAll()
-        {
-            TooltipIcons.Initialize();
-            MonsterDropLoader.Initialize();
-            PlantInfoBuilder.Initialize();
-            HarvestInfoBuilder.Initialize();
-
-
-            foreach (var plant in PlantInfoBuilder.AllPlants)
-            {
-                // seed, trade currency icons
-                PlantIconInitializer.InitializeIcons(plant);
-
-            }
-            foreach (var harvest in HarvestInfoBuilder.AllHarvests)
-            {
-                IconInitializers.HarvestIcons(harvest);
-            }
-
-            CacheForTesting.DumpPlantInfoToJson();
-
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] Plant Database Initialized",
-                LogLevel.Alert);
-
-
-
-
-        }
 
 
     }

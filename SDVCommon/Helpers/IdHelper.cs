@@ -35,8 +35,20 @@ namespace SDVCommon.Helpers
 
             // Vanilla IDs → return numeric form
                 return new string(id.Where(char.IsDigit).ToArray());
-            ;
+            
         }
+
+        public static string ToQualifiedId(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return id;
+
+            if (id.StartsWith("(O)"))
+                return id;
+
+            return "(O)" + id;
+        }
+
 
 
         //---------------

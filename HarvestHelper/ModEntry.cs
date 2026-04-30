@@ -15,6 +15,7 @@ using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
 using StardewValley.Menus;
 using HarmonyLib;
+using StardewValley.SpecialOrders.Objectives;
 
 
 
@@ -97,9 +98,14 @@ namespace HarvestHelper
             if (!Context.IsWorldReady)
                 return;
 
-            //Item? hovered = HoveredItem.GetFromInventory();
             Item? hovered = HoveredItem.GetFromAnyMenu();
+
+            //must be an object
             if (hovered is not StardewValley.Object obj)
+                return;
+
+            //skip recipes
+            if (obj.IsRecipe)
                 return;
 
 
@@ -154,6 +160,29 @@ namespace HarvestHelper
 
             //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
 
+            foreach (var pair in Game1.player.friendshipData.Pairs)
+            {
+                string npcName = pair.Key;
+                Friendship f = pair.Value;
+
+                NPC npc = Game1.getCharacterFromName(npcName, mustBeVillager: false);
+                if (npc == null)
+                {
+                    ModEntry.Instance.Monitor.Log($"[Friendship] {npcName}: NPC not found.", LogLevel.Warn);
+                    continue;
+                }
+
+                int maxHearts = GiftHelper.GetMaxHearts(npc);
+                int maxPoints = maxHearts * 250;
+
+                int currentPoints = f.Points;
+                int currentHearts = currentPoints / 250;
+
+                ModEntry.Instance.Monitor.Log(
+                    $"[Friendship] {npcName}: {currentHearts}/{maxHearts} hearts ({currentPoints}/{maxPoints} points)",
+                    LogLevel.Info
+                );
+            }
 
 
         }

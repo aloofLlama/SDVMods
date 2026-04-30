@@ -12,7 +12,6 @@ namespace SDVCommon
 
     public static class TooltipRenderer
     {
-
         public static void DrawTooltip(SpriteBatch b, List<TooltipElement> elements)
         {
             SpriteFont font = Game1.smallFont;
@@ -103,8 +102,20 @@ namespace SDVCommon
             //
             // Position tooltip
             //
-            int x = Game1.getMouseX() - width -32;  //dad have +32 it covered the sprite in shipping
-            int y = Game1.getMouseY() + 32;
+            int x, y;
+            bool isShippingMenu = Game1.activeClickableMenu is StardewValley.Menus.ShippingMenu;
+
+            if (isShippingMenu)
+            {
+                // Shipping menu cursor is shifted right → move tooltip left more
+                x = Game1.getMouseX() - width - 64;
+            }
+            else
+            {
+                x = Game1.getMouseX() - width - 32;
+            }
+
+            y = Game1.getMouseY() + 32;
 
             if (x < 0)
                 x = 0;

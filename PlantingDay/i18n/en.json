@@ -32,7 +32,7 @@
 	"tooltip.basic_price": "{0}g",
 
 	//Misc
-	"tooltip.owned": "qty: {0}"
+	"tooltip.owned": "x{0}"
 
 
 

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Netcode;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
 
 namespace SDVCommon.Helpers
 {
@@ -11,13 +12,15 @@ namespace SDVCommon.Helpers
     {
         public static readonly Color Normal = Color.Black;
         public static readonly Color Deemphasize = Color.DarkSlateGray;
-        public static readonly Color Muted = Color.Gray;
+        public static readonly Color Muted = Color.DimGray;
         public static readonly Color Warning = Color.DarkRed;
-        public static readonly Color Trellis = Color.Orange;
+        public static readonly Color Perfection = Color.MediumPurple; //TODO replace hardcoded with this
         public static readonly Color Separator = new(188,148,60);
 
         //Plant
         public static readonly Color Paddy = Color.CornflowerBlue;
+        public static readonly Color Trellis = Color.Orange;
+
 
 
         //seasons
