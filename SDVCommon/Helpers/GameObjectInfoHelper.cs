@@ -1,8 +1,9 @@
-﻿using SDVData;
-using StardewValley;
-using StardewValley.GameData.Objects;
-using StardewValley.GameData.Crops;
+﻿using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
+using SDVData;
+using StardewValley;
+using StardewValley.GameData.Crops;
+using StardewValley.GameData.Objects;
 
 
 namespace SDVCommon.GameData
@@ -57,7 +58,24 @@ namespace SDVCommon.GameData
                 if (fruit != null && !string.IsNullOrEmpty(fruit.ItemId))
                     _harvestToSeed[fruit.ItemId] = saplingId;
             }
-        }
+
+            //TODO CUSTOM BUSH
+            // Custom Bushes
+            //var api = CustomBushCompat.Api;
+            //if (api != null)
+            //{
+            //    foreach (string bushId in api.GetAllBushIds())
+            //    {
+            //        // bushId is the SEED ID
+            //        if (api.TryGetDrops(bushId, out var drops) && drops.Count > 0)
+            //        {
+            //            string harvestId = drops[0].ItemId; // HARVEST ID
+            //            _harvestToSeed[harvestId] = bushId;
+            //        }
+            //    }
+            //}
+        //}
+    }
 
 
 

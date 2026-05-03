@@ -29,6 +29,7 @@ namespace PlantingDay
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
+            SDVCommonLog.Initialize(this.Monitor);
 
 
             //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
@@ -105,7 +106,6 @@ namespace PlantingDay
             HarvestInfoBuilder.Reset();
 
             Initializer.InitializeAll(ModHelper);
-
 
 
 

@@ -29,6 +29,7 @@ namespace PlantingDay.Helpers.SeedSource
                 "Festival_EggFestival_Pierre" => "Egg Festival",
                 "Festival_StardewValleyFair_StarTokens" => "Valley Fair",
                 "Festival_FlowerDance_Pierre" => "Flower Dance",
+                "Festival_FestivalOfIce_TravelingMerchant" => "Festival of Ice",
 
 
                 // Remove Desert Festival header

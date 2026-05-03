@@ -91,8 +91,8 @@ namespace SDVData_Tests.Helpers
                         vendorId != "skellady.SBVCP_JumanaShop" &&
                         vendorId != "AnimalShop" &&
                         vendorId != "Traveler" &&
-                        //vendorId == "FlashShifter.StardewValleyExpandedCP_ZoeyVendor"
-                        vendorId == "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor"
+                        vendorId != "FlashShifter.StardewValleyExpandedCP_ZoeyVendor" &&
+                        vendorId != "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor"
                         //
                         //!seedId.Contains("slimerrain.uncleirohapprovedtea", StringComparison.OrdinalIgnoreCase) &&
                         //!seedId.Contains("slimerrain.grainsoverhullcp", StringComparison.OrdinalIgnoreCase) &&

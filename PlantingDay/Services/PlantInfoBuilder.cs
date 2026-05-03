@@ -196,18 +196,11 @@ namespace PlantingDay.Services
 
             foreach (var (qualifiedId, objData) in Game1.objectData)
             {
-                // Log raw objectData key
-                ModEntry.Instance.Monitor.Log($"ONE {qualifiedId}", LogLevel.Alert);
-
                 // Convert to CustomBush key: add (O) if missing
                 string cbKey = IdHelper.ToQualifiedId(qualifiedId);
 
-                // Try to get drops using the qualified ID
                 if (!api.TryGetDrops(cbKey, out var drops) || drops.Count == 0)
                     continue;
-
-                // If we get here, Custom Bush recognized the bush
-                ModEntry.Instance.Monitor.Log($"TWO {cbKey}", LogLevel.Alert);
 
                 string harvestId = drops[0].ItemId;
 
@@ -217,7 +210,7 @@ namespace PlantingDay.Services
                     HarvestId = harvestId,
                     PlantType = PlantType.Bush,
                     Seed = GameObjectInfoHelper.FromObject(qualifiedId),
-                    Seasons = new() { SeasonId.Spring, SeasonId.Summer, SeasonId.Fall },
+                    //Seasons = new() { SeasonId.Spring, SeasonId.Summer, SeasonId.Fall },
                     DaysToProduce = 20,
                     RegrowDays = 1
                 };
