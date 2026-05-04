@@ -1,11 +1,10 @@
-﻿using SDVCommon.Models.Runtime;
-using SDVCommon.Services;
-using StardewValley;
+﻿using StardewValley;
 using HarmonyLib;
 using StardewModdingAPI;
+using GiftDiscovery.Models;
+using GiftDiscovery.Services;
 
-
-namespace HarvestHelper.Compatibility
+namespace GiftDiscovery.Compatibility
 {
 
     public static class GiftPatch
@@ -30,12 +29,12 @@ namespace HarvestHelper.Compatibility
             GiftTaste taste = (GiftTaste)tasteValue;
 
             ModEntry.Instance.Monitor.Log(
-                $"[GIFTHH] Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
-                LogLevel.Info
+                $"[GIFTDISCOVERY] Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
+                LogLevel.Alert
                 );
 
 
-            GiftKnowledgeServiceOLD.LearnTaste(itemId, npcName, taste);
+            GiftKnowledgeService.LearnTaste(itemId, npcName, taste);
         }
     }
 }

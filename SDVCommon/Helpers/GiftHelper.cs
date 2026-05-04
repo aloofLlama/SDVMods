@@ -5,7 +5,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Characters;
 
-public static class GiftHelper
+public static class GiftHelperOLD
 {
     public static IEnumerable<NPC> GetLovedBy(Item item)
     {
@@ -45,7 +45,7 @@ public static class GiftHelper
 
         return GetLovedBy(item)
             .Where(npc =>
-                GiftKnowledgeService.TryGetKnownTaste(itemId, npc.Name, out var taste)
+                GiftKnowledgeServiceOLD.TryGetKnownTaste(itemId, npc.Name, out var taste)
                 && taste == GiftTaste.Love)
             .OrderBy(npc => npc.displayName); // alphabetical
     }
@@ -56,7 +56,7 @@ public static class GiftHelper
 
         foreach (var npc in GetLovedBy(item))
         {
-            if (!GiftKnowledgeService.TryGetKnownTaste(itemId, npc.Name, out var taste)
+            if (!GiftKnowledgeServiceOLD.TryGetKnownTaste(itemId, npc.Name, out var taste)
                 || taste != GiftTaste.Love)
                 yield return npc;
         }

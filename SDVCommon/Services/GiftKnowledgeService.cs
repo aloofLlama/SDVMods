@@ -7,17 +7,17 @@ using StardewValley;
 
 namespace SDVCommon.Services
 {
-    public static class GiftKnowledgeService
+    public static class GiftKnowledgeServiceOLD
     {
         private const string DataKey = "GiftKnowledge";
-        private static GiftKnowledgeData _data = null!;
+        private static GiftKnowledgeDataOLD _data = null!;
         private static IModHelper _helper = null!;
 
         public static void Initialize(IModHelper helper)
         {
             _helper = helper;
-            _data = helper.Data.ReadGlobalData<GiftKnowledgeData>(DataKey)
-                    ?? new GiftKnowledgeData();
+            _data = helper.Data.ReadGlobalData<GiftKnowledgeDataOLD>(DataKey)
+                    ?? new GiftKnowledgeDataOLD();
         }
 
         public static void Save()

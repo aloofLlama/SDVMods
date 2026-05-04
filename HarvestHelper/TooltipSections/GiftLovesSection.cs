@@ -17,18 +17,18 @@ namespace HarvestHelper.TooltipSections
             var list = new List<TooltipElement>();
 
             // Build sorted collapsible segments (known)
-            var collapsible = GiftHelper.GetKnownLovedBy(obj)
+            var collapsible = GiftHelperOLD.GetKnownLovedBy(obj)
                 .Select(npc => new
                 {
                     Npc = npc,
-                    Maxed = GiftHelper.IsMaxHearts(npc)
+                    Maxed = GiftHelperOLD.IsMaxHearts(npc)
                 })
                 .OrderBy(x => x.Maxed)                 // non‑maxed first
                 .ThenBy(x => x.Npc.displayName)        // alphabetical
                 .Select(x => new InlineSegment
                 {
                     Text = x.Npc.displayName,
-                    TextColor = x.Maxed ? TooltipColors.Normal : Color.MediumPurple
+                    TextColor = x.Maxed ? TooltipColors.Normal : TooltipColors.Perfection
                 })
                 .ToList();
 
@@ -37,7 +37,7 @@ namespace HarvestHelper.TooltipSections
             //    .Select(npc => npc.displayName)
             //    .ToList();
 
-            var unknown = GiftHelper.GetUnknownLovedBy(obj).Count();
+            var unknown = GiftHelperOLD.GetUnknownLovedBy(obj).Count();
 
             //// Build collapsible segments (known)
             //var collapsible = GiftHelper.GetKnownLovedBy(obj)

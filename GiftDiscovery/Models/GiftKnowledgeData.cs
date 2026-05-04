@@ -1,6 +1,6 @@
-﻿namespace SDVCommon.Models.Data
+﻿namespace GiftDiscovery.Models
 {
-    public class GiftKnowledgeDataOLD
+    public class GiftKnowledgeData
     {
         // ItemId → NPCName → GiftTaste
         public Dictionary<string, Dictionary<string, string>> KnownTastes { get; set; }

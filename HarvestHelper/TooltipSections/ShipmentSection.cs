@@ -42,7 +42,7 @@ namespace HarvestHelper.TooltipSections
                 {
                 new InlineSegment { 
                      Text = text,
-                     TextColor = Color.MediumPurple
+                     TextColor = TooltipColors.Perfection
                      }
                 }
             );

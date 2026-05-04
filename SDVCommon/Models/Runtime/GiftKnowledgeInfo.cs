@@ -4,12 +4,12 @@ using System.Text;
 
 namespace SDVCommon.Models.Runtime
 {
-    public class GiftKnowledgeInfo
+    public class GiftKnowledgeInfoOLD
     {
         public string ItemId { get; }
         public Dictionary<string, string> KnownTastes { get; }
 
-        public GiftKnowledgeInfo(string itemId, Dictionary<string, string>? known)
+        public GiftKnowledgeInfoOLD(string itemId, Dictionary<string, string>? known)
         {
             ItemId = itemId;
             KnownTastes = known ?? new Dictionary<string, string>();

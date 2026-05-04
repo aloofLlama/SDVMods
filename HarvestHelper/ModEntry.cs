@@ -47,7 +47,7 @@ namespace HarvestHelper
             //helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
 
             // Initialize shared gift knowledge
-            GiftKnowledgeService.Initialize(helper);
+            GiftKnowledgeServiceOLD.Initialize(helper);
 
             // Harmony patch for perfect gift detection
             var harmony = new Harmony(ModManifest.UniqueID);
@@ -132,7 +132,7 @@ namespace HarvestHelper
 
             var elements = TooltipBuilder.BuildTooltip(harvest, obj);
 
-            TooltipRenderer.DrawTooltip(e.SpriteBatch, elements);
+            TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
 
         }
 
@@ -160,29 +160,29 @@ namespace HarvestHelper
 
             //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
 
-            foreach (var pair in Game1.player.friendshipData.Pairs)
-            {
-                string npcName = pair.Key;
-                Friendship f = pair.Value;
+            //foreach (var pair in Game1.player.friendshipData.Pairs)
+            //{
+            //    string npcName = pair.Key;
+            //    Friendship f = pair.Value;
 
-                NPC npc = Game1.getCharacterFromName(npcName, mustBeVillager: false);
-                if (npc == null)
-                {
-                    ModEntry.Instance.Monitor.Log($"[Friendship] {npcName}: NPC not found.", LogLevel.Warn);
-                    continue;
-                }
+            //    NPC npc = Game1.getCharacterFromName(npcName, mustBeVillager: false);
+            //    if (npc == null)
+            //    {
+            //        ModEntry.Instance.Monitor.Log($"[Friendship] {npcName}: NPC not found.", LogLevel.Warn);
+            //        continue;
+            //    }
 
-                int maxHearts = GiftHelper.GetMaxHearts(npc);
-                int maxPoints = maxHearts * 250;
+            //    int maxHearts = GiftHelperOLD.GetMaxHearts(npc);
+            //    int maxPoints = maxHearts * 250;
 
-                int currentPoints = f.Points;
-                int currentHearts = currentPoints / 250;
+            //    int currentPoints = f.Points;
+            //    int currentHearts = currentPoints / 250;
 
-                ModEntry.Instance.Monitor.Log(
-                    $"[Friendship] {npcName}: {currentHearts}/{maxHearts} hearts ({currentPoints}/{maxPoints} points)",
-                    LogLevel.Info
-                );
-            }
+            //    ModEntry.Instance.Monitor.Log(
+            //        $"[Friendship] {npcName}: {currentHearts}/{maxHearts} hearts ({currentPoints}/{maxPoints} points)",
+            //        LogLevel.Info
+            //    );
+            //}
 
 
         }

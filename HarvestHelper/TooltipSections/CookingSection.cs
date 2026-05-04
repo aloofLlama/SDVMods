@@ -36,7 +36,7 @@ namespace HarvestHelper.TooltipSections
                     new InlineSegment
                     {
                         Text = $"{cooked}/{total}",
-                        TextColor = Color.MediumPurple
+                        TextColor = TooltipColors.Perfection
                     }
                 };
             }

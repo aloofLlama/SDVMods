@@ -186,42 +186,46 @@ namespace SDVCommon.Helpers
                     });
                 }
 
-                // unknowns
                 unified.AddRange(endSegments);
             }
 
-            return WrapWithCommas(unified, wrapSize, maxRows);
+            return WrapWithCommas(unified, wrapSize, maxRows, S);
         }
 
         private static List<InlineSegment> WrapWithCommas(
             List<InlineSegment> segments,
             int wrapSize,
-            int maxRows)
+            int maxRows,
+            int startCount)
         {
             var result = new List<InlineSegment>();
 
-            int index = 0;
+            int globalIndex = 0;
             int row = 0;
 
-            while (index < segments.Count && row < maxRows)
+            while (globalIndex < segments.Count && row < maxRows)
             {
                 if (row > 0)
                     result.Add(new InlineSegment { IsLineBreak = true });
 
                 int itemsThisRow = 0;
 
-                while (index < segments.Count && itemsThisRow < wrapSize)
+                while (globalIndex < segments.Count && itemsThisRow < wrapSize)
                 {
-                    result.Add(segments[index]);
-                    itemsThisRow++;
-                    index++;
+                    var seg = segments[globalIndex];
+                    result.Add(seg);
 
-                    if (itemsThisRow < wrapSize && index < segments.Count)
+                    bool isStart = (globalIndex < startCount);
+
+                    itemsThisRow++;
+                    globalIndex++;
+
+                    if (!isStart && itemsThisRow < wrapSize && globalIndex < segments.Count)
                     {
                         result.Add(new InlineSegment
                         {
                             Text = ", ",
-                            TextColor = result.Last().TextColor   // ← match previous segment
+                            TextColor = seg.TextColor
                         });
                     }
                 }

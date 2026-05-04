@@ -14,7 +14,7 @@ namespace SDVCommon.Helpers
         public static readonly Color Deemphasize = Color.DarkSlateGray;
         public static readonly Color Muted = Color.DimGray;
         public static readonly Color Warning = Color.DarkRed;
-        public static readonly Color Perfection = Color.MediumPurple; //TODO replace hardcoded with this
+        public static readonly Color Perfection = new(133, 81, 255); //purple
         public static readonly Color Separator = new(188,148,60);
 
         //Plant

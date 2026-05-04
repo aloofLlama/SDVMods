@@ -12,6 +12,8 @@ public class TooltipElement
     public string? Text { get; set; }
     public Color TextColor { get; set; } = TooltipColors.Normal;
     public bool Bold { get; set; }
+    public bool Underline { get; set; }
+
 
     // Icon (optional)
     public Texture2D? IconTexture { get; set; }   // dynamic item icons
@@ -36,6 +38,7 @@ public class InlineSegment
     public string Text { get; set; } = "";
     public Color TextColor { get; set; } = TooltipColors.Normal;
     public bool Bold { get; set; }
+    public bool Underline { get; set; }
     public bool IsLineBreak { get; set; }
 }
 

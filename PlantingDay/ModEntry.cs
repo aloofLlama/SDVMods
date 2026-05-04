@@ -88,7 +88,7 @@ namespace PlantingDay
 
             var elements = TooltipBuilder.BuildTooltip(plant);
 
-            TooltipRenderer.DrawTooltip(e.SpriteBatch, elements);
+            TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
 
         }
 

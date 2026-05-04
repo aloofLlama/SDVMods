@@ -12,15 +12,51 @@ namespace SDVCommon
 
     public static class TooltipRenderer
     {
-        public static void DrawTooltip(SpriteBatch b, List<TooltipElement> elements)
+
+        public static void DrawLeftOfCursor(SpriteBatch b, List<TooltipElement> elements)
         {
             SpriteFont font = Game1.smallFont;
+            TooltipStyle style = TooltipStyle.Default;
 
-            const int IconRenderSize = 32;  
-            const int IconColumnWidth = 34;
-            const int separatorPadding = 12;
-            const int inlineIconWidthPadding = 6;
+            var (width, height) = MeasureTooltip(elements, font, style);
+            var (x, y) = PositionLeftOfCursor(width, height);
+            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+        }
 
+
+        public static void DrawBottomLeft(SpriteBatch b, List<TooltipElement> elements)
+        {
+            SpriteFont font = Game1.smallFont;
+            TooltipStyle style = TooltipStyle.Default;
+
+            var (width, height) = MeasureTooltip(elements, font, style);
+            var (x, y) = PositionBottomLeft(width, height);
+            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+        }
+
+        public struct TooltipStyle
+        {
+            public int IconRenderSize;
+            public int IconColumnWidth;
+            public int SeparatorPadding;
+            public int InlineIconWidthPadding;
+
+            public static TooltipStyle Default => new TooltipStyle
+            {
+                IconRenderSize = 32,
+                IconColumnWidth = 34,
+                SeparatorPadding = 12,
+                InlineIconWidthPadding = 6
+            };
+        }
+
+
+
+        private static (int width, int height) MeasureTooltip(
+            List<TooltipElement> elements,
+            SpriteFont font,
+            TooltipStyle style)
+        { 
             int width = 0;
             int height = 0;
             int maxIconColumnWidth = 0;
@@ -34,15 +70,15 @@ namespace SDVCommon
 
                 if (el.IsSeparator)
                 {
-                    height += el.PaddingTop + separatorPadding + el.PaddingBottom;
+                    height += el.PaddingTop + style.SeparatorPadding + el.PaddingBottom;
                     continue;
                 }
 
                 if (el.IconTexture != null || el.Icon.HasValue)
                 {
-                    int iconSize = IconRenderSize;
+                    int iconSize = style.IconRenderSize;
                     lineHeight = Math.Max(lineHeight, iconSize + 2);
-                    maxIconColumnWidth = Math.Max(maxIconColumnWidth, IconColumnWidth);
+                    maxIconColumnWidth = Math.Max(maxIconColumnWidth, style.IconColumnWidth);
                 }
 
                 int lineCount = 1;
@@ -79,7 +115,7 @@ namespace SDVCommon
                         }
 
                         if (seg.Icon.HasValue)
-                            currentLineWidth += font.LineSpacing + inlineIconWidthPadding;
+                            currentLineWidth += font.LineSpacing + style.InlineIconWidthPadding;
 
                         if (!string.IsNullOrEmpty(seg.Text))
                             currentLineWidth += (int)font.MeasureString(seg.Text).X;
@@ -99,11 +135,15 @@ namespace SDVCommon
             width += 32;
             height += 32;
 
-            //
-            // Position tooltip
-            //
-            int x, y;
-            bool isShippingMenu = Game1.activeClickableMenu is StardewValley.Menus.ShippingMenu;
+            return (width, height);
+        }
+
+        private static (int x, int y) PositionLeftOfCursor(int width, int height)
+        {
+            int x = Game1.getMouseX() - width - 32;
+            int y = Game1.getMouseY() + 32;
+
+            bool isShippingMenu = Game1.activeClickableMenu is ShippingMenu;
 
             if (isShippingMenu)
             {
@@ -123,9 +163,28 @@ namespace SDVCommon
             if (y + height > Game1.uiViewport.Height)
                 y = Game1.uiViewport.Height - height;
 
-            //
+            return (x, y);
+        }
+
+        private static (int x, int y) PositionBottomLeft(int width, int height)
+        {
+            int x = 32;
+            int y = Game1.uiViewport.Height - height - 32;
+            return (x, y);
+        }
+
+        private static void DrawTooltipAt(
+            SpriteBatch b,
+            List<TooltipElement> elements,
+            SpriteFont font,
+            TooltipStyle style,
+            int x,
+            int y,
+            int width,
+            int height)
+        {
+
             // Draw background
-            //
             IClickableMenu.drawTextureBox(b, x, y, width, height, Color.White);
 
             //
@@ -142,7 +201,7 @@ namespace SDVCommon
 
                 if (el.IconTexture != null || el.Icon.HasValue)
                 {
-                    int iconSize = IconRenderSize;
+                    int iconSize = style.IconRenderSize;
                     lineHeight = Math.Max(lineHeight, iconSize + 2);
                 }
 
@@ -151,7 +210,7 @@ namespace SDVCommon
                 //
                 if (el.IsSeparator)
                 {
-                    int lineY = drawY + separatorPadding /2;
+                    int lineY = drawY + style.SeparatorPadding / 2;
 
                     b.Draw(
                         Game1.staminaRect,
@@ -159,7 +218,7 @@ namespace SDVCommon
                         new Color(255, 170, 110)
                     );
 
-                    drawY += separatorPadding;
+                    drawY += style.SeparatorPadding;
                     continue;
                 }
 
@@ -168,10 +227,10 @@ namespace SDVCommon
                 //
                 if (el.IconTexture != null)
                 {
-                    int iconSize = IconRenderSize;
+                    int iconSize = style.IconRenderSize;
 
                     int yOffset = drawY + (lineHeight - iconSize) / 2;
-                    int xOffset = drawX + (IconColumnWidth - iconSize) / 2;
+                    int xOffset = drawX + (style.IconColumnWidth - iconSize) / 2;
 
                     b.Draw(
                         el.IconTexture,
@@ -179,7 +238,7 @@ namespace SDVCommon
                         Color.White
                     );
 
-                    drawX += IconColumnWidth;
+                    drawX += style.IconColumnWidth;
                 }
                 else if (el.Icon.HasValue)
                 {
@@ -190,13 +249,13 @@ namespace SDVCommon
                         icon.Texture,
                         icon.Source,
                         icon.Scale,
-                        IconColumnWidth,
+                        style.IconColumnWidth,
                         drawX,
                         drawY,
                         lineHeight
                     );
 
-                    drawX += IconColumnWidth;
+                    drawX += style.IconColumnWidth;
                 }
 
                 //
@@ -208,7 +267,7 @@ namespace SDVCommon
 
                     foreach (var seg in el.InlineSegments)
                     {
-                        // NEW: handle explicit line breaks
+                        // handle explicit line breaks
                         if (seg.IsLineBreak)
                         {
                             // Move to next line
@@ -235,7 +294,7 @@ namespace SDVCommon
                                 lineHeight
                             );
 
-                            xCursor += lineHeight + inlineIconWidthPadding;
+                            xCursor += lineHeight + style.InlineIconWidthPadding;
                         }
 
                         if (!string.IsNullOrEmpty(seg.Text))
@@ -249,8 +308,29 @@ namespace SDVCommon
                             {
                                 b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.TextColor);
                             }
+                            var size = font.MeasureString(seg.Text);
 
-                            xCursor += (int)font.MeasureString(seg.Text).X;
+
+                            if (seg.Underline)
+                            {
+
+                                int thickness = 2;
+                                float underlineY = drawY + size.Y - 6;
+
+                                b.Draw(
+                                    Game1.staminaRect,
+                                    new Rectangle(
+                                        xCursor,              
+                                        (int)underlineY,
+                                        (int)size.X,
+                                        thickness
+                                    ),
+                                    seg.TextColor
+                                );
+                            }
+
+
+                            xCursor += (int)size.X;
                         }
                     }
 
@@ -272,11 +352,35 @@ namespace SDVCommon
                     {
                         b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
                     }
-                }
 
-                drawY += lineHeight + el.PaddingBottom;
+                    if (el.Underline)
+                    {
+                        var size = font.MeasureString(el.Text);
+
+                        // underline thickness
+                        int thickness = 2;
+
+                        // underline Y position
+                        float underlineY = drawY + size.Y - 6;
+
+                        b.Draw(
+                            Game1.staminaRect,
+                            new Rectangle(
+                                drawX,
+                                (int)underlineY,
+                                (int)size.X,
+                                thickness
+                            ),
+                            el.TextColor
+                        );
+                    }
+
+                    drawY += lineHeight + el.PaddingBottom;
+                }
             }
         }
+
+
 
 
 
