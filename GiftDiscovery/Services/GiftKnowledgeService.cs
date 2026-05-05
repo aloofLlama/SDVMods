@@ -44,6 +44,8 @@ namespace GiftDiscovery.Services
 
         }
 
+        public static int GiftVersion = 0; //used for cache update
+
         // ⭐ Accept enum
         public static void LearnTaste(string itemId, string npcName, GiftTaste taste)
         {
@@ -64,6 +66,8 @@ namespace GiftDiscovery.Services
             npcDict[npcName] = taste.ToString();
 
             Save(); //saves both global and local data
+            GiftVersion++;
+
         }
 
         // ⭐ Return enum instead of string

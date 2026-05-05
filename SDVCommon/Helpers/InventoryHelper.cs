@@ -14,7 +14,7 @@ namespace SDVCommon.Helpers
         public static int CountOwned(string canonicalId)
         {
             int total = 0;
-            HashSet<Item> seen = new(); // Option B: default reference equality
+            HashSet<Item> seen = new();
 
             // 1. Inventory
             ScanItem(Game1.player, Game1.player.Items, canonicalId, ref total, seen);
@@ -57,7 +57,7 @@ namespace SDVCommon.Helpers
                 }
             }
 
-            // 3. Hay (optional)
+            // 3. Hay
             if (canonicalId == "178")
             {
                 int hayCount = Game1.getFarm()?.piecesOfHay.Value ?? 0;
@@ -66,6 +66,31 @@ namespace SDVCommon.Helpers
 
             return total;
         }
+
+        public static int CountOwnedInMainFarmhouseFridges(string canonicalId)
+        {
+            int total = 0;
+            HashSet<Item> seen = new(); // reference equality
+
+            // Get the MAIN farmhouse (not island, not modded)
+            var farmhouse = Game1.getLocationFromName("FarmHouse") as FarmHouse;
+            if (farmhouse == null)
+                return 0;
+
+            // 1. Main farmhouse built‑in fridge
+            if (farmhouse.fridge?.Value is Chest mainFridge)
+                ScanItem(farmhouse, mainFridge, canonicalId, ref total, seen);
+
+            // 2. Mini‑fridges placed INSIDE the main farmhouse
+            foreach (var obj in farmhouse.objects.Values)
+            {
+                if (obj is Chest chest && chest.fridge.Value)
+                    ScanItem(farmhouse, chest, canonicalId, ref total, seen);
+            }
+
+            return total;
+        }
+
 
         private static void ScanItem(object parent, IEnumerable<Item> roots, string canonicalId, ref int total, HashSet<Item> seen)
         {

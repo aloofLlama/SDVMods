@@ -10,6 +10,7 @@ using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Crops;
 using StardewValley.GameData.FruitTrees;
+using StardewValley.GameData.Shops;
 
 
 namespace PlantingDay.Services
@@ -76,7 +77,7 @@ namespace PlantingDay.Services
         {
             foreach (var (seedId, cropData) in Game1.cropData)
             {
-                // Build raw data object
+
                 var data = new PlantInfoData
                 {
                     SeedId = seedId,
@@ -96,24 +97,12 @@ namespace PlantingDay.Services
                     MultiSprite = cropData.TintColors?.Count ?? 0,
                     NeedsWatering = cropData.NeedsWatering,
                     NeedsScythe = cropData.HarvestMethod == HarvestMethod.Scythe,
+                    Location = GetLocation(cropData),
 
                     Seed = GameObjectInfoHelper.FromObject(seedId),
                 };
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(seedId);
                 data.MonsterDrops = MonsterDropLoader.GetDropsForItem(seedId);
-
-                //// Apply Monster Drop Overrides
-                //if (SeedOverrides.MonsterDrops.TryGetValue(seedId, out var overrideList))
-                //{
-                //    data.MonsterDrops = overrideList
-                //        .Select(m => new MonsterDropInfoData
-                //        {
-                //            MonsterName = m.Monster,
-                //            DropChance = (float)m.Chance
-                //        })
-                //        .ToList();
-                //}
-
 
                 var plant = new PlantInfo(data);
                 _plants[data.SeedId] = plant;
@@ -130,16 +119,11 @@ namespace PlantingDay.Services
                 // Fruit tree always has exactly one fruit entry
                 var fruitEntry = fruitTreeData.Fruit.FirstOrDefault();
 
-                string fruitId = fruitEntry?.ItemId ?? "";
+                //string fruitId = fruitEntry?.ItemId ?? "";
+                string fruitId = IdHelper.CanonicalItemId(fruitEntry?.ItemId);
+
 
                 var harvestInfo = GameObjectInfoHelper.FromObject(fruitId);
-
-                // Patch for Uncle Iroh Approved Tea which mismatches the (O) prefix
-                if (harvestInfo == null && fruitId.StartsWith("(O)"))
-                {
-                    string cleanId = fruitId[3..]; // remove "(O)"
-                    harvestInfo = GameObjectInfoHelper.FromObject(cleanId);
-                }
 
                 var data = new PlantInfoData
                 {
@@ -164,20 +148,6 @@ namespace PlantingDay.Services
                 };
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(saplingId);
                 data.MonsterDrops = MonsterDropLoader.GetDropsForItem(saplingId);
-
-                //// Apply Monster Drop Overrides
-                //if (SeedOverrides.MonsterDrops.TryGetValue(saplingId, out var overrideList))
-                //{
-                //    data.MonsterDrops = overrideList
-                //        .Select(m => new MonsterDropInfoData
-                //        {
-                //            MonsterName = m.Monster,
-                //            DropChance = (float)m.Chance
-                //        })
-                //        .ToList();
-                //}
-
-
 
                 var plant = new PlantInfo(data);
                 _plants[data.SeedId] = plant;
@@ -246,10 +216,37 @@ namespace PlantingDay.Services
         //return null;
         //          }
 
+        private static Location GetLocation(CropData cropData)
+        {
+            // Default
+            var result = Location.Unrestricted;
 
+            if (cropData.PlantableLocationRules != null)
+            {
+                foreach (var rule in cropData.PlantableLocationRules)
+                {
+                    if (rule.Id == "NotOutsideUnlessGingerIsland")
+                    {
+                        result = Location.Indoor;
+                        break;
+                    }
+
+                    if (rule.Id == "NoGardenPots")
+                    {
+                        result = Location.NoGardenPot;
+                        break;
+                    }
+                }
+            }
+
+            return result;
+        }
 
 
     }
+
+
+
 }
 
 

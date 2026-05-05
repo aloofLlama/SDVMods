@@ -19,7 +19,7 @@ namespace GiftDiscovery.Config
 
         // Extra options to highlight nearby NPCs
         public bool EmphasizeNearbyNPCs { get; set; } = true;
-        public int NearbyRangeTiles { get; set; } = 15; // or whatever default you want
+        public int NearbyRangeTiles { get; set; } = 15;
 
 
         public bool ShowLoves { get; set; } = true;

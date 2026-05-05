@@ -19,11 +19,11 @@ namespace SDVData_Tests
         }
 
         [Theory]
-        [InlineData("slimerrain.uncleirohapprovedteacp_Chamomile_Seeds", "SeedShop", 50)] //Chamomile_Seeds
+        [InlineData("slimerrain.uncleirohapprovedteacp_Chamomile_Seeds", "SeedShop", 100)] //Chamomile_Seeds
         [InlineData("slimerrain.uncleirohapprovedteacp_Chrysanthemum_Seeds", "SeedShop", 130)] //Chrysanthemum_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.uncleirohapprovedteacp_Goji_Berry_Seeds", "SeedShop", 160)] //Berry_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.uncleirohapprovedteacp_Lavender_Seeds", "SeedShop", 240)] //Lavender_Seeds *MANUALLY CORRECTED
-        [InlineData("slimerrain.uncleirohapprovedteacp_Lily_Bulb", "SeedShop", 120)] //Lily_Bulb
+        [InlineData("slimerrain.uncleirohapprovedteacp_Lily_Bulb", "SeedShop", 240)] //Lily_Bulb
         [InlineData("slimerrain.uncleirohapprovedteacp_Lotus_Seeds", "SeedShop", 180)] //Lotus_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.uncleirohapprovedteacp_Sugarcane_Seeds", "SeedShop", 350)] //Sugarcane_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.uncleirohapprovedteacp_Cassia_Sapling", "Sandy", 2400)] //Cassia_Sapling
@@ -59,7 +59,7 @@ namespace SDVData_Tests
         [Theory]
         [InlineData("slimerrain.grainsoverhullcp_Barley_Seeds", "SeedShop", 10)] //Barley_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.grainsoverhullcp_Buckwheat_Seeds", "SeedShop", 200)] //Buckwheat_Seeds *MANUALLY CORRECTED
-        [InlineData("slimerrain.grainsoverhullcp_Millet_Seeds", "SeedShop", 5)] //Millet_Seeds
+        [InlineData("slimerrain.grainsoverhullcp_Millet_Seeds", "SeedShop", 10)] //Millet_Seeds
         [InlineData("slimerrain.grainsoverhullcp_Oat_Seeds", "SeedShop", 16)] //Oat_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.grainsoverhullcp_Rye_Seeds", "SeedShop", 20)] //Rye_Seeds *MANUALLY CORRECTED
         [InlineData("slimerrain.grainsoverhullcp_Sorghum_Seeds", "SeedShop", 10)] //Sorghum_Seeds *MANUALLY CORRECTED
@@ -133,7 +133,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_RedOnionSeeds", "SeedShop", 80)] //RedOnionSeeds
         [InlineData("Cornucopia_ShallotSeeds", "SeedShop", 80)] //ShallotSeeds
         [InlineData("Cornucopia_SugarBeetSeeds", "SeedShop", 100)] //SugarBeetSeeds
-        [InlineData("Cornucopia_SweetPotatoSeeds", "SeedShop", 70)] //SweetPotatoSeeds
+        [InlineData("Cornucopia_SweetPotatoSeeds", "SeedShop", 90)] //SweetPotatoSeeds
         [InlineData("Cornucopia_WasabiRootSeeds", "SeedShop", 100)] //WasabiRootSeeds
         [InlineData("Cornucopia_ChivesSeeds", "SeedShop", 20)] //ChivesSeeds
         [InlineData("Cornucopia_CilantroSeeds", "SeedShop", 20)] //CilantroSeeds
@@ -182,7 +182,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_VioletSeeds", "SeedShop", 20)] //VioletSeeds
         [InlineData("Cornucopia_AvocadoSapling", "SeedShop", 8000)] //AvocadoSapling
         [InlineData("Cornucopia_CocoaPodSapling", "SeedShop", 5000)] //CocoaPodSapling
-        [InlineData("Cornucopia_PearSapling", "SeedShop", 5500)] //PearSapling
+        [InlineData("Cornucopia_PearSapling", "SeedShop", 3200)] //PearSapling
         [InlineData("Cornucopia_PistachioSapling", "SeedShop", 3748)] //PistachioSapling
         [InlineData("Cornucopia_AlmondSapling", "SeedShop", 3748)] //AlmondSapling
         [InlineData("Cornucopia_CashewSapling", "SeedShop", 4000)] //CashewSapling
@@ -192,7 +192,7 @@ namespace SDVData_Tests
         [InlineData("Cornucopia_LimeSapling", "SeedShop", 2000)] //LimeSapling
         [InlineData("Cornucopia_NectarineSapling", "SeedShop", 6000)] //NectarineSapling
         [InlineData("Cornucopia_PecanSapling", "SeedShop", 5000)] //PecanSapling
-        [InlineData("Cornucopia_PersimmonSapling", "SeedShop", 7000)] //PersimmonSapling
+        [InlineData("Cornucopia_PersimmonSapling", "SeedShop", 8000)] //PersimmonSapling
         [InlineData("Cornucopia_PomeloSapling", "SeedShop", 3400)] //PomeloSapling
         [InlineData("Cornucopia_UmeSapling", "SeedShop", 2000)] //UmeSapling
         [InlineData("Cornucopia_WalnutSapling", "SeedShop", 3748)] //WalnutSapling

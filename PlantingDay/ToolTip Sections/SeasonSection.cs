@@ -17,22 +17,42 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.Seasons.Count == 0)
                 return null;
 
+            // SPECIAL CASE: Indoor crops → show only one segment styled like current season
+            if (plant.Data.Location == Location.Indoor)
+            {
+                // Convert Game1.currentSeason ("spring") → SeasonId.Spring
+                SeasonId current = Enum.Parse<SeasonId>(Game1.currentSeason, true);
+
+                var (color, bold) = Style(current);
+
+                return new TooltipElement
+                {
+                    Text = ModEntry.ModHelper.Translation.Get(TooltipKeys.PlantIndoor),
+                    TextColor = color,
+                    Bold = bold
+                };
+            }
+
+            // NORMAL CASE: Seasonal crops
             var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
                 plant.Data.Seasons,
                 season =>
                 {
                     var (color, bold) = Style(season);
 
-                    return new[] { new InlineSegment
+                    return new[]
                     {
-                        Text = SeasonHelper.Translate(season),
-                        TextColor = color,
-                        Bold = bold }
+                        new InlineSegment
+                        {
+                            Text = SeasonHelper.Translate(season),
+                            TextColor = color,
+                            Bold = bold
+                        }
                     };
                 }
             );
-            return new TooltipElement { InlineSegments = segments };
 
+            return new TooltipElement { InlineSegments = segments };
         }
 
         public static (Color color, bool bold) Style(SeasonId season)

@@ -75,7 +75,6 @@ namespace PlantingDay
                 return;
 
 
-
             // Use the correct key format O:#### to see if the item is in the plant library
             string lookupKey = obj.ItemId;
 
@@ -83,7 +82,7 @@ namespace PlantingDay
 
             if (plant is null)
                 return;
-            //ModEntry.Instance.Monitor.Log($"Harvest ID for {plant.Data.Seed?.Name} = {plant.Data.Harvest?.Id}", LogLevel.Info);
+            //ModEntry.Instance.Monitor.Log($"{plant.Data.Seed?.Name} = {plant.Data.Location}", LogLevel.Info);
 
 
             var elements = TooltipBuilder.BuildTooltip(plant);

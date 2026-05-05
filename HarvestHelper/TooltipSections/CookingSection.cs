@@ -234,6 +234,20 @@ namespace HarvestHelper.TooltipSections
                 InlineSegments = segments
             });
 
+            // Add mini-fridge count line
+            int fridgeQty = InventoryHelper.CountOwnedInMainFarmhouseFridges(harvestId);
+
+            if (fridgeQty > 0)
+            {
+                list.Add(new TooltipElement
+                {
+                    Icon = TooltipIcons.Get(IconKey.MiniFridge),
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
+                    fridgeQty)
+                });
+            }
+
+
             return list;
         }
     }

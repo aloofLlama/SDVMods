@@ -26,6 +26,10 @@ namespace GiftDiscovery
         public static ModConfig ModConfig { get; internal set; } = null!;
 
         private bool _showTooltip = false;
+        //public static bool IsHudVisible { get; private set; }
+        //public static bool IsActiveMenuVisible { get; private set; }
+        public static int ToggleVersion = 0; //used for cache update
+
 
 
         public override void Entry(IModHelper helper)
@@ -39,9 +43,11 @@ namespace GiftDiscovery
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
-            //helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
+            helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
             helper.Events.Display.RenderedHud += OnRenderedHud;
             helper.Events.Input.ButtonPressed += OnButtonPressed;
+            helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
+
 
 
             GiftKnowledgeService.InitializeGlobal(helper);
@@ -66,6 +72,21 @@ namespace GiftDiscovery
             Initializer.InitializeAll(ModHelper);
         }
 
+        private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
+        {
+            //Show tooltip when toggled on, holding a giftable item that has loves and/or likes
+            //
+            if (!Context.IsWorldReady
+                || !_showTooltip)
+                return;
+
+            //must be an object
+            if (HoveredItem.GetFromAnyMenu() is not StardewValley.Object obj)
+                return;
+
+            TooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+
+        }
         private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
         {
             //Show tooltip when toggled on, holding a giftable item that has loves and/or likes
@@ -81,19 +102,7 @@ namespace GiftDiscovery
             if (Game1.player.CurrentItem is not StardewValley.Object obj)
                 return;
 
-            if (!obj.canBeGivenAsGift())
-                return;
-
-            if (!GiftHelper.GetKnownBy(obj, GiftTaste.Love, TasteSourceMode.All).Any() &&
-                !GiftHelper.GetKnownBy(obj, GiftTaste.Like, TasteSourceMode.All).Any())
-                return;
-
-
-            var elements = TooltipBuilder.BuildTooltip(obj);
-            if (elements is not { Count: > 0 })
-                return;
-
-            TooltipRenderer.DrawBottomLeft(e.SpriteBatch, elements);
+            TooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
         }
 
 
@@ -103,32 +112,66 @@ namespace GiftDiscovery
             if (e.Button == ModConfig.ToggleTooltipKey)
             {
                 _showTooltip = !_showTooltip;
+                ToggleVersion++; //used to refresh tooltip
             }
 
 
             // Reinitialize for debug
             if (e.Button == SButton.F5)
             {
+                LogAllNpcClassifications();
                 GiftKnowledgeService.InitializeGlobal(ModHelper);
                 Initializer.InitializeAll(ModHelper);
-
             }
+        }
 
-            var monitor = ModEntry.Instance.Monitor;
+        public static void LogAllNpcClassifications()
+        {
+            // Build classifications using YOUR classify function
+            var list = GiftHelper.GetAllGiftableNPCs()
+                .Select(npc => NpcGiftClassificationBuilder.Classify(npc))
+                .OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
 
-            monitor.Log("=== WHO CLASSIFY SAYS I CAN GIFT TODAY ===", LogLevel.Info);
-
-            foreach (var npc in GiftHelper.GetAllGiftableNPCs())
+            // Log each one
+            foreach (var c in list)
             {
-                var c = NpcGiftClassificationBuilder.Classify(npc);
+                var npc = c.Npc;
 
-                if (c.CanGiftToday)
-                {
-                    monitor.Log($"{c.Name} — CanGiftToday", LogLevel.Info);
-                }
+                string loc = npc?.currentLocation?.Name ?? "null";
+                string tile = npc != null ? npc.Tile.ToString() : "null";
+
+                int hearts = 0;
+                if (npc != null && Game1.player.friendshipData.TryGetValue(c.Name, out var f))
+                    hearts = f.Points;
+
+                ModEntry.Instance.Monitor.Log(
+                    $"[CLASSIFY] {c.Name} | Giftable={c.IsGiftable}, Available={c.IsAvailable}, " +
+                    $"Met={c.IsMet}, CanGiftToday={c.CanGiftToday}, MaxHeart={c.IsMaxHeart}, " +
+                    $"Hearts={hearts}, Loc={loc}, Tile={tile}",
+                    LogLevel.Info
+                );
             }
+        }
 
-            monitor.Log("=== END WHO CLASSIFY SAYS I CAN GIFT TODAY ===", LogLevel.Info);
+
+
+        public static bool MenuStateChanged { get; private set; }
+        private static bool _lastHudVisible;
+        private static bool _lastMenuVisible;
+
+        private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+        {
+            bool hud = Game1.displayHUD;
+            bool menu = Game1.activeClickableMenu != null;
+
+            MenuStateChanged = hud != _lastHudVisible || menu != _lastMenuVisible;
+
+            _lastHudVisible = hud;
+            _lastMenuVisible = menu;
+
+            //IsHudVisible = hud;
+            //IsActiveMenuVisible = menu;
         }
 
 

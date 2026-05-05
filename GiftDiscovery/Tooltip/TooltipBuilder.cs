@@ -3,19 +3,115 @@ using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using SDVCommon;
 using SDVCommon.Helpers;
+using SDVCommon.Models.Wrappers;
 using SDVCommon.Tooltip;
+using StardewModdingAPI;
 using StardewValley;
 using System.Reflection.Emit;
 
 
 public static class TooltipBuilder
 {
+    private static List<TooltipElement>? _cachedTooltip;
+    private static string? _cachedItemId;
+    private static int _cachedConfigHash;
+    private static HashSet<string> _cachedNearbyNpcSet = new();
+    private static bool _cachedMenuChanged;
+    private static int _cachedToggleVersion;
+    private static int _cachedGiftVersion;
+
+    public static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
+    {
+        if (!obj.canBeGivenAsGift())
+            return;
+
+        if (!GiftHelper.GetKnownBy(obj, GiftTaste.Love, TasteSourceMode.All).Any() &&
+            !GiftHelper.GetKnownBy(obj, GiftTaste.Like, TasteSourceMode.All).Any())
+            return;
+
+        var elements = GetTooltip(obj);
+
+        if (elements is null || elements.Count == 0)
+            return;
+
+        TooltipRenderer.DrawBottomLeft(b, elements);
+    }
+
+    public static List<TooltipElement>? GetTooltip(StardewValley.Object obj)
+    {
+        string itemId = obj.ItemId;
+        int configHash = ModEntry.ModConfig.GetHashCode();
+        bool menuChanged = ModEntry.MenuStateChanged;
+        int toggleVersion = ModEntry.ToggleVersion;
+        int giftVersion = GiftKnowledgeService.GiftVersion;
+
+        var nearbyNpcSet = DisplayHelper.GetNearbyNpcNames(ModEntry.ModConfig.NearbyRangeTiles);
+
+        bool needsRebuild =
+            _cachedTooltip == null ||
+            itemId != _cachedItemId ||
+            configHash != _cachedConfigHash ||
+            menuChanged != _cachedMenuChanged ||
+            !nearbyNpcSet.SetEquals(_cachedNearbyNpcSet) ||
+            toggleVersion != _cachedToggleVersion ||
+            giftVersion != _cachedGiftVersion;
+
+        if (!needsRebuild)
+            return _cachedTooltip;
+
+        bool itemChanged = itemId != _cachedItemId;
+        bool configChanged = configHash != _cachedConfigHash;
+        bool nearbyChanged = ModEntry.ModConfig.EmphasizeNearbyNPCs &&
+                             !nearbyNpcSet.SetEquals(_cachedNearbyNpcSet);
+
+        ModEntry.Instance.Monitor.Log(
+            $"[{DateTime.Now:HH:mm:ss}] | " +
+            $"item={itemChanged}, " +
+            //$"configChanged={configChanged}, " +
+            $"menu={menuChanged}, " +
+            $"nearby={nearbyChanged}, " +
+            $"itemId={itemId} " +
+            $"| {_cachedItemId ?? "null"}, " +
+            $"nearbyCount={nearbyNpcSet.Count} " +
+            $"toggle={toggleVersion}",
+            LogLevel.Info
+        );
+
+
+        // Rebuild
+        _cachedTooltip = BuildTooltip(obj);
+        _cachedItemId = itemId;
+        _cachedConfigHash = configHash;
+        _cachedMenuChanged = menuChanged;
+        _cachedNearbyNpcSet = nearbyNpcSet.ToHashSet();
+        _cachedToggleVersion = toggleVersion;
+        _cachedGiftVersion = giftVersion;
+
+        //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]Rebuilding tooltip)", LogLevel.Info);
+
+        return _cachedTooltip;
+    }
+
     public static List<TooltipElement> BuildTooltip(
         StardewValley.Object obj)
     {
         int wrapSize = 6;
         var list = new List<TooltipElement>();
+
+        //Icon and display name
+        var giftItem = HarvestInfoBuilder.LookupFromKey(obj.ItemId);
+
+        if (giftItem != null)
+        {
+            list.Add(new TooltipElement
+            {
+                Icon = giftItem.Runtime.HarvestIcon,
+                Text = obj.DisplayName
+            });
+        }
 
         var allGiftable = GiftHelper.GetAllGiftableNPCs()
             .Select(NpcGiftClassificationBuilder.Classify)

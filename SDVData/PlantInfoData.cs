@@ -1,5 +1,9 @@
 ﻿namespace SDVData
 {
+    public enum PlantType { Crop, FruitTree, Bush, Unknown }
+    public enum SeasonId { Spring, Summer, Fall, Winter }
+    public enum Location { Unrestricted, Indoor, NoGardenPot }
+
     public class PlantInfoData
     {
         public string SeedId { get; set; } = "";
@@ -16,16 +20,14 @@
         public int MultiSprite { get; set; }
         public bool NeedsWatering { get; set; }
         public bool NeedsScythe { get; set; }
+        public Location Location { get; set; }
 
-        //public int HarvestPrice { get; set; }
         public List<PurchaseInfoData> PurchaseOptions { get; set; } = new();
         public List<MonsterDropInfoData> MonsterDrops { get; set; } = new();
 
         public ItemInfo? Seed { get; set; } = new ItemInfo();
     }
 
-    public enum PlantType { Crop, FruitTree, Bush, Unknown }
-    public enum SeasonId { Spring, Summer, Fall, Winter }
 
 
 }

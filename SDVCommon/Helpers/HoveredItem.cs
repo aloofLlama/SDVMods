@@ -8,34 +8,6 @@ namespace SDVCommon.Helpers
 {
     internal class HoveredItem
     {
-        public static Item? GetFromInventory()
-        {
-            IClickableMenu menu = Game1.activeClickableMenu;
-            if (menu == null)
-                return null;
-
-            switch (menu)
-            {
-                // Inventory (GameMenu → InventoryPage)
-                case GameMenu gm:
-                    if (gm.currentTab != GameMenu.inventoryTab)
-                        return null;
-
-                    var invPage = gm.pages
-                        .OfType<InventoryPage>()
-                        .FirstOrDefault();
-
-                    return invPage?.hoveredItem;
-
-                // Chests, Fridges, Dressers, Junimo Chests, etc.
-                case StardewValley.Menus.ItemGrabMenu chest:
-                    return chest.hoveredItem;
-
-                default:
-                    return null;
-
-            }
-        }
 
         public static Item? GetFromAnyMenu()
         {

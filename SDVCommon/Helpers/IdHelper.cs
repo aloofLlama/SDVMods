@@ -8,9 +8,7 @@ namespace SDVCommon.Helpers
 {
     public static class IdHelper
     {
-        //Seed and Harvest Ids are stored raw from game data:
-        //e.g. 890, CarrotSeeds, Cornucopia_BasilSeeds, 889, Carrot, Cornucopia_Basil, (O)638 [for fruit tree fruit]
-        //Shop data lists seeds as (O)890, Carrot Seeds, Cornucopia_BasilSeeds
+        //Removes the (O) prefix from seed/harvest Ids
         public static string CanonicalItemId(string? raw)
         {
             if (string.IsNullOrEmpty(raw))

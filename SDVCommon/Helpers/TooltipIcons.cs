@@ -128,7 +128,7 @@ namespace SDVCommon.Icons
 
             //Achievements
             Add(IconKey.ShipBin, Sheet("Craftables"), new Rectangle(0, 1001, 16, 22), 22, 1.2f);
-            Add(IconKey.MiniFridge, Sheet("Craftables"), new Rectangle(0, 864, 16, 22), 22, 1.2f);
+            Add(IconKey.MiniFridge, Sheet("Craftables"), new Rectangle(0, 864, 16, 30), 30, 0.8f);
         }
 
         //

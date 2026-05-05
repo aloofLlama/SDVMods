@@ -4,6 +4,8 @@
 	"season.summer": "Summer",
 	"season.fall": "Fall",
 	"season.winter": "Winter",
+	"tooltip.plant_indoor": "Indoor",
+
 
 
 	// Basic crop info
@@ -18,6 +20,7 @@
 	"tooltip.too_late": "Too late to plant [TBD fertilizer]",
 	"tooltip.regrow_qty": "{0} total harvests",
 	"tooltip.regrow_indef": "Regrows indefinitely",
+
 
 	// Trees
 	"tooltip.tree_ready_in_future": "Ready next {0}",

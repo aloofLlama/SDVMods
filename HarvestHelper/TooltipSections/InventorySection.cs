@@ -1,5 +1,6 @@
 ﻿using HarvestHelper.Helpers;
 using Microsoft.Xna.Framework;
+using SDVCommon;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
@@ -21,6 +22,7 @@ namespace HarvestHelper.TooltipSections
 
             list.Add(new TooltipElement
             {
+                Icon = harvest.Runtime.HarvestIcon,
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
                     owned)
             });

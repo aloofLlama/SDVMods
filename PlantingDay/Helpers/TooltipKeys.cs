@@ -10,6 +10,7 @@ namespace PlantingDay.Helpers
     {
         // Seasons
         public const string Seasons = "tooltip.seasons";
+        public const string PlantIndoor = "tooltip.plant_indoor";
 
         // Growth
         public const string DaysToProduce = "tooltip.days_to_produce";
