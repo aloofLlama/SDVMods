@@ -84,7 +84,7 @@ namespace SDVCommon.Icons
             LoadSheet("Debris", "Tilesheets/Debris");
             LoadSheet("Furniture", "Tilesheets/Furniture");
             LoadSheet("WizardFurniture", "Tilesheets/wizard_furniture");
-            LoadSheet("Craftables", "TileSheets/Craftables");
+            //LoadSheet("Craftables", "TileSheets/Craftables"); Use the function below
             LoadSheet("DustSprite", "Characters/Monsters/Dust Spirit");
             LoadSheet("Grub", "Characters/Monsters/Grub");
             LoadSheet("MagmaDuggy", "Characters/Monsters/Magma Duggy");
@@ -126,9 +126,6 @@ namespace SDVCommon.Icons
             Add(IconKey.Plate, Sheet("Objects"), new Rectangle(16, 128, 16, 16), 16, 1.5f);
 
 
-            //Achievements
-            Add(IconKey.ShipBin, Sheet("Craftables"), new Rectangle(0, 1001, 16, 22), 22, 1.2f);
-            Add(IconKey.MiniFridge, Sheet("Craftables"), new Rectangle(0, 864, 16, 30), 30, 0.8f);
         }
 
         //

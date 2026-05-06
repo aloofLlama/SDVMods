@@ -50,7 +50,7 @@ namespace HarvestHelper.TooltipSections
             // Prepend the icon
             segments.Insert(0, new InlineSegment
             {
-                Icon = TooltipIcons.Get(IconKey.ShipBin)
+                Icon = TooltipIcons.GetIconForGameObject("(BC)248", 1.4f), //Mini Shipping Bin
             });
 
             list.Add(new TooltipElement

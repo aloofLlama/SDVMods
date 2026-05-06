@@ -159,61 +159,26 @@ namespace HarvestHelper.TooltipSections
                 }
             }
 
-            //var knownIconSegments = CookingRecipeService
-            //    .GetKnownRecipesUsing(harvestId)
-            //    .Select(r => new InlineSegment
-            //    {
-            //        Icon = r.Runtime.DishIcon
-            //    })
-            //    .ToList();
+            int fridgeQty = InventoryHelper.CountOwnedInMainFarmhouseFridges(harvestId);
 
-            //var unknownSegments = new List<InlineSegment>();
-
-            //if (unknown > 0)
-            //{
-            //    unknownSegments.Add(new InlineSegment
-            //    {
-            //        Text = string.Format(
-            //            ModEntry.ModHelper.Translation.Get(TooltipKeys.Qty_Unknown),
-            //            unknown
-            //        ),
-            //        TextColor = TooltipColors.Muted
-            //    });
-            //}
-
-            //var knownUnknownCombined = new List<InlineSegment>();
-            //knownUnknownCombined.AddRange(knownIconSegments);
-            //knownUnknownCombined.AddRange(unknownSegments);
+            var fridgeSegment = new[]
+            {
+                new InlineSegment
+                {
+                    Icon = TooltipIcons.GetIconForGameObject("(BC)216", 1.2f), //MiniFridge
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned), 
+                        fridgeQty)
+                }
+            };
 
 
-
-            //var knownUnknownSegments = TooltipBuildHelper.BuildInlineSegmentsWithCommas(
-            //    new[]
-            //    {
-            //        new { Count = known, Key = TooltipKeys.Qty_Known, Color = TooltipColors.Normal },
-            //        new { Count = unknown, Key = TooltipKeys.Qty_Unknown, Color = TooltipColors.Muted }
-            //    }
-            //    ,
-            //    x =>
-            //    {
-            //        if (x.Count == 0)
-            //            return Enumerable.Empty<InlineSegment>();
-
-            //        return new[]
-            //        {
-            //            new InlineSegment
-            //            {
-            //                Text = string.Format(ModEntry.ModHelper.Translation.Get(x.Key), x.Count),
-            //                TextColor = x.Color
-            //            }
-            //        };
-            //    });
 
             var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
                 new[]
                 {
                     new { Type = "Achievement" },
-                    new { Type = "KnownUnknown" }
+                    new { Type = "KnownUnknown" },
+                    new { Type = "Fridge" }
                 },
                 x =>
                 {
@@ -222,6 +187,9 @@ namespace HarvestHelper.TooltipSections
 
                     if (x.Type == "KnownUnknown")
                         return knownUnknownCombined;
+
+                    if (x.Type == "Fridge")
+                        return fridgeSegment;
 
                     return Enumerable.Empty<InlineSegment>();
                 }
@@ -233,20 +201,6 @@ namespace HarvestHelper.TooltipSections
                 Icon = TooltipIcons.Get(IconKey.Plate),
                 InlineSegments = segments
             });
-
-            // Add mini-fridge count line
-            int fridgeQty = InventoryHelper.CountOwnedInMainFarmhouseFridges(harvestId);
-
-            if (fridgeQty > 0)
-            {
-                list.Add(new TooltipElement
-                {
-                    Icon = TooltipIcons.Get(IconKey.MiniFridge),
-                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
-                    fridgeQty)
-                });
-            }
-
 
             return list;
         }
