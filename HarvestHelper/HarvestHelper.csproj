@@ -19,14 +19,19 @@
 
   <Import Project="..\SDVCommon\SDVCommon.projitems" Label="Shared" />
 
-  <ItemGroup>
-    <ProjectReference Include="..\SDVData\SDVData.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\SDVData\SDVData.csproj" >
+		</ProjectReference>
+	</ItemGroup>
 
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\smapi-internal\0Harmony.dll</HintPath>
     </Reference>
+	  <Reference Include="GenericModConfigMenu">
+		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\GenericModConfigMenu\GenericModConfigMenu.dll</HintPath>
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
 
 </Project>

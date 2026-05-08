@@ -5,66 +5,69 @@ using SDVData;
 using StardewModdingAPI;
 using StardewValley;
 
-public static class CookingInfoBuilder
+namespace SDVCommon.Services
 {
-    private static readonly Dictionary<string, CookingInfo> _recipes = new();
-
-    public static IEnumerable<CookingInfo> AllRecipes => _recipes.Values;
-
-    public static void BuildAll()
+    public static class CookingInfoBuilder
     {
-        _recipes.Clear();
+        private static readonly Dictionary<string, CookingInfo> _recipes = new();
 
-        foreach (var pair in CraftingRecipe.cookingRecipes)
+        public static IEnumerable<CookingInfo> AllRecipes => _recipes.Values;
+
+        public static void BuildAll()
         {
-            string recipeName = pair.Key;
+            _recipes.Clear();
 
-            var recipe = new CraftingRecipe(recipeName, isCookingRecipe: true);
+            foreach (var pair in CraftingRecipe.cookingRecipes)
+            {
+                string recipeName = pair.Key;
 
-            var info = Build(recipe);
-            _recipes[recipeName] = info;
+                var recipe = new CraftingRecipe(recipeName, isCookingRecipe: true);
+
+                var info = Build(recipe);
+                _recipes[recipeName] = info;
+            }
+
+            //foreach (var r in _recipes.Values)
+            //{
+            //    foreach (var ing in r.Data.Ingredients)
+            //    {
+            //        SDVCommonLog.Log(
+            //            $"RECIPE {r.Data.RecipeName} uses ingredient {ing.IngredientId}",
+            //            LogLevel.Info
+            //        );
+            //    }
+            //}
+
         }
 
-        //foreach (var r in _recipes.Values)
-        //{
-        //    foreach (var ing in r.Data.Ingredients)
-        //    {
-        //        SDVCommonLog.Log(
-        //            $"RECIPE {r.Data.RecipeName} uses ingredient {ing.IngredientId}",
-        //            LogLevel.Info
-        //        );
-        //    }
-        //}
-
-    }
-
-    public static CookingInfo? Lookup(string recipeName)
-    {
-        _recipes.TryGetValue(recipeName, out var info);
-        return info;
-    }
-
-    private static CookingInfo Build(CraftingRecipe recipe)
-    {
-        var data = new CookingInfoData
+        public static CookingInfo? Lookup(string recipeName)
         {
-            RecipeName = recipe.name,
-            DisplayName = recipe.DisplayName,
-            OutputId = IdHelper.CanonicalItemId(recipe.itemToProduce.First()),
-            OutputCount = recipe.numberProducedPerCraft,
-            Ingredients = recipe.recipeList
-                .Select(kvp => new RecipeIngredientData
-                {
-                    IngredientId = IdHelper.CanonicalItemId(kvp.Key),
-                    Count = kvp.Value
-                })
-                .ToList()
-        };
+            _recipes.TryGetValue(recipeName, out var info);
+            return info;
+        }
 
-        var runtime = new CookingInfoRuntime
+        private static CookingInfo Build(CraftingRecipe recipe)
         {
-        };
+            var data = new CookingInfoData
+            {
+                RecipeName = recipe.name,
+                DisplayName = recipe.DisplayName,
+                OutputId = IdHelper.CanonicalItemId(recipe.itemToProduce.First()),
+                OutputCount = recipe.numberProducedPerCraft,
+                Ingredients = recipe.recipeList
+                    .Select(kvp => new RecipeIngredientData
+                    {
+                        IngredientId = IdHelper.CanonicalItemId(kvp.Key),
+                        Count = kvp.Value
+                    })
+                    .ToList()
+            };
 
-        return new CookingInfo(data, runtime);
+            var runtime = new CookingInfoRuntime
+            {
+            };
+
+            return new CookingInfo(data, runtime);
+        }
     }
 }

@@ -17,7 +17,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\SDVData\SDVData.csproj" />
+		<ProjectReference Include="..\SDVData\SDVData.csproj" >
+		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	<Reference Include="GenericModConfigMenu">
+		<HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\GenericModConfigMenu\GenericModConfigMenu.dll</HintPath>
+		<Private>false</Private>
+	</Reference>
 	</ItemGroup>
 
 	<PropertyGroup>

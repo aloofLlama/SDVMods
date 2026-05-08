@@ -26,7 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SDVData\SDVData.csproj" >
-		<Private>false</Private>
 	</ProjectReference>
 	</ItemGroup>
 
