@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -20,11 +20,14 @@
 		</Reference>
 		<Reference Include="GenericModConfigMenu">
 		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\GenericModConfigMenu\GenericModConfigMenu.dll</HintPath>
+			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDVData\SDVData.csproj" />
-  </ItemGroup>
+    <ProjectReference Include="..\SDVData\SDVData.csproj" >
+		<Private>false</Private>
+	</ProjectReference>
+	</ItemGroup>
 
 </Project>
