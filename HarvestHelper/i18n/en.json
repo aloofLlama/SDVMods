@@ -1,0 +1,19 @@
+﻿{
+	// Economics
+	"tooltip.price": "{0}g",
+	//"tooltip.pierres_purchase": "{0}g",
+	//"tooltip.other_shop_purchase": "{0}g {1}",
+	//"tooltip.other_shop_trade": "({0}) {1}",
+
+	//Gifts
+
+	//cooking
+	"tooltip.cooking": "Cooking: {0}%",
+
+	//Misc
+	"tooltip.owned": "x{0}",
+	"tooltip.qty_known": "{0} known",
+	"tooltip.qty_unknown": "({0})"
+
+
+}

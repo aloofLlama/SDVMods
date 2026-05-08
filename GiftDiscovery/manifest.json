@@ -1,0 +1,11 @@
+﻿{
+	"Name": "Gift Discovery",
+	"Author": "aloofLlama",
+	"Version": "1.0.0",
+	"Description": "Learn everyone's gift tastes. Knowledge can be available across farms.",
+	"UniqueID": "aloofLlama.GiftDiscovery",
+	"EntryDll": "GiftDiscovery.dll",
+	"MinimumApiVersion": "4.0.0",
+	"UpdateKeys": [ "Nexus:45950" ]
+
+}

@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>e313b039-e59a-442c-bd5b-a29efd4825b6</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SDVCommon</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\CustomBushCompat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ICustomBushApi.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\AchievementHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\PlantedHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\InventoryHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\HarvestCategories.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\SDVCommonLog.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GameObjectInfoHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\CookingIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\CookingInfoRuntime.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\GiftTaste.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Data\GiftKnowledgeData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Wrappers\CookingInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CookingRecipeService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\CookingInfoBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\GiftKnowledgeService.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\HarvestInfoBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GiftHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\HoveredItem.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipBuildHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\HarvestIconInitializer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\HarvestIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\IconRegistry.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\IconRenderer.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\IIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\PurchaseIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\SeedIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipIcons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\IdHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\GiftKnowledgeInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\HarvestInfoRuntime.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\TooltipColors.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Wrappers\HarvestInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Models\Runtime\TooltipElement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Rendering\TooltipRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Rendering\" />
+  </ItemGroup>
+</Project>
