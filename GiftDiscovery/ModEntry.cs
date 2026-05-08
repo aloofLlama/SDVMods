@@ -117,44 +117,14 @@ namespace GiftDiscovery
 
 
             // Reinitialize for debug
+#if DEBUG
             if (e.Button == SButton.F5)
             {
-                LogAllNpcClassifications();
                 GiftKnowledgeService.InitializeGlobal(ModHelper);
                 Initializer.InitializeAll(ModHelper);
             }
+#endif
         }
-
-        public static void LogAllNpcClassifications()
-        {
-            // Build classifications using YOUR classify function
-            var list = GiftHelper.GetAllGiftableNPCs()
-                .Select(npc => NpcGiftClassificationBuilder.Classify(npc))
-                .OrderBy(c => c.Name, StringComparer.OrdinalIgnoreCase)
-                .ToList();
-
-            // Log each one
-            foreach (var c in list)
-            {
-                var npc = c.Npc;
-
-                string loc = npc?.currentLocation?.Name ?? "null";
-                string tile = npc != null ? npc.Tile.ToString() : "null";
-
-                int hearts = 0;
-                if (npc != null && Game1.player.friendshipData.TryGetValue(c.Name, out var f))
-                    hearts = f.Points;
-
-                ModEntry.Instance.Monitor.Log(
-                    $"[CLASSIFY] {c.Name} | Giftable={c.IsGiftable}, Available={c.IsAvailable}, " +
-                    $"Met={c.IsMet}, CanGiftToday={c.CanGiftToday}, MaxHeart={c.IsMaxHeart}, " +
-                    $"Hearts={hearts}, Loc={loc}, Tile={tile}",
-                    LogLevel.Info
-                );
-            }
-        }
-
-
 
         public static bool MenuStateChanged { get; private set; }
         private static bool _lastHudVisible;
@@ -169,16 +139,9 @@ namespace GiftDiscovery
 
             _lastHudVisible = hud;
             _lastMenuVisible = menu;
-
-            //IsHudVisible = hud;
-            //IsActiveMenuVisible = menu;
         }
 
-
     }
-
-
-
 
 }
 

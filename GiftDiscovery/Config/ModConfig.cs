@@ -21,6 +21,8 @@ namespace GiftDiscovery.Config
         public bool EmphasizeNearbyNPCs { get; set; } = true;
         public int NearbyRangeTiles { get; set; } = 15;
 
+        public int WrapSize { get; set; } = 6; //How many names to show before wrapping
+
 
         public bool ShowLoves { get; set; } = true;
         public bool ShowLikes { get; set; } = true;

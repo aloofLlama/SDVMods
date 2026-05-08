@@ -29,8 +29,8 @@ namespace GiftDiscovery.Compatibility
             GiftTaste taste = (GiftTaste)tasteValue;
 
             ModEntry.Instance.Monitor.Log(
-                $"[GIFTDISCOVERY] Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
-                LogLevel.Alert
+                $"Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
+                LogLevel.Debug
                 );
 
 

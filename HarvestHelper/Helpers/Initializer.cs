@@ -28,10 +28,10 @@ namespace HarvestHelper.Helpers
             }
 
             CacheForTesting.DumpHarvestInfoToJson();
-
+#if DEBUG
             ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]  Harvest Database Initialized",
-                LogLevel.Alert);
-
+                LogLevel.Warn);
+#endif
 
         }
 

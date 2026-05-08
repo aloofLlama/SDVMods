@@ -30,8 +30,8 @@ namespace HarvestHelper.Compatibility
             GiftTaste taste = (GiftTaste)tasteValue;
 
             ModEntry.Instance.Monitor.Log(
-                $"[GIFTHH] Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
-                LogLevel.Info
+                $"[HH] Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
+                LogLevel.Debug
                 );
 
 

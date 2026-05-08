@@ -37,9 +37,10 @@ namespace PlantingDay.Helpers
 
             CacheForTesting.DumpPlantInfoToJson();
 
+#if DEBUG
             ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] Plant Database Initialized",
-                LogLevel.Alert);
-
+                LogLevel.Warn);
+#endif
 
 
 

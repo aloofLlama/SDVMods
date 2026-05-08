@@ -58,31 +58,6 @@ namespace HarvestHelper
 
         }
 
-        ////Temp for debug gift detection
-        //private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
-        //{
-        //    if (!Context.IsWorldReady)
-        //        return;
-
-        //    foreach (var pair in Game1.player.friendshipData.Pairs)
-        //    {
-        //        string npc = pair.Key;
-        //        Friendship data = pair.Value;
-        //        int gifts = data.GiftsToday;
-
-        //        if (_prevGifts.TryGetValue(npc, out int oldGifts))
-        //        {
-        //            if (gifts != oldGifts)
-        //            {
-        //                Monitor.Log(
-        //                    $"[GIFT-TRACE] Delta detected on tick {Game1.ticks}: {npc} GiftsToday {oldGifts} → {gifts}",
-        //                    LogLevel.Warn);
-        //            }
-        //        }
-
-        //        _prevGifts[npc] = gifts;
-        //    }
-        //}
 
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
@@ -110,7 +85,6 @@ namespace HarvestHelper
 
 
             string lookupKey = obj.ItemId;
-            //ModEntry.Instance.Monitor.Log($"CHECK ID {lookupKey}", LogLevel.Info);
 
             var harvest = HarvestInfoBuilder.LookupFromKey(lookupKey);
             string canonicalId = IdHelper.CanonicalItemId(obj.QualifiedItemId);
@@ -127,9 +101,6 @@ namespace HarvestHelper
                 )
                 return;
 
-            //ModEntry.Instance.Monitor.Log($"CHECK ID {harvest.Data.HarvestId} price ", LogLevel.Info);
-
-
             var elements = TooltipBuilder.BuildTooltip(harvest, obj);
 
             TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
@@ -138,6 +109,7 @@ namespace HarvestHelper
 
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
+#if DEBUG
             // Only run when the player presses F5
             if (e.Button != SButton.F5)
                 return;
@@ -183,7 +155,7 @@ namespace HarvestHelper
             //        LogLevel.Info
             //    );
             //}
-
+#endif
 
         }
 

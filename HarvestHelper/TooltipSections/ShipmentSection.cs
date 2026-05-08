@@ -25,8 +25,6 @@ namespace HarvestHelper.TooltipSections
             if (!needsOne && !needsPoly && !needsMono)
                 return list;
 
-            //ModEntry.Instance.Monitor.Log($"TEXT: {harvest.Data.ShipMonoCulture}", LogLevel.Info);
-
             Game1.player.basicShipped.TryGetValue(id, out int count);
 
             // Build the text items

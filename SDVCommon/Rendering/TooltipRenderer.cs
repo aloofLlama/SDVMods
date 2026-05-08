@@ -115,7 +115,10 @@ namespace SDVCommon
                         }
 
                         if (seg.Icon.HasValue)
-                            currentLineWidth += font.LineSpacing + style.InlineIconWidthPadding;
+                        {
+                            int iconSize = style.IconRenderSize;
+                            currentLineWidth += iconSize + style.InlineIconWidthPadding;
+                        }
 
                         if (!string.IsNullOrEmpty(seg.Text))
                             currentLineWidth += (int)font.MeasureString(seg.Text).X;
@@ -413,6 +416,12 @@ namespace SDVCommon
 
             return drawW;
         }
+
+        //private static int MeasureInlineIconWidth(InlineIcon icon, TooltipStyle style)
+        //{
+        //    float scale = icon.Scale <= 0 ? 1f : icon.Scale;
+        //    return (int)(style.IconRenderSize * scale) + style.InlineIconWidthPadding;
+        //}
 
 
     }

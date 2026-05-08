@@ -83,9 +83,6 @@ namespace SDVCommon
             bool shipMono = seedData?.CountForMonoculture == true;
             bool shipPoly = seedData?.CountForPolyculture == true;
 
-            //SDVCommonLog.Log($"SHIP: {harvestId} {shipOne} {shipMono} {shipPoly}", LogLevel.Info);
-
-
             var data = new HarvestInfoData
             {
                 HarvestId = harvestId,

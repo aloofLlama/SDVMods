@@ -22,8 +22,6 @@ namespace HarvestHelper.TooltipSections
             var (cooked, uncooked) = CookingRecipeService.CountCookedRecipesUsing(harvestId);
             int total = known + unknown;
 
-            //ModEntry.Instance.Monitor.Log($"TEXT: {harvestId} {known}  {unknown}", LogLevel.Info);
-
             if (known == 0 && unknown == 0)
                 return list;
 

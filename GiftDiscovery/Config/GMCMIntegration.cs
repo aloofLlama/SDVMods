@@ -77,6 +77,15 @@ namespace GiftDiscovery.Config
                 max: 20
             );
 
+            gmcm.AddNumberOption(
+                mod: manifest,
+                name: () => "Line Wrapping",
+                tooltip: () => "Wrap the list to the next line after this many names.",
+                getValue: () => ModEntry.ModConfig.WrapSize,
+                setValue: value => ModEntry.ModConfig.WrapSize = value,
+                min: 3,
+                max: 6
+            );
 
 
             gmcm.AddBoolOption(

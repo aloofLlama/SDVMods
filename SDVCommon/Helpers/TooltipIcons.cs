@@ -84,7 +84,7 @@ namespace SDVCommon.Icons
             LoadSheet("Debris", "Tilesheets/Debris");
             LoadSheet("Furniture", "Tilesheets/Furniture");
             LoadSheet("WizardFurniture", "Tilesheets/wizard_furniture");
-            //LoadSheet("Craftables", "TileSheets/Craftables"); Use the function below
+            LoadSheet("Craftables", "TileSheets/Craftables");
             LoadSheet("DustSprite", "Characters/Monsters/Dust Spirit");
             LoadSheet("Grub", "Characters/Monsters/Grub");
             LoadSheet("MagmaDuggy", "Characters/Monsters/Magma Duggy");

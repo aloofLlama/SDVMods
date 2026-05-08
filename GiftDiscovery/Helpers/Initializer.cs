@@ -20,8 +20,13 @@ namespace GiftDiscovery.Helpers
             }
 
 
+            ModEntry.Instance.Monitor.Log($"Gift Discovery Initialized",
+                LogLevel.Trace);
+
+#if DEBUG
             ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]  Gift Discovery Initialized",
-                LogLevel.Alert);
+                LogLevel.Info);
+#endif
         }
 
     }

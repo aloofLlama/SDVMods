@@ -51,17 +51,7 @@ namespace PlantingDay
         {
             Initializer.InitializeAll(ModHelper);
 
-        
-
-
-            //string dataPath = ModEntry.ModHelper.DirectoryPath;
-
-            //foreach (string file in Directory.GetFiles(dataPath, "shop_*.json"))
-            //{
-            //    string vendorId = Path.GetFileNameWithoutExtension(file);
-            //    //ModEntry.Instance.Monitor.Log($"[Planting Day] Found mod shop: {vendorId}", LogLevel.Info);
-            //}
-
+       
         }
 
         [EventPriority(EventPriority.Low-1)]
@@ -82,7 +72,6 @@ namespace PlantingDay
 
             if (plant is null)
                 return;
-            //ModEntry.Instance.Monitor.Log($"{plant.Data.Seed?.Name} = {plant.Data.Location}", LogLevel.Info);
 
 
             var elements = TooltipBuilder.BuildTooltip(plant);

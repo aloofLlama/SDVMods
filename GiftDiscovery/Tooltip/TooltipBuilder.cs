@@ -12,7 +12,6 @@ using StardewModdingAPI;
 using StardewValley;
 using System.Reflection.Emit;
 
-
 public static class TooltipBuilder
 {
     private static List<TooltipElement>? _cachedTooltip;
@@ -67,20 +66,6 @@ public static class TooltipBuilder
         bool nearbyChanged = ModEntry.ModConfig.EmphasizeNearbyNPCs &&
                              !nearbyNpcSet.SetEquals(_cachedNearbyNpcSet);
 
-        ModEntry.Instance.Monitor.Log(
-            $"[{DateTime.Now:HH:mm:ss}] | " +
-            $"item={itemChanged}, " +
-            //$"configChanged={configChanged}, " +
-            $"menu={menuChanged}, " +
-            $"nearby={nearbyChanged}, " +
-            $"itemId={itemId} " +
-            $"| {_cachedItemId ?? "null"}, " +
-            $"nearbyCount={nearbyNpcSet.Count} " +
-            $"toggle={toggleVersion}",
-            LogLevel.Info
-        );
-
-
         // Rebuild
         _cachedTooltip = BuildTooltip(obj);
         _cachedItemId = itemId;
@@ -90,15 +75,13 @@ public static class TooltipBuilder
         _cachedToggleVersion = toggleVersion;
         _cachedGiftVersion = giftVersion;
 
-        //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]Rebuilding tooltip)", LogLevel.Info);
-
         return _cachedTooltip;
     }
 
     public static List<TooltipElement> BuildTooltip(
         StardewValley.Object obj)
     {
-        int wrapSize = 6;
+        int wrapSize = ModEntry.ModConfig.WrapSize;
         var list = new List<TooltipElement>();
 
         //Icon and display name
@@ -150,18 +133,31 @@ public static class TooltipBuilder
                 return;
 
             var known = Known(t).ToList();
-            int unknown = UnknownCount(t);
+            int unknownCount = UnknownCount(t);
 
             TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-                BuildTasteSection(label, known, unknown, wrapSize)
+                BuildTasteSection(label, known, unknownCount, wrapSize)
             );
         }
 
-        AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
-        AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
-        AddTaste("Neutral", GiftTaste.Neutral, ModEntry.ModConfig.ShowNeutral);
-        AddTaste("Dislikes", GiftTaste.Dislike, ModEntry.ModConfig.ShowDislikes);
-        AddTaste("Hates", GiftTaste.Hate, ModEntry.ModConfig.ShowHates);
+        if (!GiftHelper.HasDiscoveredAllLovesLikes(obj, mode))
+        {
+            AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
+            AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
+            AddTaste("Neutral", GiftTaste.Neutral, ModEntry.ModConfig.ShowNeutral);
+            AddTaste("Dislikes", GiftTaste.Dislike, ModEntry.ModConfig.ShowDislikes);
+            AddTaste("Hates", GiftTaste.Hate, ModEntry.ModConfig.ShowHates);
+        }
+
+        //hide the non love/like (and empty) if all love/like are discovered
+        else
+        {
+            if (Known(GiftTaste.Love).Any())
+                AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
+
+            if (Known(GiftTaste.Like).Any())
+                AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
+        }
 
         // ---------------------------------------------------------
         // Undiscovered Section (only in Global/Local and if there are still loves/likes to discover

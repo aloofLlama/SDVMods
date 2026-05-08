@@ -26,8 +26,6 @@ namespace SDVCommon.Icons
 
         public static Icon? GetIcon(string id)
         {
-            //ModEntry.Instance.Monitor.Log($"[IconRegistry] GetIcon called with id='{id}'", LogLevel.Warn);
-
             if (Cache.TryGetValue(id, out var cached))
                 return cached;
 
@@ -36,13 +34,11 @@ namespace SDVCommon.Icons
 
                 if (provider.CanHandle(id))
                 {
-                    //ModEntry.Instance.Monitor.Log($"[Can Handle] {id}", LogLevel.Warn);
                     var icon = provider.LoadIcon(id);
                     Cache[id] = icon;
                     return icon;
                 }
                 else { }
-                    //ModEntry.Instance.Monitor.Log($"[Can't Handle] {id}", LogLevel.Warn);
 
             }
 
