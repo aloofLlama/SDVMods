@@ -1,15 +1,10 @@
-﻿using SDVData;
-using StardewModdingAPI;
+﻿using SDVCommon.Compatibility;
+using SDVData;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PlantingDay.Helpers.SeedSource
+namespace SDVCommon.Services
 {
-    internal static class MonsterDropLoader
+    internal static class MonsterDropBuilder
     {
         private static Dictionary<string, List<(int itemId, float chance)>>? _monsterDropTable;
 
@@ -86,7 +81,7 @@ namespace PlantingDay.Helpers.SeedSource
             }
 
             // Apply overrides
-            if (SeedOverrides.MonsterDrops.TryGetValue(seedId, out var overrideList))
+            if (DataOverrides.MonsterDrops.TryGetValue(seedId, out var overrideList))
             {
 
                 return overrideList

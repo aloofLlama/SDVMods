@@ -1,17 +1,8 @@
 ﻿
 using PlantingDay.Helpers;
-using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
-using SDVCommon;
-using SDVCommon.Helpers;
-using SDVCommon.Icons;
-using SDVCommon.Tooltip;
-using SDVData;
-using StardewModdingAPI;
-using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Services;
 
 namespace PlantingDay.ToolTip_Sections
 {
@@ -24,14 +15,13 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.DaysToProduce <= 0)
                 return list;
 
-            // Look up the harvest info
             var harvestId = plant.Data.HarvestId;
-            var harvestInfo = HarvestInfoBuilder.LookupFromKey(harvestId);
+            var harvest = HarvestInfoBuilder.LookupFromKey(harvestId);
 
-            if (harvestInfo == null)
-                return list; // no harvest info found
+            if (harvest == null)
+                return list;
 
-            var harvestIcon = harvestInfo.Runtime.HarvestIcon;
+            var harvestIcon = harvest.Runtime.HarvestIcon;
             int harvestPrice = EconomicsHelper.GetHarvestSellPriceFromSeed(plant.Data.SeedId);
 
             list.Add(new TooltipElement

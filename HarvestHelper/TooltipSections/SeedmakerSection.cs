@@ -4,7 +4,7 @@ using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 using StardewValley.GameData.Shops;
 using StardewValley.GameData.WildTrees;
 using System;

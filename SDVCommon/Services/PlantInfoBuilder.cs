@@ -1,10 +1,7 @@
-﻿using PlantingDay.Compatibility;
-using PlantingDay.Helpers;
-using PlantingDay.Helpers.SeedSource;
-using PlantingDay.Models.Wrappers;
-using SDVCommon.Compatibility;
+﻿using SDVCommon.Compatibility;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
+using SDVCommon.Models.Wrappers;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -13,7 +10,7 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Shops;
 
 
-namespace PlantingDay.Services
+namespace SDVCommon.Services
 {
 
     public static class PlantInfoBuilder
@@ -24,10 +21,6 @@ namespace PlantingDay.Services
         public static IEnumerable<PlantInfo> AllPlants => _plants.Values;
         public static IEnumerable<string> AllKeys() => _plants.Keys;
 
-
-        //private static Dictionary<string, List<(int itemId, float chance)>> _monsterDropTable = new();
-
-
         public static void Initialize()
         {
             if (_isInitialized)
@@ -37,16 +30,7 @@ namespace PlantingDay.Services
             LoadFruitTrees();
             LoadCustomBushes();
 
-            foreach (var plant in _plants.Values)
-            {
-                string seedId = plant.Data.SeedId;
-
-
-
-            }
-
             _isInitialized = true;
-
 
 
             // KEEP Debug to output desired database variable
@@ -63,7 +47,6 @@ namespace PlantingDay.Services
             _isInitialized = false;
         }
 
-        // Lookup by seed item ID (e.g. "O:472" for Parsnip Seeds)
         public static PlantInfo? LookupFromKey(string key)
         {
             return _plants.TryGetValue(key, out var info) ? info : null;
@@ -102,7 +85,7 @@ namespace PlantingDay.Services
                     Seed = GameObjectInfoHelper.FromObject(seedId),
                 };
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(seedId);
-                data.MonsterDrops = MonsterDropLoader.GetDropsForItem(seedId);
+                data.MonsterDrops = MonsterDropBuilder.GetDropsForItem(seedId);
 
                 var plant = new PlantInfo(data);
                 _plants[data.SeedId] = plant;
@@ -147,7 +130,7 @@ namespace PlantingDay.Services
 
                 };
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(saplingId);
-                data.MonsterDrops = MonsterDropLoader.GetDropsForItem(saplingId);
+                data.MonsterDrops = MonsterDropBuilder.GetDropsForItem(saplingId);
 
                 var plant = new PlantInfo(data);
                 _plants[data.SeedId] = plant;
@@ -186,7 +169,7 @@ namespace PlantingDay.Services
                 };
 
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(qualifiedId);
-                data.MonsterDrops = MonsterDropLoader.GetDropsForItem(qualifiedId);
+                data.MonsterDrops = MonsterDropBuilder.GetDropsForItem(qualifiedId);
 
                 _plants[data.SeedId] = new PlantInfo(data);
             }

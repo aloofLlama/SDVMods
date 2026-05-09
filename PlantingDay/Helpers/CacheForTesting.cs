@@ -13,7 +13,7 @@ namespace PlantingDay.Helpers
         {
             
             // Serialize ONLY the data portion
-            var dataOnly = PlantInfoBuilder.AllPlants
+            var dataOnly = OBSPlantInfoBuilder.AllPlants
                 .Select(p => p.Data)
                 .ToList();
 

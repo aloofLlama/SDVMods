@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon.Helpers;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;

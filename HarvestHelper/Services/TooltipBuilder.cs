@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework.Graphics;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 using StardewModdingAPI;
 using StardewValley;
 

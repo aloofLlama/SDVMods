@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SDVCommon.Tooltip;
-using Microsoft.Xna.Framework;
+﻿using SDVCommon.Models.Tooltip;
 
-
-namespace SDVCommon.Helpers
+namespace SDVCommon.Helpers.Tooltip
 {
     internal class TooltipBuildHelper
     {

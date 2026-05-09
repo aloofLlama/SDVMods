@@ -1,23 +1,18 @@
 ﻿using PlantingDay.Helpers;
-using PlantingDay.Helpers.SeedSource;
-using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
-using SDVCommon;
-using SDVCommon.Helpers;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Helpers.Tooltip;
+using SDVCommon.Helpers.Specific;
+using SDVCommon.Services;
 using SDVCommon.Icons;
 using SDVData;
-using StardewModdingAPI;
-using StardewValley;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 
 
 namespace PlantingDay.ToolTip_Sections
 {
     // Where to get the seed and how much it costs
-    internal class SeedSourceSection
+    internal static class SeedSourceSection
     {
         public static List<TooltipElement> Build(PlantInfo plant)
         {
@@ -28,7 +23,7 @@ namespace PlantingDay.ToolTip_Sections
 
 
             // Check for 'rare' drops (<1%)
-            bool IsRare(MonsterDropInfoRuntime drop)
+            static bool IsRare(MonsterDropInfo drop)
             {
                 float pct = MathF.Round(drop.Data.DropChance * 100f);
                 return pct < 1f;
@@ -42,11 +37,11 @@ namespace PlantingDay.ToolTip_Sections
                 source =>
                 {
                     // Vendors
-                    if (source is PurchaseInfoRuntime vendor)
+                    if (source is PurchaseInfo vendor)
                         return BuildVendorSegments(vendor) ?? Array.Empty<InlineSegment>();
 
                     // Monsters
-                    if (source is MonsterDropInfoRuntime drop)
+                    if (source is MonsterDropInfo drop)
                     {
                         if (hasMultipleRareDrops)
                         {
@@ -99,7 +94,7 @@ namespace PlantingDay.ToolTip_Sections
         //──────────────────────────────────────────────
         // Vendor → InlineSegments
         //──────────────────────────────────────────────
-        private static InlineSegment[]? BuildVendorSegments(PurchaseInfoRuntime vendor)
+        private static InlineSegment[]? BuildVendorSegments(PurchaseInfo vendor)
         {
             var data = vendor.Data;
 
@@ -181,7 +176,7 @@ namespace PlantingDay.ToolTip_Sections
                         {
                             new InlineSegment
                             {
-                                Icon = vendor.CurrencyIcon,
+                                Icon = vendor.Runtime.CurrencyIcon,
                                 Text = string.Format(
                                     ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
                                     data.TradeAmount.ToString(),
@@ -198,13 +193,13 @@ namespace PlantingDay.ToolTip_Sections
         //──────────────────────────────────────────────
         // Monster Drop → InlineSegments
         //──────────────────────────────────────────────
-        private static InlineSegment[] BuildMonsterSegments(MonsterDropInfoRuntime drop)
+        private static InlineSegment[] BuildMonsterSegments(MonsterDropInfo drop)
         {
             return new[]
             {
                 new InlineSegment
                 {
-                    Icon = drop.MonsterIcon,
+                    Icon = drop.Runtime.MonsterIcon,
                     Text = FormatChance(drop.Data.DropChance),
                     
                 }
@@ -213,7 +208,7 @@ namespace PlantingDay.ToolTip_Sections
 
         private static InlineSegment[] BuildRareMonsterSegment(PlantInfo plant)
         {
-            bool IsRare(MonsterDropInfoRuntime d)
+            static bool IsRare(MonsterDropInfo d)
             {
                 float pct = MathF.Round(d.Data.DropChance * 100f);
                 return pct < 1f;
@@ -232,7 +227,7 @@ namespace PlantingDay.ToolTip_Sections
 
                 segments.Add(new InlineSegment
                 {
-                    Icon = drop.MonsterIcon,
+                    Icon = drop.Runtime.MonsterIcon,
                     Text = isLast ? "rare" : "",
                     
                 });

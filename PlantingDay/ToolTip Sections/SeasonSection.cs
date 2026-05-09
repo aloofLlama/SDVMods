@@ -2,9 +2,9 @@
 using StardewValley;
 using Microsoft.Xna.Framework;
 using SDVData;
-using SDVCommon.Helpers;
-using SDVCommon.Tooltip;
-using PlantingDay.Models.Wrappers;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Helpers.Tooltip;
 
 namespace PlantingDay.ToolTip_Sections
 {

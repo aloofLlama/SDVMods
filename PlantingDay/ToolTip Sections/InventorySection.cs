@@ -1,13 +1,7 @@
 ﻿using PlantingDay.Helpers;
-using PlantingDay.Models.Wrappers;
-using Microsoft.Xna.Framework;
 using SDVCommon.Helpers;
-using SDVCommon.Icons;
+using SDVCommon.Models.Tooltip;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Tooltip;
-using StardewModdingAPI;
-using StardewValley;
-using System.Xml.Linq;
 
 
 namespace PlantingDay.TooltipSections
@@ -20,10 +14,6 @@ namespace PlantingDay.TooltipSections
 
             string seedId = plant.Data.SeedId;
             string harvestId = plant.Data.HarvestId;
-
-            //ModEntry.Instance.Monitor.Log(
-            //    $"[InventorySection] SeedId={seedId} | HarvestId={harvestId}",
-            //    LogLevel.Debug);
 
             int owned = InventoryHelper.CountOwned(seedId);
 

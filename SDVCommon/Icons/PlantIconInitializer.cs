@@ -1,9 +1,7 @@
-﻿using PlantingDay.Models.Wrappers;
-using SDVCommon.Helpers;
-using SDVCommon.Icons;
-using StardewModdingAPI;
+﻿using SDVCommon.Helpers;
+using SDVCommon.Models.Wrappers;
 
-namespace PlantingDay.Helpers.Icons
+namespace SDVCommon.Icons
 {
     internal static class PlantIconInitializer
     {
@@ -30,11 +28,7 @@ namespace PlantingDay.Helpers.Icons
 
                 if (!string.IsNullOrEmpty(vendor.Data.TradeItemId))
                 {
-                    //ModEntry.Instance.Monitor.Log($"Vendor: {vendor.Data.TradeItemId}", LogLevel.Info);
-                    //ModEntry.Instance.Monitor.Log($"Vendor: {IdHelper.CanonicalItemId(vendor.Data.TradeItemId)}", LogLevel.Info);
-
-
-                    vendor.CurrencyIcon = IconRegistry.GetIcon($"item:{IdHelper.CanonicalItemId(vendor.Data.TradeItemId)}");
+                    vendor.Runtime.CurrencyIcon = IconRegistry.GetIcon($"item:{IdHelper.CanonicalItemId(vendor.Data.TradeItemId)}");
                 }
             }
 
@@ -44,7 +38,7 @@ namespace PlantingDay.Helpers.Icons
                 var name = drop.Data.MonsterName;
                 if (name is not null && MonsterIconMap.TryGetValue(name, out var key))
                 {
-                    drop.MonsterIcon = TooltipIcons.Get(key);
+                    drop.Runtime.MonsterIcon = TooltipIcons.Get(key);
                 }
             }
         }

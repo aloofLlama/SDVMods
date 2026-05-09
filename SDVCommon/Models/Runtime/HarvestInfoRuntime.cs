@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using SDVCommon.Icons;
+﻿using SDVCommon.Icons;
 
 namespace SDVCommon.Models.Runtime
 {
@@ -10,6 +7,6 @@ namespace SDVCommon.Models.Runtime
         public Icon? HarvestIcon { get; set; }
 
         // Future: artisan product icons, cooking icons, etc.
-        public Dictionary<string, Icon?> ExtraIcons { get; set; } = new();
+        //public Dictionary<string, Icon?> ExtraIcons { get; set; } = new();
     }
 }

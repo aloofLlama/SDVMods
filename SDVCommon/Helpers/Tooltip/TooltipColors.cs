@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SDVCommon.Helpers
+namespace SDVCommon.Helpers.Tooltip
 {
     public class TooltipColors
     {

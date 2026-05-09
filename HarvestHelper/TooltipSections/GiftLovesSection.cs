@@ -4,7 +4,7 @@ using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
 using SDVCommon.Services;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 using StardewModdingAPI;
 
 

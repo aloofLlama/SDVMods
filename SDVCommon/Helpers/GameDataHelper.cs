@@ -17,7 +17,7 @@ namespace PlantingDay.Helpers
         public static StardewValley.Object? GetHarvestObjectFromSeedId(string seedId)
         {
             // Use your canonical accessor
-            PlantInfo? plant = PlantInfoBuilder.LookupFromKey(seedId);
+            OBSPlantInfo? plant = OBSPlantInfoBuilder.LookupFromKey(seedId);
             if (plant == null)
                 return null;
 

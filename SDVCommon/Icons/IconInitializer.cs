@@ -1,7 +1,4 @@
 ﻿using SDVCommon.Models.Wrappers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SDVCommon.Icons
 {

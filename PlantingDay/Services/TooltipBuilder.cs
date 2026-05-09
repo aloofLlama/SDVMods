@@ -7,7 +7,7 @@ using PlantingDay.ToolTip_Sections;
 using PlantingDay.TooltipSections;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 
 
 
@@ -15,7 +15,7 @@ namespace PlantingDay.Services
 {
     public static class TooltipBuilder
     {
-        public static List<TooltipElement> BuildTooltip(PlantInfo plant)
+        public static List<TooltipElement> BuildTooltip(OBSPlantInfo plant)
         {
             var list = new List<TooltipElement>();
 

@@ -5,7 +5,7 @@ using SObject = StardewValley.Object;
 
 
 
-namespace SDVCommon.Helpers
+namespace SDVCommon.Helpers.Specific
 {
     public static class AchievementHelper
     {

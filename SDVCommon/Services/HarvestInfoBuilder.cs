@@ -15,12 +15,11 @@ using SObject = StardewValley.Object;
 
 
 
-namespace SDVCommon
+namespace SDVCommon.Services
 {
     internal class HarvestInfoBuilder
     {
         private static bool _isInitialized;
-
 
         private static readonly Dictionary<string, HarvestInfo> _harvests = new();
         public static IEnumerable<HarvestInfo> AllHarvests => _harvests.Values;

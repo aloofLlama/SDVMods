@@ -1,7 +1,9 @@
-﻿using PlantingDay.Helpers.SeedSource;
-using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
+﻿using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Helpers.Specific;
 using SDVData;
+
+namespace SDVCommon.Services;
 
 public static class SeedSourceBuilder
 {
@@ -32,7 +34,7 @@ public static class SeedSourceBuilder
     }
 
 
-    private static int CurrencySortKey(PurchaseInfoRuntime v)
+    private static int CurrencySortKey(PurchaseInfo v)
     {
         var d = v.Data;
 
@@ -48,7 +50,7 @@ public static class SeedSourceBuilder
     //──────────────────────────────────────────────
     // Vendor sort key (before monsters)
     //──────────────────────────────────────────────
-    private static int VendorSortKey(PurchaseInfoRuntime v)
+    private static int VendorSortKey(PurchaseInfo v)
     {
         return v.Data.Type switch
         {
@@ -72,8 +74,8 @@ public static class SeedSourceBuilder
     {
         return source switch
         {
-            PurchaseInfoRuntime v => VendorSortKey(v), // vendors first
-            MonsterDropInfoRuntime => 5,               // monsters after vendors, before icons
+            PurchaseInfo v => VendorSortKey(v), // vendors first
+            MonsterDropInfo => 5,               // monsters after vendors, before icons
             _ => 999
         };
     }

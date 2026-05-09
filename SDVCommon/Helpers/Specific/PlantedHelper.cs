@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SDVCommon.Helpers
+namespace SDVCommon.Helpers.Specific
 {
     public static class PlantedHelper
     {

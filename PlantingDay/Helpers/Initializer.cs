@@ -20,14 +20,14 @@ namespace PlantingDay.Helpers
             TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
             MonsterDropLoader.Initialize();
-            PlantInfoBuilder.Initialize();
+            OBSPlantInfoBuilder.Initialize();
             HarvestInfoBuilder.Initialize();
 
 
-            foreach (var plant in PlantInfoBuilder.AllPlants)
+            foreach (var plant in OBSPlantInfoBuilder.AllPlants)
             {
                 // seed, trade currency icons
-                PlantIconInitializer.InitializeIcons(plant);
+                OBSPlantIconInitializer.InitializeIcons(plant);
 
             }
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)

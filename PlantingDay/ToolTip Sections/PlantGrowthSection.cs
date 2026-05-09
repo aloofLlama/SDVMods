@@ -1,17 +1,12 @@
 ﻿
 using PlantingDay.Helpers;
-using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
-using SDVCommon;
-using SDVCommon.Helpers;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Services;
 using SDVCommon.Icons;
-using SDVCommon.Tooltip;
+using SDVCommon.Helpers.Tooltip;
 using SDVData;
-using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace PlantingDay.ToolTip_Sections
 {

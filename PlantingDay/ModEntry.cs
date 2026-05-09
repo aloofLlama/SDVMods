@@ -68,7 +68,7 @@ namespace PlantingDay
             // Use the correct key format O:#### to see if the item is in the plant library
             string lookupKey = obj.ItemId;
 
-            var plant = PlantInfoBuilder.LookupFromKey(lookupKey);
+            var plant = OBSPlantInfoBuilder.LookupFromKey(lookupKey);
 
             if (plant is null)
                 return;
@@ -90,7 +90,7 @@ namespace PlantingDay
             // Only run when the player presses F5
             if (e.Button != SButton.F5)
                 return;
-            PlantInfoBuilder.Reset();
+            OBSPlantInfoBuilder.Reset();
             HarvestInfoBuilder.Reset();
 
             Initializer.InitializeAll(ModHelper);

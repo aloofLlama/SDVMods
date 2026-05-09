@@ -1,15 +1,8 @@
 ﻿using PlantingDay.Helpers;
 using SDVCommon.Icons;
-using StardewValley.GameData.Crops;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SDVData;
-using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
 
 namespace PlantingDay.ToolTip_Sections
 {

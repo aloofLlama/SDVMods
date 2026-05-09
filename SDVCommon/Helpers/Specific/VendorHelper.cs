@@ -1,12 +1,10 @@
-﻿using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
-using SDVCommon.Helpers;
+﻿using SDVCommon.Models.Wrappers;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using static SDVData.PurchaseInfoData;
 
-namespace PlantingDay.Helpers.SeedSource
+namespace SDVCommon.Helpers.Specific
 {
     public static class VendorHelper
     {
@@ -53,14 +51,14 @@ namespace PlantingDay.Helpers.SeedSource
         // ------------------------------------------------------------
         // GROUPING KEY (used to collapse duplicates)
         // ------------------------------------------------------------
-        public static string VendorKey(PurchaseInfoRuntime info)
+        public static string VendorKey(PurchaseInfo purchase)
         {
-            return GetVendorType(info.Data.VendorId) switch
+            return GetVendorType(purchase.Data.VendorId) switch
             {
                 VendorType.Pierre => "SeedShop",
                 VendorType.NightMarket => "NightMarket",
                 VendorType.DesertFestival => "DesertFestival",
-                _ => info.Data.VendorId
+                _ => purchase.Data.VendorId
             };
         }
 

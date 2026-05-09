@@ -1,17 +1,13 @@
-﻿using PlantingDay.Helpers;
-using SDVCommon.Helpers;
+﻿using SDVCommon.Helpers;
+using SDVCommon.Helpers.Specific;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using StardewValley.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 using static SDVData.PurchaseInfoData;
 
-namespace PlantingDay.Helpers.SeedSource
+namespace SDVCommon.Services
 {
     internal static class PurchaseDataBuilder
     {
@@ -60,9 +56,6 @@ namespace PlantingDay.Helpers.SeedSource
                         VendorId = shopId,
                         VendorName = VendorHelper.GetVendorName(shopId),
                         Condition = entry.Condition,
-
-                        //IsNightMarket = VendorHelper.IsNightMarket(shopId),
-                        //IsTravelingCartSpecial = false // set below
                     };
                     info.Type = VendorHelper.GetVendorType(shopId);
 
@@ -154,45 +147,15 @@ namespace PlantingDay.Helpers.SeedSource
 
             bool isSpecial = false;
 
-            if (directMatch)
+            if (directMatch ||
+                wildcardMatch || 
+                randomPoolMatch ||
+                entry.PriceModifiers?.Count > 0 ||
+                entry.PriceModifiers?.Any(m => m.RandomAmount?.Count > 0) == true ||
+                !string.IsNullOrEmpty(entry.PerItemCondition)
+                )
             {
                 isSpecial = true;
-                ModEntry.Instance.Monitor.Log($"[TC-SPECIAL] {itemId} matched direct entry.", LogLevel.Info);
-            }
-
-            if (wildcardMatch)
-            {
-                isSpecial = true;
-                ModEntry.Instance.Monitor.Log($"[TC-SPECIAL] {itemId} matched wildcard entry.", LogLevel.Info);
-            }
-
-            if (randomPoolMatch)
-            {
-                isSpecial = true;
-                ModEntry.Instance.Monitor.Log($"[TC-SPECIAL] {itemId} appears in Random ItemId pool: {entry.ItemId}", LogLevel.Info);
-            }
-
-            if (entry.PriceModifiers?.Count > 0)
-            {
-                isSpecial = true;
-                ModEntry.Instance.Monitor.Log($"[TC-SPECIAL] {itemId} has price modifiers.", LogLevel.Info);
-            }
-
-            if (entry.PriceModifiers?.Any(m => m.RandomAmount?.Count > 0) == true)
-            {
-                isSpecial = true;
-                ModEntry.Instance.Monitor.Log($"[TC-SPECIAL] {itemId} has RandomAmount pricing.", LogLevel.Info);
-            }
-
-            if (!string.IsNullOrEmpty(entry.PerItemCondition))
-            {
-                isSpecial = true;
-                ModEntry.Instance.Monitor.Log($"[TC-SPECIAL] {itemId} has per-item conditions.", LogLevel.Info);
-            }
-
-            if (!isSpecial)
-            {
-                ModEntry.Instance.Monitor.Log($"[TC-NORMAL] {itemId} has a TC entry but no special rules.", LogLevel.Info);
             }
 
             return isSpecial;

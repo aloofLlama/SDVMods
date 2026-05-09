@@ -1,6 +1,6 @@
 ﻿using SDVCommon.Models.Wrappers;
 using SDVCommon.Icons;
-using SDVCommon.Tooltip;
+using SDVCommon.Models.Runtime;
 using SDVCommon.Helpers;
 using HarvestHelper.Helpers;
 using StardewValley;
