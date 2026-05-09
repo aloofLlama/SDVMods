@@ -1,5 +1,5 @@
 ﻿using SDVCommon.Models.Runtime;
-using SDVCommon.Services;
+using SDVCommon.OBSGift;
 using StardewValley;
 using HarmonyLib;
 using StardewModdingAPI;

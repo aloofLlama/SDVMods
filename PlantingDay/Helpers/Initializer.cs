@@ -1,15 +1,11 @@
-﻿using PlantingDay.Helpers.Icons;
-using PlantingDay.Helpers.SeedSource;
-using PlantingDay.Services;
-using SDVCommon;
-using PlantingDay.Compatibility;
+﻿using PlantingDay.Compatibility;
+using SDVCommon.Helpers;
+using SDVCommon.Helpers.Specific;
+using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
+using SDVCommon.Models.Wrappers;
+using SDVCommon.Services;
 using StardewModdingAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PlantingDay.Helpers
 {
@@ -19,15 +15,15 @@ namespace PlantingDay.Helpers
         {
             TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
-            MonsterDropLoader.Initialize();
-            OBSPlantInfoBuilder.Initialize();
+            MonsterDropBuilder.Initialize();
+            PlantInfoBuilder.Initialize();
             HarvestInfoBuilder.Initialize();
 
 
-            foreach (var plant in OBSPlantInfoBuilder.AllPlants)
+            foreach (var plant in PlantInfoBuilder.AllPlants)
             {
                 // seed, trade currency icons
-                OBSPlantIconInitializer.InitializeIcons(plant);
+                PlantIconInitializer.InitializeIcons(plant);
 
             }
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)
@@ -37,15 +33,13 @@ namespace PlantingDay.Helpers
 
             CacheForTesting.DumpPlantInfoToJson();
 
-#if DEBUG
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] Plant Database Initialized",
-                LogLevel.Warn);
-#endif
-
-
+            ModEntry.Instance.Monitor.Log(
+                $"Plant Database Initialized",
+                LogHelper.DebugOrTrace
+            );
 
         }
 
 
-}
+    }
 }

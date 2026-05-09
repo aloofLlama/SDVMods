@@ -1,11 +1,7 @@
 ﻿using SDVCommon.Models.Wrappers;
 using SDVCommon.Icons;
-using SDVCommon.Models.Runtime;
-using SDVCommon.Helpers;
-using HarvestHelper.Helpers;
-using StardewValley;
-using Microsoft.Xna.Framework;
-
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Helpers.Tooltip;
 
 namespace HarvestHelper.TooltipSections
 {

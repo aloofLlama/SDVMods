@@ -1,13 +1,8 @@
-﻿using PlantingDay.Models.Wrappers;
-using PlantingDay.Services;
+﻿using SDVCommon.Models.Wrappers;
+using SDVCommon.Services;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PlantingDay.Helpers
+namespace SDVCommon.Helpers
 {
     internal class GameDataHelper
     {
@@ -17,7 +12,7 @@ namespace PlantingDay.Helpers
         public static StardewValley.Object? GetHarvestObjectFromSeedId(string seedId)
         {
             // Use your canonical accessor
-            OBSPlantInfo? plant = OBSPlantInfoBuilder.LookupFromKey(seedId);
+            PlantInfo? plant = PlantInfoBuilder.LookupFromKey(seedId);
             if (plant == null)
                 return null;
 

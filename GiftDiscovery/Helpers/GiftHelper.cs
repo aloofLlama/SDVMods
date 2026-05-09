@@ -1,7 +1,5 @@
 ﻿using StardewValley;
 using Microsoft.Xna.Framework;
-
-
 using GiftDiscovery.Services;
 using GiftDiscovery.Models;
 using GiftDiscovery.Compatibility;

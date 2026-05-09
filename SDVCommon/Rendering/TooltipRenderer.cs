@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SDVCommon.Helpers;
-using SDVCommon.Models.Runtime;
-using StardewModdingAPI;
+using SDVCommon.Models.Tooltip;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -30,7 +28,7 @@ namespace SDVCommon
             TooltipStyle style = TooltipStyle.Default;
 
             var (width, height) = MeasureTooltip(elements, font, style);
-            var (x, y) = PositionBottomLeft(width, height);
+            var (x, y) = PositionBottomLeft(height);
             DrawTooltipAt(b, elements, font, style, x, y, width, height);
         }
 
@@ -41,7 +39,7 @@ namespace SDVCommon
             public int SeparatorPadding;
             public int InlineIconWidthPadding;
 
-            public static TooltipStyle Default => new TooltipStyle
+            public static TooltipStyle Default => new()
             {
                 IconRenderSize = 32,
                 IconColumnWidth = 34,
@@ -143,8 +141,7 @@ namespace SDVCommon
 
         private static (int x, int y) PositionLeftOfCursor(int width, int height)
         {
-            int x = Game1.getMouseX() - width - 32;
-            int y = Game1.getMouseY() + 32;
+            int x, y;
 
             bool isShippingMenu = Game1.activeClickableMenu is ShippingMenu;
 
@@ -169,7 +166,7 @@ namespace SDVCommon
             return (x, y);
         }
 
-        private static (int x, int y) PositionBottomLeft(int width, int height)
+        private static (int x, int y) PositionBottomLeft(int height)
         {
             int x = 32;
             int y = Game1.uiViewport.Height - height - 32;

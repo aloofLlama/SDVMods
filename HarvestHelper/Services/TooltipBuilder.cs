@@ -1,13 +1,8 @@
 ﻿using HarvestHelper.Helpers;
 using HarvestHelper.TooltipSections;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using SDVCommon.Helpers;
-using SDVCommon.Icons;
+using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Models.Runtime;
-using StardewModdingAPI;
-using StardewValley;
+using SDVCommon.Models.Tooltip;
 
 
 
@@ -21,7 +16,7 @@ namespace HarvestHelper.Services
 
             list.AddRange(FirstSection.Build(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => InventorySection.Build(harvest, obj));
-            TooltipBuildHelper.AddSectionWithSeparator(list, () => GiftLovesSection.Build(harvest, obj));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => GiftLovesSection.Build(obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => ShipmentSection.Build(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.Build(harvest));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedmakerSection.Build(harvest, obj));

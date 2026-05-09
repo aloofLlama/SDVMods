@@ -1,17 +1,10 @@
-﻿using Microsoft.Xna.Framework.Graphics;
-using PlantingDay.Compatibility;
-using PlantingDay.Helpers;
-using PlantingDay.Helpers.SeedSource;
-using PlantingDay.Models;
+﻿using PlantingDay.Helpers;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
 using SDVCommon;
-using SDVCommon.Icons;
 using SDVCommon.Helpers;
-using SDVData;
-using PlantingDay.Helpers.Icons;
+using SDVCommon.Services;
 using PlantingDay.Services;
 
 
@@ -68,7 +61,7 @@ namespace PlantingDay
             // Use the correct key format O:#### to see if the item is in the plant library
             string lookupKey = obj.ItemId;
 
-            var plant = OBSPlantInfoBuilder.LookupFromKey(lookupKey);
+            var plant = PlantInfoBuilder.LookupFromKey(lookupKey);
 
             if (plant is null)
                 return;
@@ -88,16 +81,14 @@ namespace PlantingDay
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
             // Only run when the player presses F5
+#if DEBUG
             if (e.Button != SButton.F5)
                 return;
-            OBSPlantInfoBuilder.Reset();
+            PlantInfoBuilder.Reset();
             HarvestInfoBuilder.Reset();
 
             Initializer.InitializeAll(ModHelper);
-
-
-
-
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
             //KEEP Debug to output desired database variable from a list
             //foreach (var plant in PlantInfoBuilder.AllPlants)
@@ -132,6 +123,7 @@ namespace PlantingDay
             }
             */
 
+#endif
 
 
         }

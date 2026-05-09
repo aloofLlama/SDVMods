@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SDVCommon.Models.Runtime
+namespace SDVCommon.OBSGift
 {
     public class GiftKnowledgeInfoOLD
     {

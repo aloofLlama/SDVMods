@@ -4,7 +4,8 @@ using HarvestHelper.Services;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
 using SDVCommon.Helpers;
-using SDVCommon.Icons;
+using SDVCommon.Helpers.Specific;
+using SDVCommon.OBSGift;
 using SDVCommon.Models.Runtime;
 using SDVCommon.Models.Wrappers;
 using SDVCommon.Services;
@@ -28,7 +29,7 @@ namespace HarvestHelper
         public static IMonitor ModMonitor { get; private set; } = null!;
 
         //Temp for debug gift detection
-        private static Dictionary<string, int> _prevGifts = new();
+        private readonly static Dictionary<string, int> _prevGifts = new();
 
         public override void Entry(IModHelper helper)
         {
@@ -62,7 +63,7 @@ namespace HarvestHelper
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            Initializer.InitializeAll(ModHelper);
+            Initializer.InitializeAll();
         }
 
 
@@ -114,8 +115,9 @@ namespace HarvestHelper
             if (e.Button != SButton.F5)
                 return;
             HarvestInfoBuilder.Reset();
+            Initializer.InitializeAll();
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
-            Initializer.InitializeAll(ModHelper);
 
             //KEEP Debug to output desired database variable from a list
             //foreach (var plant in PlantInfoBuilder.AllPlants)

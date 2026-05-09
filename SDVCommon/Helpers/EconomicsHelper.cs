@@ -1,11 +1,5 @@
-﻿using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PlantingDay.Helpers
+﻿
+namespace SDVCommon.Helpers
 {
     public static class EconomicsHelper
     {

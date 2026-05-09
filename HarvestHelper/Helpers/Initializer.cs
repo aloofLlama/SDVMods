@@ -9,7 +9,7 @@ namespace HarvestHelper.Helpers
 {
     public static class Initializer
     {
-        public static void InitializeAll(IModHelper helper)
+        public static void InitializeAll()
         {
             TooltipIcons.Initialize();
             GameObjectInfoHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
@@ -28,10 +28,10 @@ namespace HarvestHelper.Helpers
             }
 
             CacheForTesting.DumpHarvestInfoToJson();
-#if DEBUG
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]  Harvest Database Initialized",
-                LogLevel.Warn);
-#endif
+
+            ModEntry.Instance.Monitor.Log($"Harvest Database Initialized",
+                LogHelper.DebugOrTrace
+            );
 
         }
 

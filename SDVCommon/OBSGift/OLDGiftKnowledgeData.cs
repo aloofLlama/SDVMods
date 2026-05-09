@@ -1,4 +1,4 @@
-﻿namespace SDVCommon.Models.Data
+﻿namespace SDVCommon.OBSGift
 {
     public class GiftKnowledgeDataOLD
     {

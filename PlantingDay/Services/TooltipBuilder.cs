@@ -1,13 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using PlantingDay.Helpers;
-using PlantingDay.Models.Runtime;
-using PlantingDay.Models.Wrappers;
+﻿using SDVCommon.Models.Wrappers;
 using PlantingDay.ToolTip_Sections;
 using PlantingDay.TooltipSections;
-using SDVCommon.Helpers;
-using SDVCommon.Icons;
-using SDVCommon.Models.Runtime;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Helpers.Tooltip;
 
 
 
@@ -15,7 +10,7 @@ namespace PlantingDay.Services
 {
     public static class TooltipBuilder
     {
-        public static List<TooltipElement> BuildTooltip(OBSPlantInfo plant)
+        public static List<TooltipElement> BuildTooltip(PlantInfo plant)
         {
             var list = new List<TooltipElement>();
 

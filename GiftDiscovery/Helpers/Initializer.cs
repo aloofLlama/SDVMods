@@ -1,5 +1,6 @@
 ﻿using GiftDiscovery.Services;
-using SDVCommon;
+using SDVCommon.Services;
+using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using StardewModdingAPI;
 using static SDVCommon.TooltipRenderer;
@@ -19,14 +20,9 @@ namespace GiftDiscovery.Helpers
                 IconInitializers.HarvestIcons(harvest);
             }
 
-
             ModEntry.Instance.Monitor.Log($"Gift Discovery Initialized",
-                LogLevel.Trace);
-
-#if DEBUG
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]  Gift Discovery Initialized",
-                LogLevel.Info);
-#endif
+                LogHelper.DebugOrTrace
+            );
         }
 
     }

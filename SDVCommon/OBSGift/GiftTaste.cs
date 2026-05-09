@@ -1,6 +1,6 @@
 ﻿using StardewValley;
 
-namespace SDVCommon.Models.Runtime
+namespace SDVCommon.OBSGift
 {
     public enum GiftTaste
     {

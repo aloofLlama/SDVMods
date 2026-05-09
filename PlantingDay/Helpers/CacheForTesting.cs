@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using PlantingDay.Services;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using System;
 using System.IO;
@@ -13,7 +13,7 @@ namespace PlantingDay.Helpers
         {
             
             // Serialize ONLY the data portion
-            var dataOnly = OBSPlantInfoBuilder.AllPlants
+            var dataOnly = PlantInfoBuilder.AllPlants
                 .Select(p => p.Data)
                 .ToList();
 

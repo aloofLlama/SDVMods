@@ -16,4 +16,15 @@ namespace SDVCommon.Helpers
             Monitor?.Log(message, level);
         }
     }
+
+    public static class LogHelper
+    {
+        public static LogLevel DebugOrTrace =>
+#if DEBUG
+            LogLevel.Warn;
+#else
+        LogLevel.Trace;
+#endif
+    }
+
 }

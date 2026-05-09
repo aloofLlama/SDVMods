@@ -1,19 +1,13 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.Config;
 using GiftDiscovery.Helpers;
-using GiftDiscovery.Models;
 using GiftDiscovery.Services;
+using GiftDiscovery.Tooltip;
 using HarmonyLib;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using SDVCommon;
 using SDVCommon.Helpers;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
-using StardewModdingAPI.Framework.ModLoading;
 using StardewValley;
-using StardewValley.Menus;
-using System.Runtime.CompilerServices;
 
 
 namespace GiftDiscovery
@@ -26,11 +20,6 @@ namespace GiftDiscovery
         public static ModConfig ModConfig { get; internal set; } = null!;
 
         private bool _showTooltip = false;
-        //public static bool IsHudVisible { get; private set; }
-        //public static bool IsActiveMenuVisible { get; private set; }
-        public static int ToggleVersion = 0; //used for cache update
-
-
 
         public override void Entry(IModHelper helper)
         {
@@ -112,7 +101,7 @@ namespace GiftDiscovery
             if (e.Button == ModConfig.ToggleTooltipKey)
             {
                 _showTooltip = !_showTooltip;
-                ToggleVersion++; //used to refresh tooltip
+                ModEntry.IncrementToggleVersion();
             }
 
 
@@ -122,6 +111,7 @@ namespace GiftDiscovery
             {
                 GiftKnowledgeService.InitializeGlobal(ModHelper);
                 Initializer.InitializeAll(ModHelper);
+                ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
             }
 #endif
         }
@@ -141,8 +131,17 @@ namespace GiftDiscovery
             _lastMenuVisible = menu;
         }
 
-    }
 
+        private static int _toggleVersion = 0;
+        public static int ToggleVersion => _toggleVersion;
+        public static void IncrementToggleVersion()
+        {
+            _toggleVersion++;
+        }
+
+
+
+    }
 }
 
 

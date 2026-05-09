@@ -1,18 +1,16 @@
 ﻿using HarvestHelper.Helpers;
-using Microsoft.Xna.Framework;
-using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Services;
-using SDVCommon.Models.Runtime;
-using StardewModdingAPI;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Helpers.Tooltip;
+using SDVCommon.OBSGift;
 
 
 namespace HarvestHelper.TooltipSections
 {
     public static class GiftLovesSection
     {
-        public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
+        public static List<TooltipElement> Build(StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
 

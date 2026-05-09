@@ -1,12 +1,9 @@
-﻿using HarvestHelper.Helpers;
-using Microsoft.Xna.Framework;
-using SDVCommon.Helpers;
+﻿using SDVCommon.Helpers.Specific;
+using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Models.Runtime;
-using StardewModdingAPI;
+using SDVCommon.Models.Tooltip;
 using StardewValley;
-using System.Xml.Linq;
 
 
 namespace HarvestHelper.TooltipSections

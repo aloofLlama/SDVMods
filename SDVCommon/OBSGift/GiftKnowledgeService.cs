@@ -1,11 +1,7 @@
-﻿using SDVCommon.Helpers;
-using SDVCommon.Models.Data;
-using SDVCommon.Models.Runtime;
-using StardewModdingAPI;
-using StardewValley;
+﻿using StardewModdingAPI;
 
 
-namespace SDVCommon.Services
+namespace SDVCommon.OBSGift
 {
     public static class GiftKnowledgeServiceOLD
     {

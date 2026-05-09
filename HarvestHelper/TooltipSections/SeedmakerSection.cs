@@ -1,17 +1,11 @@
 ﻿using HarvestHelper.Helpers;
-using SDVCommon;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Models.Runtime;
-using StardewValley.GameData.Shops;
-using StardewValley.GameData.WildTrees;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SDVCommon.Helpers.Specific;
+using SDVCommon.Helpers.Tooltip;
+using SDVCommon.Models.Tooltip;
 
 namespace HarvestHelper.TooltipSections
 {
