@@ -2,7 +2,7 @@
 using SDVData;
 using StardewValley;
 
-namespace SDVCommon.Services
+namespace SDVCommon.Models.Builders
 {
     internal static class MonsterDropBuilder
     {

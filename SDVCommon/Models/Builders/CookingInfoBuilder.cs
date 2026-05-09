@@ -5,7 +5,7 @@ using SDVData;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace SDVCommon.Services
+namespace SDVCommon.Models.Builders
 {
     public static class CookingInfoBuilder
     {

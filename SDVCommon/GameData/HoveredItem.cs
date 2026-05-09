@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace SDVCommon.Helpers
+namespace SDVCommon.GameData
 {
     internal class HoveredItem
     {

@@ -1,9 +1,4 @@
 ﻿
-using SDVCommon.GameData;
-using StardewValley;
-using StardewValley.GameData.Crops;
-using StardewValley.GameData.Objects;
-
 namespace SDVCommon.Helpers
 {
     public static class IdHelper
@@ -46,24 +41,5 @@ namespace SDVCommon.Helpers
 
             return "(O)" + id;
         }
-
-
-
-        //---------------
-        //Have harvest Id, get access to seed data in plantinfo
-        //---------------
-        public static CropData? GetSeedDataForHarvest(string harvestId)
-        {
-            if (GameObjectInfoHelper._harvestToSeed.TryGetValue(harvestId, out string? seedId))
-            {
-                if (Game1.cropData.TryGetValue(seedId, out var seedData))
-                    return seedData;
-            }
-
-            return null;
-        }
-
     }
-
-
 }

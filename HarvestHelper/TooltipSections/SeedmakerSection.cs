@@ -3,7 +3,7 @@ using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Helpers.Specific;
+
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
 
@@ -34,7 +34,7 @@ namespace HarvestHelper.TooltipSections
             if (seedId == null)
                 return list;
 
-            var seedObject = GameObjectInfoHelper.FromObject(seedId);
+            var seedObject = GameObjectInfo.FromObject(seedId);
 
             //don't show if seedmaker banned
             if (seedObject?.ContextTags?.Contains("seedmaker_banned") == true)
@@ -48,7 +48,7 @@ namespace HarvestHelper.TooltipSections
 
             if (seedId != null)
             {
-                owned = InventoryHelper.CountOwned(seedId);
+                owned = Inventory.CountOwned(seedId);
             }
 
             list.Add(new TooltipElement

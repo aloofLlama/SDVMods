@@ -1,4 +1,4 @@
-﻿using SDVCommon.Helpers.Specific;
+﻿using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;

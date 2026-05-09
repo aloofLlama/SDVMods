@@ -1,7 +1,7 @@
 ﻿using SDVCommon.Helpers;
 using SDVCommon.Models.Runtime;
 using SDVCommon.OBSGift;
-using SDVCommon.Services;
+using SDVCommon.GameData;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Characters;

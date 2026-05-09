@@ -19,9 +19,6 @@ namespace SDVCommon.Helpers.Tooltip
 
         //Plant
         public static readonly Color Paddy = Color.CornflowerBlue;
-        public static readonly Color Trellis = Color.Orange;
-
-
 
         //seasons
         public static readonly Color SpringColor = new(80, 200, 120); //green

@@ -1,42 +1,31 @@
-﻿using SDVCommon.Compatibility;
-using SDVCommon.Helpers;
-using SDVData;
+﻿using SDVCommon.GameData;
+using SDVCommon.Models.Builders;
+using SDVCommon.Models.Wrappers;
 using StardewValley;
 using StardewValley.GameData.Crops;
-using StardewValley.GameData.Objects;
 
-
-namespace SDVCommon.GameData
+namespace SDVCommon.Helpers
 {
-    public class GameObjectInfoHelper
+    internal class GameDataHelper
     {
-        public static ItemInfo? FromObject(string objectId)
+        //---------------
+        //Have seed Id, get access to harvest SDV object from game data
+        //---------------
+        public static StardewValley.Object? GetHarvestObjectFromSeedId(string seedId)
         {
+            // Use your canonical accessor
+            PlantInfo? plant = PlantInfoBuilder.LookupFromKey(seedId);
+            if (plant == null)
+                return null;
 
-            // 1) Try raw key first (works for modded IDs and numeric vanilla)
-            if (!Game1.objectData.TryGetValue(objectId, out var obj))
-            {
-                // 2) Fallback: extract numeric ID for "(O)638" / "O:638" / "638"
-                string numeric = new(objectId.Where(char.IsDigit).ToArray());
+            // Get the harvest ID from your PlantInfoData
+            string harvestId = plant.Data.HarvestId;
+            if (string.IsNullOrEmpty(harvestId))
+                return null;
 
-                if (string.IsNullOrEmpty(numeric) ||
-                    !Game1.objectData.TryGetValue(numeric, out obj))
-                {
-                    return null;
-                }
-            }
-
-            return new ItemInfo
-            {
-                Id = objectId,
-                Name = obj.Name,
-                Description = obj.Description,
-                Price = obj.Price,
-                Category = obj.Category,
-                Edibility = obj.Edibility,
-                Type = obj.Type,
-                ContextTags = obj.ContextTags?.ToList()
-            };
+            // Create the actual harvest item instance (UIS-style)
+            Item item = ItemRegistry.Create(harvestId);
+            return item as StardewValley.Object;
         }
 
         public static readonly Dictionary<string, string> _harvestToSeed = new();
@@ -74,11 +63,22 @@ namespace SDVCommon.GameData
             //        }
             //    }
             //}
-        //}
-    }
+            //}
+        }
 
+        //---------------
+        //Have harvest Id, get access to seed data in plantinfo
+        //---------------
+        public static CropData? GetSeedDataForHarvest(string harvestId)
+        {
+            if (_harvestToSeed.TryGetValue(harvestId, out string? seedId))
+            {
+                if (Game1.cropData.TryGetValue(seedId, out var seedData))
+                    return seedData;
+            }
 
-
+            return null;
+        }
 
     }
 }

@@ -1,7 +1,7 @@
 ﻿using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Helpers.Specific;
+
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -16,7 +16,7 @@ using SObject = StardewValley.Object;
 
 
 
-namespace SDVCommon.Services
+namespace SDVCommon.Models.Builders
 {
     internal class HarvestInfoBuilder
     {
@@ -69,17 +69,17 @@ namespace SDVCommon.Services
             if (_harvests.ContainsKey(harvestId))
                 return;
 
-            var itemInfo = GameObjectInfoHelper.FromObject(harvestId);
+            var itemInfo = GameObjectInfo.FromObject(harvestId);
             if (itemInfo == null)
                 return;
 
-            GameObjectInfoHelper._harvestToSeed.TryGetValue(harvestId, out string? seedId);
+            GameDataHelper._harvestToSeed.TryGetValue(harvestId, out string? seedId);
 
 
             bool shipOne = IsShipOneCandidate(harvestId, obj);
 
             // Mono/Poly shipping achievements come from the seed data
-            var seedData = IdHelper.GetSeedDataForHarvest(harvestId);
+            var seedData = GameDataHelper.GetSeedDataForHarvest(harvestId);
             bool shipMono = seedData?.CountForMonoculture == true;
             bool shipPoly = seedData?.CountForPolyculture == true;
 

@@ -2,13 +2,12 @@
 using StardewValley.Buildings;
 using StardewValley.Objects;
 using StardewValley.Locations;
+using SDVCommon.Helpers;
 
 
-
-
-namespace SDVCommon.Helpers
+namespace SDVCommon.GameData
 {
-    public class InventoryHelper
+    public class Inventory
     {
 
         public static int CountOwned(string canonicalId)

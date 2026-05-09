@@ -2,13 +2,11 @@
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.TerrainFeatures;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SDVCommon.Helpers;
 
-namespace SDVCommon.Helpers.Specific
+namespace SDVCommon.GameData
 {
-    public static class PlantedHelper
+    public static class Planted
     {
         public static int CountPlanted(string id)
         {
@@ -36,7 +34,7 @@ namespace SDVCommon.Helpers.Specific
             }
 
 
-            foreach (var location in InventoryHelper.GetAllLocations())
+            foreach (var location in Inventory.GetAllLocations())
             {
 
                 // Skip inaccessible or placeholder locations (eg SBV Ripley Farm)

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using SDVCommon.Services;
+using SDVCommon.Models.Builders;
 
 namespace HarvestHelper.Helpers
 {

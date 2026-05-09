@@ -2,8 +2,7 @@
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Services;
-using SDVCommon.Helpers.Specific;
+using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
 
@@ -17,8 +16,8 @@ namespace HarvestHelper.TooltipSections
             var list = new List<TooltipElement>();
 
             string harvestId = harvest.Data.HarvestId;
-            var (known, unknown) = CookingRecipeService.CountRecipesUsing(harvestId);
-            var (cooked, uncooked) = CookingRecipeService.CountCookedRecipesUsing(harvestId);
+            var (known, unknown) = CookingRecipe.CountRecipesUsing(harvestId);
+            var (cooked, uncooked) = CookingRecipe.CountCookedRecipesUsing(harvestId);
             int total = known + unknown;
 
             if (known == 0 && unknown == 0)
@@ -44,7 +43,7 @@ namespace HarvestHelper.TooltipSections
 
             List<InlineSegment> knownUnknownCombined;
 
-            var knownIconSegments = CookingRecipeService
+            var knownIconSegments = CookingRecipe
                 .GetKnownRecipesUsing(harvestId)
                 .Select(r => new InlineSegment
                 {
@@ -156,7 +155,7 @@ namespace HarvestHelper.TooltipSections
                 }
             }
 
-            int fridgeQty = InventoryHelper.CountOwnedInMainFarmhouseFridges(harvestId);
+            int fridgeQty = Inventory.CountOwnedInMainFarmhouseFridges(harvestId);
 
             var fridgeSegment = new[]
             {

@@ -1,5 +1,5 @@
 ﻿using SDVCommon.Helpers;
-using SDVCommon.Helpers.Specific;
+using SDVCommon.GameData;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -7,7 +7,7 @@ using StardewValley.GameData.Shops;
 using StardewValley.Internal;
 using static SDVData.PurchaseInfoData;
 
-namespace SDVCommon.Services
+namespace SDVCommon.Models.Builders
 {
     internal static class PurchaseDataBuilder
     {
@@ -37,13 +37,13 @@ namespace SDVCommon.Services
                     bool wildcardMatch =
                         entry.ItemId == "ALL_ITEMS (O)" &&
                         (
-                            VendorHelper.ItemMatchesWildcard(itemId, entry) ||
-                            VendorHelper.EvaluatePerItemCondition(entry.PerItemCondition, itemId)
+                            Vendor.ItemMatchesWildcard(itemId, entry) ||
+                            Vendor.EvaluatePerItemCondition(entry.PerItemCondition, itemId)
                         );
 
                     bool randomPoolMatch = false;
                     if (!directMatch && !wildcardMatch)
-                        randomPoolMatch = VendorHelper.MatchesRandomPool(itemId, entry.ItemId);
+                        randomPoolMatch = Vendor.MatchesRandomPool(itemId, entry.ItemId);
 
                     if (!directMatch && !wildcardMatch && !randomPoolMatch)
                         continue;
@@ -54,10 +54,10 @@ namespace SDVCommon.Services
                     var info = new PurchaseInfoData
                     {
                         VendorId = shopId,
-                        VendorName = VendorHelper.GetVendorName(shopId),
+                        VendorName = Vendor.GetVendorName(shopId),
                         Condition = entry.Condition,
+                        Type = Vendor.GetVendorType(shopId),
                     };
-                    info.Type = VendorHelper.GetVendorType(shopId);
 
 
                     // -----------------------------
@@ -131,35 +131,6 @@ namespace SDVCommon.Services
             return (int)value;
         }
 
-        // --------------------------------------
-        // TRAVELING CART SPECIAL FLAG
-        // --------------------------------------
-        private static bool SetTravelingCartSpecialFlag(
-            string itemId,
-            string shopId,
-            ShopItemData entry,
-            bool directMatch,
-            bool wildcardMatch,
-            bool randomPoolMatch)
-        {
-            if (VendorHelper.GetVendorType(shopId) != VendorType.TravelingCart)
-                return false;
-
-            bool isSpecial = false;
-
-            if (directMatch ||
-                wildcardMatch || 
-                randomPoolMatch ||
-                entry.PriceModifiers?.Count > 0 ||
-                entry.PriceModifiers?.Any(m => m.RandomAmount?.Count > 0) == true ||
-                !string.IsNullOrEmpty(entry.PerItemCondition)
-                )
-            {
-                isSpecial = true;
-            }
-
-            return isSpecial;
-        }
     }
 }
 

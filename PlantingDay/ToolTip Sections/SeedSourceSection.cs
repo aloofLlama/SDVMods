@@ -2,8 +2,8 @@
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Models.Wrappers;
 using SDVCommon.Helpers.Tooltip;
-using SDVCommon.Helpers.Specific;
-using SDVCommon.Services;
+using SDVCommon.GameData;
+using SDVCommon.Models.Builders;
 using SDVCommon.Icons;
 using SDVData;
 using SDVCommon.Models.Runtime;
@@ -60,7 +60,7 @@ namespace PlantingDay.ToolTip_Sections
                 });
 
             // Add 'year 2' flag if applicable
-            int minYear = VendorHelper.GetMinYear(plant);
+            int minYear = Vendor.GetMinYear(plant);
             bool year2Plus = minYear >= 2;
 
             if (year2Plus)

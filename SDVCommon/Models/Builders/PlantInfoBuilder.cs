@@ -10,7 +10,7 @@ using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Shops;
 
 
-namespace SDVCommon.Services
+namespace SDVCommon.Models.Builders
 {
 
     public static class PlantInfoBuilder

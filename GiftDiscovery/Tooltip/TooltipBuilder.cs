@@ -6,7 +6,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
 using SDVCommon.Models.Tooltip;
-using SDVCommon.Services;
+using SDVCommon.Models.Builders;
 using SDVCommon.Helpers.Tooltip;
 
 namespace GiftDiscovery.Tooltip

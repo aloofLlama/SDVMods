@@ -1,11 +1,8 @@
 ﻿using SDVCommon.Models.Wrappers;
 using StardewValley;
-using StardewValley.GameData.Objects;
-using SObject = StardewValley.Object;
 
 
-
-namespace SDVCommon.Helpers.Specific
+namespace SDVCommon.GameData
 {
     public static class AchievementHelper
     {

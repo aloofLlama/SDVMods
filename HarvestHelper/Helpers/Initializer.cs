@@ -2,8 +2,7 @@
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
-using SDVCommon.Services;
-using StardewModdingAPI;
+using SDVCommon.Models.Builders;
 
 namespace HarvestHelper.Helpers
 {

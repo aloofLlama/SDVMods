@@ -1,14 +1,11 @@
 ﻿
-    using SDVCommon.Models.Wrappers;
-using StardewModdingAPI;
-    using StardewValley;
-using SDVCommon.Helpers;
-    using System.Collections.Generic;
-    using System.Linq;
+using SDVCommon.Models.Wrappers;
+using StardewValley;
+using SDVCommon.Models.Builders;
 
-namespace SDVCommon.Services
+namespace SDVCommon.GameData
 {
-    public static class CookingRecipeService
+    public static class CookingRecipe
     {
         /// <summary>
         /// Returns all CookingInfo entries whose ingredients include this ingredient.

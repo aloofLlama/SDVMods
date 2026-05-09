@@ -5,7 +5,7 @@ using StardewValley.GameData.Objects;
 using SObject = StardewValley.Object;
 
 
-namespace SDVCommon.Helpers.Specific
+namespace SDVCommon.Helpers
 {
     internal class HarvestCategories
     {

@@ -1,12 +1,12 @@
 ﻿using SDVCommon.Models.Wrappers;
-using StardewModdingAPI;
+using SDVCommon.Helpers;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using static SDVData.PurchaseInfoData;
 
-namespace SDVCommon.Helpers.Specific
+namespace SDVCommon.GameData
 {
-    public static class VendorHelper
+    public static class Vendor
     {
         // ------------------------------------------------------------
         // VENDOR NAME RESOLUTION (UI metadata)

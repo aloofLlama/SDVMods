@@ -1,10 +1,7 @@
 ﻿using PlantingDay.Compatibility;
 using SDVCommon.Helpers;
-using SDVCommon.Helpers.Specific;
-using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
-using SDVCommon.Models.Wrappers;
-using SDVCommon.Services;
+using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 
 namespace PlantingDay.Helpers
