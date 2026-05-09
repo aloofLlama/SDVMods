@@ -1,5 +1,5 @@
 ﻿using PlantingDay.Helpers;
-using SDVCommon.Helpers;
+using SDVCommon.GameData;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Models.Wrappers;
 
@@ -15,7 +15,7 @@ namespace PlantingDay.TooltipSections
             string seedId = plant.Data.SeedId;
             string harvestId = plant.Data.HarvestId;
 
-            int owned = InventoryHelper.CountOwned(seedId);
+            int owned = Inventory.CountOwned(seedId);
 
             list.Add(new TooltipElement
             {

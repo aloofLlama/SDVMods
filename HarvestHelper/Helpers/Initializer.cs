@@ -11,7 +11,7 @@ namespace HarvestHelper.Helpers
         public static void InitializeAll()
         {
             TooltipIcons.Initialize();
-            GameObjectInfoHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
+            GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
             //GiftKnowledgeService.Initialize(helper); moved to modentry with harmony patch
             CookingInfoBuilder.BuildAll();

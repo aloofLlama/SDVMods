@@ -5,6 +5,7 @@ using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
 using HarmonyLib;
 using SDVCommon.Helpers;
+using SDVCommon.GameData;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;

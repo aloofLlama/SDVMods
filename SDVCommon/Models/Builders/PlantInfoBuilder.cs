@@ -82,7 +82,7 @@ namespace SDVCommon.Models.Builders
                     NeedsScythe = cropData.HarvestMethod == HarvestMethod.Scythe,
                     Location = GetLocation(cropData),
 
-                    Seed = GameObjectInfoHelper.FromObject(seedId),
+                    Seed = GameObjectInfo.FromObject(seedId),
                 };
                 data.PurchaseOptions = PurchaseDataBuilder.GetPurchaseInfo(seedId);
                 data.MonsterDrops = MonsterDropBuilder.GetDropsForItem(seedId);
@@ -106,7 +106,7 @@ namespace SDVCommon.Models.Builders
                 string fruitId = IdHelper.CanonicalItemId(fruitEntry?.ItemId);
 
 
-                var harvestInfo = GameObjectInfoHelper.FromObject(fruitId);
+                var harvestInfo = GameObjectInfo.FromObject(fruitId);
 
                 var data = new PlantInfoData
                 {
@@ -114,7 +114,7 @@ namespace SDVCommon.Models.Builders
                     HarvestId = fruitId,
                     PlantType = PlantType.FruitTree,
 
-                    Seed = GameObjectInfoHelper.FromObject(saplingId),
+                    Seed = GameObjectInfo.FromObject(saplingId),
 
                     Seasons = fruitTreeData.Seasons?
                         .Select(s => Enum.Parse<SeasonId>(s.ToString(), ignoreCase: true))
@@ -162,7 +162,7 @@ namespace SDVCommon.Models.Builders
                     SeedId = qualifiedId,
                     HarvestId = harvestId,
                     PlantType = PlantType.Bush,
-                    Seed = GameObjectInfoHelper.FromObject(qualifiedId),
+                    Seed = GameObjectInfo.FromObject(qualifiedId),
                     //Seasons = new() { SeasonId.Spring, SeasonId.Summer, SeasonId.Fall },
                     DaysToProduce = 20,
                     RegrowDays = 1
