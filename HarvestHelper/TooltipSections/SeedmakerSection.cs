@@ -34,7 +34,7 @@ namespace HarvestHelper.TooltipSections
             if (seedId == null)
                 return list;
 
-            var seedObject = GameObjectInfo.FromObject(seedId);
+            var seedObject = GameObject.FromObject(seedId);
 
             //don't show if seedmaker banned
             if (seedObject?.ContextTags?.Contains("seedmaker_banned") == true)

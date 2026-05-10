@@ -1,18 +1,12 @@
 ﻿using GiftDiscovery.Compatibility;
-using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GiftDiscovery.Services
+namespace GiftDiscovery.Models.Builders
 {
-    internal class NpcGiftClassificationBuilder
+    internal class NPCGiftStatusBuilder
     {
-        public static NpcGiftClassification Classify(NPC npc)
+        public static NPCGiftStatus GiftStatus(NPC npc)
         {
             var name = npc.Name;
 
@@ -34,9 +28,9 @@ namespace GiftDiscovery.Services
             bool canGiftToday = isAvailable && !MaxGiftsReached(npc);
             bool isMaxHeart = isAvailable && isMet && IsMaxHearts(npc);
 
-            return new NpcGiftClassification
+            return new NPCGiftStatus
             {
-                Npc = npc,
+                NPC = npc,
                 Name = name,
                 IsGiftable = isGiftable,
                 IsAvailable = isAvailable,

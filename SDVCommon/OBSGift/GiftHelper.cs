@@ -14,21 +14,21 @@ public static class GiftHelperOLD
         {
 
             // Skip monsters, pets, horses, festival NPCs, etc.
-            if (npc is not NPC realNpc)
+            if (npc is not NPC realNPC)
                 continue;
 
             var giftTastes = Game1.NPCGiftTastes; // Dictionary<string, GiftTaste[]>
 
             // Skip NPCs that do not have gift taste data or are overridden to be nongiftable
-            if (!giftTastes.ContainsKey(realNpc.Name) ||
-                GiftOverrides.NonGiftableNPCs.Contains(realNpc.Name))
+            if (!giftTastes.ContainsKey(realNPC.Name) ||
+                GiftOverrides.NonGiftableNPCs.Contains(realNPC.Name))
                 continue;
 
             GiftTaste? taste = null;
 
             try
             {
-                taste = (GiftTaste)realNpc.getGiftTasteForThisItem(item);
+                taste = (GiftTaste)realNPC.getGiftTasteForThisItem(item);
             }
             catch
             {
@@ -36,7 +36,7 @@ public static class GiftHelperOLD
             }
 
             if (taste == GiftTaste.Love)
-                yield return realNpc;
+                yield return realNPC;
         }
     }
 

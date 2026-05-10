@@ -19,6 +19,7 @@ namespace GiftDiscovery.Models
             GlobalKnownTastes = global ?? new Dictionary<string, string>();
             LocalKnownTastes = local ?? new Dictionary<string, string>();
         }
+
         public bool IsKnownGlobally(string npcName)
             => GlobalKnownTastes.ContainsKey(npcName);
 

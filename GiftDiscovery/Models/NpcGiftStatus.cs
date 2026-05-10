@@ -2,9 +2,9 @@
 
 namespace GiftDiscovery.Models
 {
-    public class NpcGiftClassification
+    public class NPCGiftStatus
     {
-        public NPC Npc { get; set; } = null!;
+        public NPC NPC { get; set; } = null!;
         public string Name { get; set; } = "";
 
         public bool IsGiftable { get; set; }

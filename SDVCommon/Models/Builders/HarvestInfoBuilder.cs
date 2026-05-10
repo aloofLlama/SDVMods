@@ -69,7 +69,7 @@ namespace SDVCommon.Models.Builders
             if (_harvests.ContainsKey(harvestId))
                 return;
 
-            var itemInfo = GameObjectInfo.FromObject(harvestId);
+            var itemInfo = GameObject.FromObject(harvestId);
             if (itemInfo == null)
                 return;
 
@@ -98,7 +98,7 @@ namespace SDVCommon.Models.Builders
 
         public static bool IsShipOneCandidate(string itemId, ObjectData data)
         {
-            // Exclusions (same as LookupAnything and vanilla)
+            // Exclusions
             if (data.Type == "Arch"
                 || data.Type == "Fish"
                 || data.Type == "Mineral"

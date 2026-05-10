@@ -67,10 +67,10 @@ namespace HarvestHelper
             if (!Context.IsWorldReady)
                 return;
 
-            Item? hovered = HoveredItem.GetFromAnyMenu();
+            var hover = HoveredItem.Get();
 
             //must be an object
-            if (hovered is not StardewValley.Object obj)
+            if (hover.Item is not StardewValley.Object obj)
                 return;
 
             //skip recipes

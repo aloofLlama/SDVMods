@@ -6,16 +6,15 @@ using GiftDiscovery.Services;
 
 namespace GiftDiscovery.Compatibility
 {
-
     public static class GiftPatch
     {
         public static void Postfix(
             NPC __instance,
-            StardewValley.Object o,
-            Farmer giver,
-            bool updateGiftLimitInfo,
-            float friendshipChangeMultiplier,
-            bool showResponse
+            StardewValley.Object o
+            //Farmer giver,
+            //bool updateGiftLimitInfo,
+            //float friendshipChangeMultiplier,
+            //bool showResponse
         )
         {
             if (o is null)
@@ -32,7 +31,6 @@ namespace GiftDiscovery.Compatibility
                 $"Learned taste: {npcName} → {itemName} = {taste} | {itemId}",
                 LogLevel.Debug
                 );
-
 
             GiftKnowledgeService.LearnTaste(itemId, npcName, taste);
         }

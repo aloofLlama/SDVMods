@@ -21,9 +21,17 @@ namespace SDVCommon.Helpers
     {
         public static LogLevel DebugOrTrace =>
 #if DEBUG
+            LogLevel.Info;
+#else
+            LogLevel.Trace;
+#endif
+    
+
+        public static LogLevel DebugWarnOrTrace =>
+#if DEBUG
             LogLevel.Warn;
 #else
-        LogLevel.Trace;
+            LogLevel.Trace;
 #endif
     }
 

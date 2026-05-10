@@ -54,8 +54,8 @@ namespace PlantingDay
             if (!Context.IsWorldReady)
                 return;
 
-            Item? hovered = HoveredItem.GetFromAnyMenu();
-            if (hovered is not StardewValley.Object obj)
+            var hover = HoveredItem.Get();
+            if (hover.Item is not StardewValley.Object obj)
                 return;
 
 

@@ -139,7 +139,9 @@ namespace SDVCommon.Helpers.Tooltip
             List<InlineSegment> collapsibleSegments,
             List<InlineSegment> endSegments,
             int wrapSize,
-            int maxRows)
+            int maxRows,
+            bool useCommas = true
+        )
         {
             var unified = new List<InlineSegment>();
             unified.AddRange(startSegments);
@@ -184,14 +186,16 @@ namespace SDVCommon.Helpers.Tooltip
                 unified.AddRange(endSegments);
             }
 
-            return WrapWithCommas(unified, wrapSize, maxRows, S);
+            return WrapWithCommas(unified, wrapSize, maxRows, S, useCommas);
         }
 
         private static List<InlineSegment> WrapWithCommas(
             List<InlineSegment> segments,
             int wrapSize,
             int maxRows,
-            int startCount)
+            int startCount,
+            bool useCommas
+        )
         {
             var result = new List<InlineSegment>();
 
@@ -215,13 +219,22 @@ namespace SDVCommon.Helpers.Tooltip
                     itemsThisRow++;
                     globalIndex++;
 
-                    if (!isStart && itemsThisRow < wrapSize && globalIndex < segments.Count)
+                    if (useCommas && !isStart && itemsThisRow < wrapSize && globalIndex < segments.Count)
                     {
                         result.Add(new InlineSegment
                         {
                             Text = ", ",
                             TextColor = seg.TextColor
                         });
+                    }
+                    else
+                    {
+                        result.Add(new InlineSegment
+                        {
+                            Text = " ",
+                            TextColor = seg.TextColor
+                        });
+
                     }
                 }
 

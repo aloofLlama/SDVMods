@@ -32,6 +32,17 @@ namespace SDVCommon
             DrawTooltipAt(b, elements, font, style, x, y, width, height);
         }
 
+        public static void DrawBottomRight(SpriteBatch b, List<TooltipElement> elements)
+        {
+            SpriteFont font = Game1.smallFont;
+            TooltipStyle style = TooltipStyle.Default;
+
+            var (width, height) = MeasureTooltip(elements, font, style);
+            var (x, y) = PositionBottomRight(width, height);
+            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+        }
+
+
         public struct TooltipStyle
         {
             public int IconRenderSize;
@@ -172,6 +183,14 @@ namespace SDVCommon
             int y = Game1.uiViewport.Height - height - 32;
             return (x, y);
         }
+
+        private static (int x, int y) PositionBottomRight(int width, int height)
+        {
+            int x = Game1.uiViewport.Width - width - 32;
+            int y = Game1.uiViewport.Height - height - 32;
+            return (x, y);
+        }
+
 
         private static void DrawTooltipAt(
             SpriteBatch b,

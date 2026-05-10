@@ -13,6 +13,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ICustomBushApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\DataOverrides.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\Achievement.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameData\NPCGameData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameData\DisplayNames.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTOREconomicsHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTORGameDataHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OBSGift\GiftHelper.cs" />
@@ -24,7 +26,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Models\Wrappers\PlantInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\PurchaseDataBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Logging.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameData\GameObjectInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameData\GameObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\SeedSourceBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\Vendor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconProviders\CookingIconProvider.cs" />

@@ -1,6 +1,7 @@
 ﻿using GiftDiscovery;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
+using GiftDiscovery.Models.Builders;
 using GiftDiscovery.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,31 +9,48 @@ using SDVCommon;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Models.Builders;
 using SDVCommon.Helpers.Tooltip;
+using GiftDiscovery.GameData;
 
 namespace GiftDiscovery.Tooltip
 {
 
-    public static class TooltipBuilder
+    public static class GiftTooltipBuilder
     {
+        private static bool _isInitialized;
+
         private static List<TooltipElement>? _cachedTooltip;
         private static string? _cachedItemId;
         private static int _cachedConfigHash;
-        private static HashSet<string> _cachedNearbyNpcSet = new();
+        private static HashSet<string> _cachedNearbyNPCSet = new();
         private static bool _cachedMenuChanged;
         private static int _cachedToggleVersion;
         private static int _cachedGiftVersion;
 
-        public static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
+        public static void Initialize()
         {
-            if (!obj.canBeGivenAsGift())
+            if (_isInitialized)
                 return;
 
-            if (!GiftHelper.GetKnownBy(obj, GiftTaste.Love, TasteSourceMode.All).Any() &&
-                !GiftHelper.GetKnownBy(obj, GiftTaste.Like, TasteSourceMode.All).Any())
+            Reset();
+            _isInitialized = true;
+        }
+
+        public static void Reset()
+        {
+            _cachedTooltip = null;
+            _cachedItemId = null;
+            _cachedNearbyNPCSet.Clear();
+            _cachedMenuChanged = false;
+            _cachedToggleVersion = -1;
+            _cachedGiftVersion = -1;
+        }
+
+        public static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
+        {
+            if (!GiftableObjectList.GiftableIds.Contains(obj.QualifiedItemId))
                 return;
 
             var elements = GetTooltip(obj);
-
             if (elements is null || elements.Count == 0)
                 return;
 
@@ -41,42 +59,42 @@ namespace GiftDiscovery.Tooltip
 
         public static List<TooltipElement>? GetTooltip(StardewValley.Object obj)
         {
-            string itemId = obj.ItemId;
+            string key = obj.ItemId;
             int configHash = ModEntry.ModConfig.GetHashCode();
             bool menuChanged = ModEntry.MenuStateChanged;
             int toggleVersion = ModEntry.ToggleVersion;
             int giftVersion = GiftKnowledgeService.GiftVersion;
 
-            var nearbyNpcSet = DisplayHelper.GetNearbyNpcNames(ModEntry.ModConfig.NearbyRangeTiles);
+            var nearbyNPCSet = GiftableNPC.GetNearbyNPCNames(ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
 
             bool needsRebuild =
                 _cachedTooltip == null ||
-                itemId != _cachedItemId ||
+                key != _cachedItemId ||
                 configHash != _cachedConfigHash ||
                 menuChanged != _cachedMenuChanged ||
-                !nearbyNpcSet.SetEquals(_cachedNearbyNpcSet) ||
+                !nearbyNPCSet.SetEquals(_cachedNearbyNPCSet) ||
                 toggleVersion != _cachedToggleVersion ||
                 giftVersion != _cachedGiftVersion;
 
             if (!needsRebuild)
                 return _cachedTooltip;
 
-            // Rebuild
             _cachedTooltip = BuildTooltip(obj);
-            _cachedItemId = itemId;
+            _cachedItemId = key;
             _cachedConfigHash = configHash;
             _cachedMenuChanged = menuChanged;
-            _cachedNearbyNpcSet = nearbyNpcSet.ToHashSet();
+            _cachedNearbyNPCSet = nearbyNPCSet.ToHashSet();
             _cachedToggleVersion = toggleVersion;
             _cachedGiftVersion = giftVersion;
 
             return _cachedTooltip;
         }
 
+
         public static List<TooltipElement> BuildTooltip(
             StardewValley.Object obj)
         {
-            int wrapSize = ModEntry.ModConfig.WrapSize;
+            int wrapSize = ModEntry.ModConfig.WrapSizeGift;
             var list = new List<TooltipElement>();
 
             //Icon and display name
@@ -91,33 +109,39 @@ namespace GiftDiscovery.Tooltip
                 });
             }
 
-            var allGiftable = GiftHelper.GetAllGiftableNPCs()
-                .Select(NpcGiftClassificationBuilder.Classify)
-                .Where(c => c.IsGiftable)
-                .ToList();
+            //var allGiftable = GiftableNPC.GetAllGiftableNPCs()
+            //    .Select(NPCGiftStatusBuilder.GiftStatus)
+            //    .Where(c => c.IsGiftable)
+            //    .ToList();
 
-            var available = allGiftable.Where(c => c.IsAvailable).ToList();
+            //var available = allGiftable.Where(c => c.IsAvailable).ToList();
 
-            // ---------------------------------------------------------
-            // Use the user selected mode
-            // ---------------------------------------------------------
+            //// ---------------------------------------------------------
+            //// Use the user selected mode
+            //// ---------------------------------------------------------
+            //TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
+
+            //List<NPCGiftStatus> pool =
+            //    mode == TasteSourceMode.All ? allGiftable : available;
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
 
-            List<NpcGiftClassification> pool =
-                mode == TasteSourceMode.All ? allGiftable : available;
 
             // ---------------------------------------------------------
             // Taste grouping
             // ---------------------------------------------------------
-            IEnumerable<NpcGiftClassification> Known(GiftTaste t) =>
-                GiftHelper.GetKnownBy(obj, t, mode)
-                    .Select(npc => NpcGiftClassificationBuilder.Classify(npc));
+            string id = obj.QualifiedItemId;
+
+            IEnumerable<NPCGiftStatus> Known(GiftTaste t) =>
+                LearnedGiftsHelper.GetKnownFor(id, t, mode)
+                    .Select(npc => NPCGiftStatusBuilder.GiftStatus(npc));
 
             int UnknownCount(GiftTaste t) =>
-                GiftHelper.GetUnknownBy(obj, t, mode).Count();
+                LearnedGiftsHelper.GetUnknownFor(id, t, mode).Count();
 
             int UnmetCount() =>
-                pool.Count(c => c.IsUnmet);
+                GiftableNPC.GetAllGiftableNPCs()
+                    .Select(NPCGiftStatusBuilder.GiftStatus)
+                    .Count(c => c.IsUnmet);
 
             // ---------------------------------------------------------
             // Taste Sections
@@ -135,35 +159,27 @@ namespace GiftDiscovery.Tooltip
                 );
             }
 
-            if (!GiftHelper.HasDiscoveredAllLovesLikes(obj, mode))
+            AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
+            AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
+
+            if (!LearnedGiftsHelper.HasDiscoveredAllLovesLikesforItem(id, mode))
             {
-                AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
-                AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
                 AddTaste("Neutral", GiftTaste.Neutral, ModEntry.ModConfig.ShowNeutral);
                 AddTaste("Dislikes", GiftTaste.Dislike, ModEntry.ModConfig.ShowDislikes);
                 AddTaste("Hates", GiftTaste.Hate, ModEntry.ModConfig.ShowHates);
             }
 
-            //hide the non love/like (and empty) if all love/like are discovered
-            else
-            {
-                if (Known(GiftTaste.Love).Any())
-                    AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
-
-                if (Known(GiftTaste.Like).Any())
-                    AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
-            }
 
             // ---------------------------------------------------------
             // Undiscovered Section (only in Global/Local and if there are still loves/likes to discover
             // ---------------------------------------------------------
             if (mode != TasteSourceMode.All &&
                 ModEntry.ModConfig.ShowUndiscovered &&
-                !GiftHelper.HasDiscoveredAllLovesLikes(obj, mode))
+                !LearnedGiftsHelper.HasDiscoveredAllLovesLikesforItem(id, mode))
             {
                 // Unknown NPCs (all 5 tastes)
-                var unknownNPCs = GiftHelper.GetUndiscoveredBy(obj, mode)
-                    .Select(npc => NpcGiftClassificationBuilder.Classify(npc))
+                var unknownNPCs = LearnedGiftsHelper.GetUndiscoveredBy(id, mode)
+                    .Select(npc => NPCGiftStatusBuilder.GiftStatus(npc))
                     .Where(c => c.IsAvailable && c.IsMet)
                     .ToList();
 
@@ -185,13 +201,13 @@ namespace GiftDiscovery.Tooltip
         // ---------------------------------------------------------
         private static List<TooltipElement> BuildTasteSection(
             string label,
-            IEnumerable<NpcGiftClassification> known,
+            IEnumerable<NPCGiftStatus> known,
             int unknownCount,
             int wrapSize)
         {
             var collapsible = known
-                .OrderBy(c => c.Npc.displayName)
-                .Select(BuildNpcSegment)
+                .OrderBy(c => c.NPC.displayName)
+                .Select(BuildNPCSegment)
                 .ToList();
 
             var end = new List<InlineSegment>();
@@ -216,7 +232,8 @@ namespace GiftDiscovery.Tooltip
                 collapsibleSegments: collapsible,
                 endSegments: end,
                 wrapSize: wrapSize,
-                maxRows: 20
+                maxRows: 20,
+                useCommas: true
             );
 
             return new List<TooltipElement>
@@ -229,13 +246,13 @@ namespace GiftDiscovery.Tooltip
         // Undiscovered Section Builder
         // ---------------------------------------------------------
         private static List<TooltipElement> BuildUndiscoveredSection(
-            IEnumerable<NpcGiftClassification> unknownNPCs,
+            IEnumerable<NPCGiftStatus> unknownNPCs,
             int unmetCount,
             int wrapSize)
         {
             var collapsible = unknownNPCs
-                .OrderBy(c => c.Npc.displayName)
-                .Select(BuildNpcSegment)
+                .OrderBy(c => c.NPC.displayName)
+                .Select(BuildNPCSegment)
                 .ToList();
 
             var end = new List<InlineSegment>();
@@ -262,7 +279,8 @@ namespace GiftDiscovery.Tooltip
                 collapsibleSegments: collapsible,
                 endSegments: end,
                 wrapSize: wrapSize,
-                maxRows: 20
+                maxRows: 20,
+                useCommas: true
             );
 
             return new List<TooltipElement>
@@ -271,7 +289,7 @@ namespace GiftDiscovery.Tooltip
         };
         }
 
-        private static Color GetNpcNameColor(NpcGiftClassification c)
+        private static Color GetNPCNameColor(NPCGiftStatus c)
         {
             if (ModEntry.ModConfig.DeemphasizeAlreadyGifted &&
                 !c.CanGiftToday)
@@ -283,13 +301,13 @@ namespace GiftDiscovery.Tooltip
             return TooltipColors.Normal;
         }
 
-        private static InlineSegment BuildNpcSegment(NpcGiftClassification c)
+        private static InlineSegment BuildNPCSegment(NPCGiftStatus c)
         {
-            Color color = GetNpcNameColor(c);
+            Color color = GetNPCNameColor(c);
 
             bool isNearby =
                 ModEntry.ModConfig.EmphasizeNearbyNPCs &&
-                GiftHelper.IsNpcNearby(c.Npc, ModEntry.ModConfig.NearbyRangeTiles);
+                GiftableNPC.IsNPCNearby(c.NPC, ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
 
             bool isBold = false;
 
@@ -303,7 +321,7 @@ namespace GiftDiscovery.Tooltip
 
             return new InlineSegment
             {
-                Text = c.Npc.displayName,
+                Text = c.NPC.displayName,
                 TextColor = color,
                 Bold = isBold,
                 Underline = isNearby

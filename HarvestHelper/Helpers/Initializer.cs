@@ -3,6 +3,7 @@ using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
+using StardewModdingAPI;
 
 namespace HarvestHelper.Helpers
 {
@@ -10,6 +11,8 @@ namespace HarvestHelper.Helpers
     {
         public static void InitializeAll()
         {
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+
             TooltipIcons.Initialize();
             GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
@@ -31,6 +34,7 @@ namespace HarvestHelper.Helpers
             ModEntry.Instance.Monitor.Log($"Harvest Database Initialized",
                 LogHelper.DebugOrTrace
             );
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
         }
 

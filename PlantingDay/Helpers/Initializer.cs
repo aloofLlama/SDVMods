@@ -10,6 +10,8 @@ namespace PlantingDay.Helpers
     {
         public static void InitializeAll(IModHelper helper)
         {
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+
             TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
             MonsterDropBuilder.Initialize();
@@ -34,6 +36,7 @@ namespace PlantingDay.Helpers
                 $"Plant Database Initialized",
                 LogHelper.DebugOrTrace
             );
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
         }
 

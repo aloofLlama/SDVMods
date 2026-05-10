@@ -9,7 +9,6 @@ namespace SDVCommon.GameData
 {
     public class Inventory
     {
-
         public static int CountOwned(string canonicalId)
         {
             int total = 0;
@@ -65,7 +64,6 @@ namespace SDVCommon.GameData
 
             return total;
         }
-
         public static int CountOwnedInMainFarmhouseFridges(string canonicalId)
         {
             int total = 0;
@@ -90,6 +88,18 @@ namespace SDVCommon.GameData
             return total;
         }
 
+        public static bool IsInBackpack(string itemId)
+        {
+            foreach (var item in Game1.player.Items)
+            {
+                if (item is not null &&
+                    IdHelper.CanonicalItemId(item.QualifiedItemId)
+                        .Equals(IdHelper.CanonicalItemId(itemId), StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
 
         private static void ScanItem(object parent, IEnumerable<Item> roots, string canonicalId, ref int total, HashSet<Item> seen)
         {

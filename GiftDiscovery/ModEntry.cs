@@ -1,11 +1,13 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.Config;
+using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
 using HarmonyLib;
-using SDVCommon.Helpers;
 using SDVCommon.GameData;
+using SDVCommon.Helpers;
+using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -62,21 +64,49 @@ namespace GiftDiscovery
             Initializer.InitializeAll(ModHelper);
         }
 
+        //private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
+        //{
+        //    //Show tooltip when toggled on, holding a giftable item that has loves and/or likes
+        //    //
+        //    if (!Context.IsWorldReady
+        //        || !_showTooltip)
+        //        return;
+
+        //    //must be an object
+        //    if (HoveredItem.GetFromAnyMenu() is not StardewValley.Object obj)
+        //        return;
+
+        //    GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+
+        //}
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
         {
-            //Show tooltip when toggled on, holding a giftable item that has loves and/or likes
-            //
-            if (!Context.IsWorldReady
-                || !_showTooltip)
+            if (!Context.IsWorldReady || !_showTooltip)
                 return;
 
-            //must be an object
-            if (HoveredItem.GetFromAnyMenu() is not StardewValley.Object obj)
+            var hover = HoveredItem.Get();
+            if (!hover.HasValue)
                 return;
 
-            TooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+            switch (hover)
+            {
+                case { NPC: not null }:
+                    NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, hover.NPC!);
+                    break;
 
+                case { Item: StardewValley.Object obj }:
+                    GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+                    break;
+
+                case { ItemId: not null }:
+                    var itemObj = GameObject.GetObjectFromId(hover.ItemId!);
+
+                    if (itemObj != null)
+                        GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, itemObj);
+                    break;
+            }
         }
+
         private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
         {
             //Show tooltip when toggled on, holding a giftable item that has loves and/or likes
@@ -89,10 +119,18 @@ namespace GiftDiscovery
             if (Game1.activeClickableMenu != null)
                 return;
 
-            if (Game1.player.CurrentItem is not StardewValley.Object obj)
-                return;
+            // NPC proximity tooltip
+            NPC? nearest = GiftableNPC.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
+            if (nearest != null)
+            {
+                NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
+            }
 
-            TooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+            // Gift item tooltip (only if holding a giftable item)
+            if (Game1.player.CurrentItem is StardewValley.Object obj)
+            {
+                GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+            }
         }
 
 
@@ -110,6 +148,7 @@ namespace GiftDiscovery
 #if DEBUG
             if (e.Button == SButton.F5)
             {
+                Initializer.ResetAll(ModHelper);
                 GiftKnowledgeService.InitializeGlobal(ModHelper);
                 Initializer.InitializeAll(ModHelper);
                 ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);

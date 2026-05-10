@@ -71,8 +71,8 @@ namespace GiftDiscovery.Config
                 mod: manifest,
                 name: () => "Nearby NPC Range (tiles)",
                 tooltip: () => "NPCs within this many tiles of the player will be emphasized.",
-                getValue: () => ModEntry.ModConfig.NearbyRangeTiles,
-                setValue: value => ModEntry.ModConfig.NearbyRangeTiles = value,
+                getValue: () => ModEntry.ModConfig.NearbyRangeTilesGiftTooltip,
+                setValue: value => ModEntry.ModConfig.NearbyRangeTilesGiftTooltip = value,
                 min: 1,
                 max: 20
             );
@@ -81,8 +81,8 @@ namespace GiftDiscovery.Config
                 mod: manifest,
                 name: () => "Line Wrapping",
                 tooltip: () => "Wrap the list to the next line after this many names.",
-                getValue: () => ModEntry.ModConfig.WrapSize,
-                setValue: value => ModEntry.ModConfig.WrapSize = value,
+                getValue: () => ModEntry.ModConfig.WrapSizeGift,
+                setValue: value => ModEntry.ModConfig.WrapSizeGift = value,
                 min: 3,
                 max: 6
             );
@@ -135,6 +135,31 @@ namespace GiftDiscovery.Config
                 getValue: () => ModEntry.ModConfig.ShowUndiscovered,
                 setValue: value => ModEntry.ModConfig.ShowUndiscovered = value
             );
+
+            //-------------------
+            //NPC tooltip bottom right
+            //-------------------
+
+            gmcm.AddNumberOption(
+                mod: manifest,
+                name: () => "NPC Tooltip Range (tiles)",
+                tooltip: () => "NPC's gift tastes will be shown when standing this close to the NPC",
+                getValue: () => ModEntry.ModConfig.NearbyRangeTilesNPCTooltip,
+                setValue: value => ModEntry.ModConfig.NearbyRangeTilesNPCTooltip = value,
+                min: 1,
+                max: 3
+            );
+
+            gmcm.AddNumberOption(
+                mod: manifest,
+                name: () => "Line Wrapping",
+                tooltip: () => "Wrap the list to the next line after this many names.",
+                getValue: () => ModEntry.ModConfig.WrapSizeNPC,
+                setValue: value => ModEntry.ModConfig.WrapSizeNPC = value,
+                min: 3,
+                max: 20
+                );
+
 
 
         }

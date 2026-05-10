@@ -18,14 +18,14 @@ namespace HarvestHelper.TooltipSections
             var collapsible = GiftHelperOLD.GetKnownLovedBy(obj)
                 .Select(npc => new
                 {
-                    Npc = npc,
+                    NPC = npc,
                     Maxed = GiftHelperOLD.IsMaxHearts(npc)
                 })
                 .OrderBy(x => x.Maxed)                 // non‑maxed first
-                .ThenBy(x => x.Npc.displayName)        // alphabetical
+                .ThenBy(x => x.NPC.displayName)        // alphabetical
                 .Select(x => new InlineSegment
                 {
-                    Text = x.Npc.displayName,
+                    Text = x.NPC.displayName,
                     TextColor = x.Maxed ? TooltipColors.Normal : TooltipColors.Perfection
                 })
                 .ToList();
@@ -80,7 +80,9 @@ namespace HarvestHelper.TooltipSections
                 collapsibleSegments: collapsible,
                 endSegments: end,
                 wrapSize: 4,
-                maxRows: 2
+                maxRows: 2,
+                useCommas: true
+
             );
 
             // Add tooltip element with heart icon

@@ -25,7 +25,7 @@
 	</ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDVData\SDVData.csproj" >
+    <ProjectReference Include="..\SDVData\SDVData.csproj">
 	</ProjectReference>
 	</ItemGroup>
 

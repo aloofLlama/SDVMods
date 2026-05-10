@@ -1,14 +1,20 @@
-﻿using GiftDiscovery.Models;
+﻿using GiftDiscovery.GameData;
+using GiftDiscovery.Helpers;
+using GiftDiscovery.Models;
+using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 using StardewValley;
-using System.Data;
-
-
 
 namespace GiftDiscovery.Services
 {
+    // This service manages the knowledge of gift tastes for NPCs and items.
+    // Saves the learned information
+    // Reads the information for use
     public static class GiftKnowledgeService
     {
+        private static readonly Dictionary<string, Dictionary<string, GiftTaste>> CanonicalTasteCache
+    = new();
+
         // Global is available for all farm files
         private const string GlobalDataKey = "GiftKnowledge";
         private static GiftKnowledgeData _globalData = null!;
@@ -36,17 +42,14 @@ namespace GiftDiscovery.Services
 
         }
 
-
         public static void Save()
         {
             _helper.Data.WriteGlobalData(GlobalDataKey, _globalData);
             _helper.Data.WriteSaveData(LocalDataKey, _localData);
-
         }
 
         public static int GiftVersion = 0; //used for cache update
 
-        // ⭐ Accept enum
         public static void LearnTaste(string itemId, string npcName, GiftTaste taste)
         {
             if (!_globalData.KnownTastes.TryGetValue(itemId, out var npcDict))
@@ -55,14 +58,13 @@ namespace GiftDiscovery.Services
                 _globalData.KnownTastes[itemId] = npcDict;
             }
 
-            if (!_localData.KnownTastes.TryGetValue(itemId, out var localNpcDict))
+            if (!_localData.KnownTastes.TryGetValue(itemId, out var localNPCDict))
             {
-                localNpcDict = new Dictionary<string, string>();
-                _localData.KnownTastes[itemId] = localNpcDict;
+                localNPCDict = new Dictionary<string, string>();
+                _localData.KnownTastes[itemId] = localNPCDict;
             }
-            localNpcDict[npcName] = taste.ToString();
+            localNPCDict[npcName] = taste.ToString();
 
-            // ⭐ Store enum as string
             npcDict[npcName] = taste.ToString();
 
             Save(); //saves both global and local data
@@ -70,7 +72,6 @@ namespace GiftDiscovery.Services
 
         }
 
-        // ⭐ Return enum instead of string
         public static bool TryGetGlobalKnownTaste(string itemId, string npcName, out GiftTaste? taste)
         {
             taste = null;
@@ -101,49 +102,37 @@ namespace GiftDiscovery.Services
             return false;
         }
 
-
-        // ⭐ Return dictionary of enums
-        public static Dictionary<string, GiftTaste>? GetGlobalKnownTastesForItem(string itemId)
+        private static Dictionary<string, GiftTaste> BuildCanonicalTasteMap(NPC npc)
         {
-            if (!_globalData.KnownTastes.TryGetValue(itemId, out var npcDict))
-                return null;
+            var map = new Dictionary<string, GiftTaste>();
 
-            return npcDict
-                .Where(kvp => Enum.TryParse<GiftTaste>(kvp.Value, out _))
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => Enum.Parse<GiftTaste>(kvp.Value)
-                );
+            foreach (var obj in GiftableObjectList.AllGiftable)
+            {
+                try
+                {
+                    GiftTaste t = (GiftTaste)npc.getGiftTasteForThisItem(obj);
+                    map[obj.QualifiedItemId] = t;
+                }
+                catch
+                {
+                    // NPC has no taste for this item (rare)
+                }
+            }
+
+            return map;
         }
-
-        public static Dictionary<string, GiftTaste>? GetLocalKnownTastesForItem(string itemId)
+        public static Dictionary<string, GiftTaste> GetCanonicalTasteMap(NPC npc)
         {
-            if (!_localData.KnownTastes.TryGetValue(itemId, out var npcDict))
-                return null;
+            string name = npc.Name;
 
-            return npcDict
-                .Where(kvp => Enum.TryParse<GiftTaste>(kvp.Value, out _))
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => Enum.Parse<GiftTaste>(kvp.Value)
-                );
+            if (!CanonicalTasteCache.TryGetValue(name, out var map))
+            {
+                map = BuildCanonicalTasteMap(npc);
+                CanonicalTasteCache[name] = map;
+            }
+
+            return map;
         }
-
-
-        //public static GiftTasteInfo GetTasteInfo(string itemId, string npcName)
-        //{
-        //    GiftTaste canonical = GiftHelper.GetCanonicalTaste(npcName, itemId);
-
-        //    bool global = TryGetKnownTaste(itemId, npcName, out var globalTaste);
-        //    bool local = TryGetLocalTaste(itemId, npcName, out var localTaste);
-
-        //    return new GiftTasteInfo
-        //    {
-        //        Canonical = canonical,
-        //        LearnedGlobally = global,
-        //        LearnedLocally = local
-        //    };
-        //}
 
 
     }
