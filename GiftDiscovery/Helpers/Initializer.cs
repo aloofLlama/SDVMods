@@ -16,8 +16,6 @@ namespace GiftDiscovery.Helpers
     {
         public static void InitializeAll(IModHelper helper)
         {
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
-
             TooltipIcons.Initialize();
             HarvestInfoBuilder.Initialize();
             GiftableObjectList.Initialize();
@@ -28,24 +26,49 @@ namespace GiftDiscovery.Helpers
             GiftTooltipBuilder.Initialize();
             NPCGiftTooltipBuilder.Initialize();
 
-            foreach (var npc in GiftableNPC.GetAllGiftableNPCs())
-                GiftKnowledgeService.GetCanonicalTasteMap(npc);
-
+            int cnt = 0;
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
                 string harvestKey = IdHelper.CanonicalItemId(obj.QualifiedItemId);
                 var info = HarvestInfoBuilder.LookupFromKey(harvestKey);
 
                 if (info != null)
+                {
                     IconInitializers.HarvestIcons(info);
+                    cnt++;
+                }
             }
+
+#if DEBUG //TODO troubleshoot missing icons
+            foreach (var obj in GiftableObjectList.AllGiftable)
+            {
+                string harvestKey = IdHelper.CanonicalItemId(obj.QualifiedItemId);
+                var info = HarvestInfoBuilder.LookupFromKey(harvestKey);
+
+                if (info == null)
+                {
+                    SDVCommonLog.Log(
+                        $"Missing HarvestInfo for {obj.QualifiedItemId} (canonical={harvestKey})",
+                        LogHelper.DebugOrTrace
+                    );
+                    continue;
+                }
+
+                if (info.Runtime.HarvestIcon == null)
+                {
+                    SDVCommonLog.Log(
+                        $"Missing ICON for {obj.QualifiedItemId} (canonical={harvestKey})",
+                        LogHelper.DebugOrTrace
+                    );
+                }
+            }
+#endif
 
             SDVCommonLog.Log($"Gift Discovery Initialized",
                 LogHelper.DebugOrTrace);
 
-            SDVCommonLog.Log($"Giftable count = {GiftableObjectList.AllGiftable.Count}",
+            SDVCommonLog.Log($"Giftable items: {GiftableObjectList.AllGiftable.Count} | Gift icons: {cnt}",
                 LogHelper.DebugOrTrace);
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
         }
         public static void ResetAll(IModHelper helper)
@@ -53,10 +76,7 @@ namespace GiftDiscovery.Helpers
             GiftableObjectList.Reset();
             GiftTooltipBuilder.Reset();
             NPCGiftTooltipBuilder.Reset();
-
+            GiftKnowledgeService.ResetCanonicalTasteCache();
         }
-
-
-
     }
 }

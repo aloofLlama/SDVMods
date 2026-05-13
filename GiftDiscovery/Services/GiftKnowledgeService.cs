@@ -50,6 +50,13 @@ namespace GiftDiscovery.Services
 
         public static int GiftVersion = 0; //used for cache update
 
+        public static void ResetCanonicalTasteCache()
+        {
+            CanonicalTasteCache.Clear();
+            GiftVersion++;
+        }
+
+
         public static void LearnTaste(string itemId, string npcName, GiftTaste taste)
         {
             if (!_globalData.KnownTastes.TryGetValue(itemId, out var npcDict))
@@ -102,9 +109,40 @@ namespace GiftDiscovery.Services
             return false;
         }
 
+        public static GiftTaste? GetCanonicalTasteForItem(string qualifiedItemId, NPC npc)
+        {
+            var obj = GiftableObjectList.AllGiftable
+                .FirstOrDefault(o => o.QualifiedItemId == qualifiedItemId);
+
+            if (obj is null)
+                return null;
+
+            try
+            {
+                return (GiftTaste)npc.getGiftTasteForThisItem(obj);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        public static Dictionary<string, GiftTaste> GetCanonicalTasteMap(NPC npc)
+        {
+            string name = npc.Name;
+
+            if (!CanonicalTasteCache.TryGetValue(name, out var map))
+            {
+                map = BuildCanonicalTasteMap(npc);
+                CanonicalTasteCache[name] = map;
+            }
+            return map;
+        }
+
         private static Dictionary<string, GiftTaste> BuildCanonicalTasteMap(NPC npc)
         {
             var map = new Dictionary<string, GiftTaste>();
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] Start get taste map {npc.Name}", LogLevel.Warn);
 
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
@@ -118,18 +156,7 @@ namespace GiftDiscovery.Services
                     // NPC has no taste for this item (rare)
                 }
             }
-
-            return map;
-        }
-        public static Dictionary<string, GiftTaste> GetCanonicalTasteMap(NPC npc)
-        {
-            string name = npc.Name;
-
-            if (!CanonicalTasteCache.TryGetValue(name, out var map))
-            {
-                map = BuildCanonicalTasteMap(npc);
-                CanonicalTasteCache[name] = map;
-            }
+            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] End get taste map {npc.Name}", LogLevel.Warn);
 
             return map;
         }

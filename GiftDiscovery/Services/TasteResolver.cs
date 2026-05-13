@@ -10,6 +10,7 @@ namespace GiftDiscovery.Services
         // ---------------------------------------------------------
         internal static GiftTaste? GetCanonicalTaste(string qualifiedItemId, NPC npc)
         {
+
             var map = GiftKnowledgeService.GetCanonicalTasteMap(npc);
 
             if (map.TryGetValue(qualifiedItemId, out var taste))
@@ -19,8 +20,13 @@ namespace GiftDiscovery.Services
         }
 
         // ---------------------------------------------------------
-        // LEARNED TASTE (Item → NPC)
+        // TASTE (Item → NPC)
         // ---------------------------------------------------------
+        internal static GiftTaste? GetCanonicalTasteForItem(string qualifiedItemId, NPC npc)
+        {
+            return GiftKnowledgeService.GetCanonicalTasteForItem(qualifiedItemId, npc);
+        }
+
         internal static GiftTaste? GetLearnedTasteGlobal(string itemId, NPC npc)
         {
             if (GiftKnowledgeService.TryGetGlobalKnownTaste(itemId, npc.Name, out var t))
@@ -46,7 +52,7 @@ namespace GiftDiscovery.Services
             switch (mode)
             {
                 case TasteSourceMode.All:
-                    return GetCanonicalTaste(itemId, npc) != null;
+                    return GetCanonicalTasteForItem(itemId, npc) != null;
 
                 case TasteSourceMode.Global:
                     return GetLearnedTasteGlobal(itemId, npc) != null;
@@ -66,7 +72,7 @@ namespace GiftDiscovery.Services
                 return false;
 
             // Must have a canonical taste to be unknown
-            var canonical = GetCanonicalTaste(itemId, npc);
+            var canonical = TasteResolver.GetCanonicalTasteForItem(itemId, npc);
             if (canonical == null)
                 return false;
 

@@ -84,7 +84,7 @@ namespace GiftDiscovery.Tooltip
             int giftVersion = GiftKnowledgeService.GiftVersion;
 
             int range = ModEntry.ModConfig.NearbyRangeTilesNPCTooltip;
-            var nearbyNPCSet = GiftableNPC.GetNearbyNPCNames(range);
+            //var nearbyNPCSet = GiftableNPC.GetNearbyNPCNames(range);
 
             bool needsRebuild =
                 _cachedTooltip == null ||
@@ -128,7 +128,9 @@ namespace GiftDiscovery.Tooltip
             list.Add(new TooltipElement
             {
                 Icon = portrait,
-                Text = npc.displayName
+                Text = npc.displayName,
+                TextColor = DisplayHelper.GetNPCNameColor(npc)
+
             });
 
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
@@ -164,13 +166,6 @@ namespace GiftDiscovery.Tooltip
                 .Where(info => info is not null)
                 .Cast<HarvestInfo>()
                 .ToList();
-
-            foreach (var id in filteredIds)
-            {
-                var info = HarvestInfoBuilder.LookupFromKey(IdHelper.CanonicalItemId(id));
-                SDVCommonLog.Log($"HarvestInfo for {id} = {(info == null ? "NULL" : "OK")}", LogHelper.DebugOrTrace);
-            }
-
 
             // Unknown count
             int unknownCount = LearnedGiftsHelper

@@ -10,6 +10,10 @@ using SDVCommon.Models.Tooltip;
 using SDVCommon.Models.Builders;
 using SDVCommon.Helpers.Tooltip;
 using GiftDiscovery.GameData;
+using StardewValley;
+using SDVCommon.Helpers;
+using StardewModdingAPI;
+
 
 namespace GiftDiscovery.Tooltip
 {
@@ -159,14 +163,23 @@ namespace GiftDiscovery.Tooltip
                 );
             }
 
-            AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
-            AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
-
             if (!LearnedGiftsHelper.HasDiscoveredAllLovesLikesforItem(id, mode))
             {
+                AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
+                AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
                 AddTaste("Neutral", GiftTaste.Neutral, ModEntry.ModConfig.ShowNeutral);
                 AddTaste("Dislikes", GiftTaste.Dislike, ModEntry.ModConfig.ShowDislikes);
                 AddTaste("Hates", GiftTaste.Hate, ModEntry.ModConfig.ShowHates);
+            }
+
+            //hide the non love/like (and empty) if all love/like are discovered
+            else
+            {
+                if (Known(GiftTaste.Love).Any())
+                    AddTaste("Loves", GiftTaste.Love, ModEntry.ModConfig.ShowLoves);
+
+                if (Known(GiftTaste.Like).Any())
+                    AddTaste("Likes", GiftTaste.Like, ModEntry.ModConfig.ShowLikes);
             }
 
 
@@ -207,7 +220,7 @@ namespace GiftDiscovery.Tooltip
         {
             var collapsible = known
                 .OrderBy(c => c.NPC.displayName)
-                .Select(BuildNPCSegment)
+                .Select(c => BuildNPCSegment(c.NPC))
                 .ToList();
 
             var end = new List<InlineSegment>();
@@ -252,7 +265,7 @@ namespace GiftDiscovery.Tooltip
         {
             var collapsible = unknownNPCs
                 .OrderBy(c => c.NPC.displayName)
-                .Select(BuildNPCSegment)
+                .Select(c => BuildNPCSegment(c.NPC))
                 .ToList();
 
             var end = new List<InlineSegment>();
@@ -289,31 +302,19 @@ namespace GiftDiscovery.Tooltip
         };
         }
 
-        private static Color GetNPCNameColor(NPCGiftStatus c)
+
+        private static InlineSegment BuildNPCSegment(NPC npc)
         {
-            if (ModEntry.ModConfig.DeemphasizeAlreadyGifted &&
-                !c.CanGiftToday)
-                return TooltipColors.Muted;
-
-            if (ModEntry.ModConfig.HighlightNotMaxFriendship)
-                return c.IsMaxHeart ? TooltipColors.Normal : TooltipColors.Perfection;
-
-            return TooltipColors.Normal;
-        }
-
-        private static InlineSegment BuildNPCSegment(NPCGiftStatus c)
-        {
-            Color color = GetNPCNameColor(c);
+            Color color = DisplayHelper.GetNPCNameColor(npc);
 
             bool isNearby =
                 ModEntry.ModConfig.EmphasizeNearbyNPCs &&
-                GiftableNPC.IsNPCNearby(c.NPC, ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
-
+                GiftableNPC.IsNPCNearby(npc, ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
             bool isBold = false;
 
             if (isNearby)
             {
-                if (ModEntry.ModConfig.DeemphasizeAlreadyGifted && !c.CanGiftToday)
+                if (ModEntry.ModConfig.DeemphasizeAlreadyGifted && !NPCGiftStatusBuilder.GiftStatus(npc).CanGiftToday)
                     isBold = false;
                 else
                     isBold = true;
@@ -321,7 +322,7 @@ namespace GiftDiscovery.Tooltip
 
             return new InlineSegment
             {
-                Text = c.NPC.displayName,
+                Text = npc.displayName,
                 TextColor = color,
                 Bold = isBold,
                 Underline = isNearby

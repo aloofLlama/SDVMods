@@ -11,30 +11,33 @@ namespace HarvestHelper.Helpers
     {
         public static void InitializeAll()
         {
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
-
             TooltipIcons.Initialize();
             GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
-            //GiftKnowledgeService.Initialize(helper); moved to modentry with harmony patch
             CookingInfoBuilder.BuildAll();
 
+            int cnt = 0;
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)
             {
                 IconInitializers.HarvestIcons(harvest);
+                cnt++;
             }
 
+            int cnt2 = 0;
             foreach (var recipe in CookingInfoBuilder.AllRecipes)
             {
                 IconInitializers.CookingIcons(recipe);
+                cnt2++;
             }
 
+#if DEBUG
             CacheForTesting.DumpHarvestInfoToJson();
+#endif
+            SDVCommonLog.Log($"Harvest Database Initialized",
+                LogHelper.DebugOrTrace);
+            SDVCommonLog.Log($"Harvest icons: {cnt} | Cooking icons: {cnt2}",
+                LogHelper.DebugOrTrace);
 
-            ModEntry.Instance.Monitor.Log($"Harvest Database Initialized",
-                LogHelper.DebugOrTrace
-            );
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
         }
 

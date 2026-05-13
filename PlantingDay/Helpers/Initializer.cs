@@ -10,33 +10,35 @@ namespace PlantingDay.Helpers
     {
         public static void InitializeAll(IModHelper helper)
         {
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
-
             TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
             MonsterDropBuilder.Initialize();
             PlantInfoBuilder.Initialize();
             HarvestInfoBuilder.Initialize();
 
-
+            int cnt = 0;
             foreach (var plant in PlantInfoBuilder.AllPlants)
             {
                 // seed, trade currency icons
                 PlantIconInitializer.InitializeIcons(plant);
-
+                cnt++;
             }
+
+            int cnt2 = 0;
             foreach (var harvest in HarvestInfoBuilder.AllHarvests)
             {
                 IconInitializers.HarvestIcons(harvest);
+                cnt2++;
             }
 
+#if DEBUG
             CacheForTesting.DumpPlantInfoToJson();
+#endif
 
-            ModEntry.Instance.Monitor.Log(
-                $"Plant Database Initialized",
-                LogHelper.DebugOrTrace
-            );
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+            SDVCommonLog.Log($"Plant Database Initialized",
+                LogHelper.DebugOrTrace);
+            SDVCommonLog.Log($"Seed icons: {cnt} | Harvest icons: {cnt2}",
+                LogHelper.DebugOrTrace);
 
         }
 
