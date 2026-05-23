@@ -23,6 +23,8 @@ namespace GiftDiscovery
         public static ModConfig ModConfig { get; internal set; } = null!;
 
         private bool _showTooltip = false;
+        internal static bool IsInMenuTooltip = false;
+
 
         public override void Entry(IModHelper helper)
         {
@@ -88,6 +90,8 @@ namespace GiftDiscovery
             if (!hover.HasValue)
                 return;
 
+            ModEntry.IsInMenuTooltip = true;
+
             switch (hover)
             {
                 case { NPC: not null }:
@@ -118,6 +122,8 @@ namespace GiftDiscovery
 
             if (Game1.activeClickableMenu != null)
                 return;
+
+            ModEntry.IsInMenuTooltip = false;
 
             // NPC proximity tooltip
             NPC? nearest = GiftableNPC.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
@@ -154,19 +160,6 @@ namespace GiftDiscovery
                 ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
             }
 
-            if (e.Button == SButton.M)
-
-                foreach (var harvest in HarvestInfoBuilder.AllHarvests)
-                    {
-
-                if (Game1.objectData.ContainsKey(harvest.Data.HarvestId))
-                {
-                    SDVCommonLog.Log(
-                        $"[HarvestDB] Vanilla item found: '{harvest.Data.HarvestId}'",
-                        LogLevel.Info
-                    );
-                }
-            }
 #endif
         }
 

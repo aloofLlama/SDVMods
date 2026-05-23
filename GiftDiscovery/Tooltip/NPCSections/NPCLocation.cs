@@ -14,7 +14,9 @@ namespace GiftDiscovery.Tooltip.NPCSections
     {
         public static List<TooltipElement> Build(NPC npc)
         {
-            if (!ModEntry.ModConfig.ShowLocation)
+            // Only show location in menus, not in HUD proximity tooltips
+            // Only show when checked in GMCM
+            if (!ModEntry.IsInMenuTooltip || !ModEntry.ModConfig.ShowLocation)
                 return new List<TooltipElement>();
 
             string name = GiftableNPC.GetNPCLocation(npc);
