@@ -1,9 +1,11 @@
 ﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
+using SDVCommon.Helpers;
 using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Characters;
 
 namespace GiftDiscovery.Services
 {
@@ -142,7 +144,6 @@ namespace GiftDiscovery.Services
         private static Dictionary<string, GiftTaste> BuildCanonicalTasteMap(NPC npc)
         {
             var map = new Dictionary<string, GiftTaste>();
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] Start get taste map {npc.Name}", LogLevel.Warn);
 
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
@@ -153,10 +154,10 @@ namespace GiftDiscovery.Services
                 }
                 catch
                 {
-                    // NPC has no taste for this item (rare)
+                    SDVCommonLog.Log($"Missing Gift Info: {npc.displayName} | {obj.DisplayName}",
+                        LogLevel.Warn);
                 }
             }
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] End get taste map {npc.Name}", LogLevel.Warn);
 
             return map;
         }

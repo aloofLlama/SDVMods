@@ -12,6 +12,7 @@ namespace GiftDiscovery.Config
             if (gmcm == null)
                 return;
 
+
             gmcm.Register(
                 mod: manifest,
                 reset: () =>
@@ -24,6 +25,13 @@ namespace GiftDiscovery.Config
                     helper.WriteConfig(ModEntry.ModConfig);
                 }
             );
+
+            gmcm.AddSectionTitle(
+                ModEntry.Instance.ModManifest,
+                () => "General"
+                //() => ""
+                );
+
 
             gmcm.AddKeybind(
                 mod: manifest,
@@ -41,6 +49,16 @@ namespace GiftDiscovery.Config
                 setValue: value => ModEntry.ModConfig.TasteSourceMode = Enum.Parse<TasteSourceMode>(value),
                 allowedValues: Enum.GetNames(typeof(TasteSourceMode)),
                 formatAllowedValue: v => v
+            );
+
+            //------
+            // Gift tooltip
+            //------
+
+            gmcm.AddSectionTitle(
+                ModEntry.Instance.ModManifest,
+                () => "Gift Tooltip"
+                //() => ""
             );
 
             gmcm.AddBoolOption(
@@ -136,9 +154,25 @@ namespace GiftDiscovery.Config
                 setValue: value => ModEntry.ModConfig.ShowUndiscovered = value
             );
 
+            gmcm.AddBoolOption(
+                mod: manifest,
+                name: () => "Show Mod Source",
+                tooltip: () => "Show which mod a gift item comes from.",
+                getValue: () => ModEntry.ModConfig.ShowModSource,
+                setValue: value => ModEntry.ModConfig.ShowModSource = value
+            );
+
+
             //-------------------
             //NPC tooltip bottom right
             //-------------------
+
+            gmcm.AddSectionTitle(
+                ModEntry.Instance.ModManifest,
+                () => "NPC Tooltip"
+                //() => ""
+            );
+
 
             gmcm.AddNumberOption(
                 mod: manifest,
@@ -153,14 +187,31 @@ namespace GiftDiscovery.Config
             gmcm.AddNumberOption(
                 mod: manifest,
                 name: () => "Line Wrapping",
-                tooltip: () => "Wrap the list to the next line after this many names.",
+                tooltip: () => "Wrap the list to the next line after this many gifts",
                 getValue: () => ModEntry.ModConfig.WrapSizeNPC,
                 setValue: value => ModEntry.ModConfig.WrapSizeNPC = value,
                 min: 3,
                 max: 20
                 );
 
+            gmcm.AddNumberOption(
+                mod: manifest,
+                name: () => "Maximum Rows",
+                tooltip: () => "Maximum number of gift rows to display.",
+                getValue: () => ModEntry.ModConfig.MaxRowsNPC,
+                setValue: value => ModEntry.ModConfig.MaxRowsNPC = value,
+                min: 3,
+                max: 20
+                );
 
+
+            gmcm.AddBoolOption(
+                mod: manifest,
+                name: () => "Show Location",
+                tooltip: () => "Show the current location of the NPC.",
+                getValue: () => ModEntry.ModConfig.ShowLocation,
+                setValue: value => ModEntry.ModConfig.ShowLocation = value
+            );
 
         }
     }

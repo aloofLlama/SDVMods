@@ -41,5 +41,89 @@ namespace SDVCommon.Helpers
 
             return "(O)" + id;
         }
+
+        //Checks if the ID is one that belongs to the basegame (aka not a mod)
+        public static bool IsVanillaStardew(string canonicalId)
+        {
+            if (string.IsNullOrWhiteSpace(canonicalId))
+                return false;
+
+            // Normalize to canonical form
+            string id = CanonicalItemId(canonicalId);
+
+            // Numeric IDs → always vanilla
+            if (int.TryParse(id, out _))
+                return true;
+
+            // Verified vanilla string IDs
+            if (VanillaStringIds.Contains(id))
+                return true;
+
+
+            return false;
+        }
+
+        private static readonly HashSet<string> VanillaStringIds = new(StringComparer.OrdinalIgnoreCase)
+            {
+            "FarAwayStone",
+            "DeluxeBait",
+            "Moss",
+            "MossySeed",
+            "SonarBobber",
+            "SpecificBait",
+            "TentKit",
+            "MysticTreeSeed",
+            "MysticSyrup",
+            "Raisins",
+            "DriedFruit",
+            "DriedMushrooms",
+            "StardropTea",
+            "PrizeTicket",
+            "GoldCoin",
+            "TreasureTotem",
+            "ChallengeBait",
+            "Carrot",
+            "SummerSquash",
+            "Broccoli",
+            "Powdermelon",
+            "SmokedFish",
+            "PurpleBook",
+            "SkillBook_0",
+            "SkillBook_1",
+            "SkillBook_2",
+            "SkillBook_3",
+            "SkillBook_4",
+            "SeaJelly",
+            "CaveJelly",
+            "RiverJelly",
+            "Goby",
+            "BlueGrassStarter",
+            "MossSoup",
+
+            //Books
+            "Book_Trash",
+            "Book_Crabbing",
+            "Book_Bombs",
+            "Book_Roe",
+            "Book_WildSeeds",
+            "Book_Woodcutting",
+            "Book_Defense",
+            "Book_Friendship",
+            "Book_Void",
+            "Book_Speed",
+            "Book_Marlon",
+            "Book_PriceCatalogue",
+            "Book_QueenOfSauce",
+            "Book_Diamonds",
+            "Book_Mystery",
+            "Book_AnimalCatalogue",
+            "Book_Speed2",
+            "Book_Artifact",
+            "Book_Horse",
+            "Book_Grass"
+
+        };
+
+
     }
 }

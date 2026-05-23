@@ -55,7 +55,7 @@ namespace SDVCommon
                 IconRenderSize = 32,
                 IconColumnWidth = 34,
                 SeparatorPadding = 12,
-                InlineIconWidthPadding = 6
+                InlineIconWidthPadding = 2
             };
         }
 

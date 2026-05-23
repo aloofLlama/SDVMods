@@ -1,5 +1,6 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.Models;
+using GiftDiscovery.Helpers;
 using StardewValley;
 
 namespace GiftDiscovery.Models.Builders
@@ -26,7 +27,7 @@ namespace GiftDiscovery.Models.Builders
                 Game1.player.friendshipData.ContainsKey(name);
 
             bool canGiftToday = isAvailable && !MaxGiftsReached(npc);
-            bool isMaxHeart = isAvailable && isMet && IsMaxHearts(npc);
+            bool isMaxHeart = isAvailable && isMet && HeartStatus.IsMaxHearts(npc);
 
             return new NPCGiftStatus
             {
@@ -63,43 +64,6 @@ namespace GiftDiscovery.Models.Builders
             return false;
         }
 
-        private static bool IsMaxHearts(NPC npc)
-        {
-            // get friendship entry
-            if (!Game1.player.friendshipData.TryGetValue(npc.Name, out Friendship f))
-                return false;
-
-            int maxHearts = GetMaxHearts(npc);
-            int maxPoints = maxHearts * 250;
-
-            return f.Points >= maxPoints;
-        }
-
-        private static int GetMaxHearts(NPC npc)
-        {
-            // cannot socialize → 0
-            if (!npc.CanSocialize)
-                return 0;
-
-            // get friendship entry
-            if (!Game1.player.friendshipData.TryGetValue(npc.Name, out Friendship f))
-                return 0;
-
-            // marriage and roommate → 14 (roommate is marrier + a roommatemarriage flag)
-            if (f.Status == FriendshipStatus.Married)
-                return 14;
-
-            // dating or engaged → 10
-            if (f.Status == FriendshipStatus.Dating || f.Status == FriendshipStatus.Engaged)
-                return 10;
-
-            // romanceable but not dating yet → 10
-            if (npc.GetData()?.CanBeRomanced == true)
-                return 8;
-
-            // everyone else
-            return 10;
-        }
 
 
     }

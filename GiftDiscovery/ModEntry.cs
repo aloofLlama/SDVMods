@@ -148,10 +148,24 @@ namespace GiftDiscovery
 #if DEBUG
             if (e.Button == SButton.F5)
             {
-                Initializer.ResetAll(ModHelper);
+                Initializer.ResetAll();
                 GiftKnowledgeService.InitializeGlobal(ModHelper);
                 Initializer.InitializeAll(ModHelper);
                 ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+            }
+
+            if (e.Button == SButton.M)
+
+                foreach (var harvest in HarvestInfoBuilder.AllHarvests)
+                    {
+
+                if (Game1.objectData.ContainsKey(harvest.Data.HarvestId))
+                {
+                    SDVCommonLog.Log(
+                        $"[HarvestDB] Vanilla item found: '{harvest.Data.HarvestId}'",
+                        LogLevel.Info
+                    );
+                }
             }
 #endif
         }

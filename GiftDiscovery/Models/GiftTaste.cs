@@ -9,6 +9,8 @@ namespace GiftDiscovery.Models
         Neutral = NPC.gift_taste_neutral,
         Dislike = NPC.gift_taste_dislike,
         Hate = NPC.gift_taste_hate,
+        StardropTea = NPC.gift_taste_stardroptea,
+
     }
 
     public enum TasteSourceMode

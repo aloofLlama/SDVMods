@@ -1,4 +1,5 @@
 ﻿using GiftDiscovery;
+using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using GiftDiscovery.Models.Builders;
@@ -6,13 +7,13 @@ using GiftDiscovery.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
-using SDVCommon.Models.Tooltip;
-using SDVCommon.Models.Builders;
-using SDVCommon.Helpers.Tooltip;
-using GiftDiscovery.GameData;
-using StardewValley;
 using SDVCommon.Helpers;
+using SDVCommon.Helpers.Tooltip;
+using SDVCommon.Models.Builders;
+using SDVCommon.Models.Tooltip;
+using SDVData;
 using StardewModdingAPI;
+using StardewValley;
 
 
 namespace GiftDiscovery.Tooltip
@@ -113,20 +114,6 @@ namespace GiftDiscovery.Tooltip
                 });
             }
 
-            //var allGiftable = GiftableNPC.GetAllGiftableNPCs()
-            //    .Select(NPCGiftStatusBuilder.GiftStatus)
-            //    .Where(c => c.IsGiftable)
-            //    .ToList();
-
-            //var available = allGiftable.Where(c => c.IsAvailable).ToList();
-
-            //// ---------------------------------------------------------
-            //// Use the user selected mode
-            //// ---------------------------------------------------------
-            //TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
-
-            //List<NPCGiftStatus> pool =
-            //    mode == TasteSourceMode.All ? allGiftable : available;
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
 
 
@@ -205,6 +192,34 @@ namespace GiftDiscovery.Tooltip
                     );
                 }
             }
+
+            // ---------------------------------------------------------
+            // Mod Source Section
+            // ---------------------------------------------------------
+            if (ModEntry.ModConfig.ShowModSource)
+            {
+                var modSource = giftItem?.Data?.ModSource ?? ModSource.Stardew;
+
+                if (modSource != ModSource.Stardew)
+                {
+                    string? sourceText = DisplayHelper.ModToText(modSource);
+
+                    if (!string.IsNullOrEmpty(sourceText))
+                    {
+                        TooltipBuildHelper.AddSectionWithSeparator(list, () =>
+                            new List<TooltipElement>
+                            {
+                                new TooltipElement
+                                {
+                                    Text = sourceText,
+                                }
+                            }
+                        );
+                    }
+                }
+            }
+
+
 
             return list;
         }

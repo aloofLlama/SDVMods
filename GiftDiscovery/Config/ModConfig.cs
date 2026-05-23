@@ -33,13 +33,16 @@ namespace GiftDiscovery.Config
         public bool ShowDislikes { get; set; } = false;
         public bool ShowHates { get; set; } = false;
         public bool ShowUndiscovered { get; set; } = true;
+        public bool ShowModSource { get; set; } = true;
+
 
         //-------------------
         //NPC tooltip bottom right
         //-------------------
         public int NearbyRangeTilesNPCTooltip { get; set; } = 3;
         public int WrapSizeNPC { get; set; } = 8; //How many names to show before wrapping
-
+        public int MaxRowsNPC { get; set; } = 8; //How many names to show before wrapping
+        public bool ShowLocation { get; set; } = true;
 
 
     }

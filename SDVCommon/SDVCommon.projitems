@@ -17,6 +17,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameData\DisplayNames.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTOREconomicsHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTORGameDataHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ModSourceHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OBSGift\GiftHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OBSGift\ModCompat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\MonsterDropBuilder.cs" />

@@ -1,0 +1,45 @@
+﻿using SDVCommon.Helpers.Tooltip;
+using SDVCommon.Models.Tooltip;
+using GiftDiscovery.GameData;
+using StardewValley;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace GiftDiscovery.Tooltip.NPCSections
+{
+    public class NPCLocation
+    {
+        public static List<TooltipElement> Build(NPC npc)
+        {
+            if (!ModEntry.ModConfig.ShowLocation)
+                return new List<TooltipElement>();
+
+            string name = GiftableNPC.GetNPCLocation(npc);
+
+            var segments = new List<InlineSegment>
+            {
+                //new InlineSegment
+                //{
+                //    Text = "Location: ",
+                //    Bold = true
+                //},
+                new InlineSegment
+                {
+                    Text = name,
+                }
+            };
+
+            return new List<TooltipElement>
+                {
+                    new TooltipElement
+                    {
+                        InlineSegments = segments
+                    }
+                };
+            }
+
+    }
+}

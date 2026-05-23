@@ -7,6 +7,7 @@ using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Characters;
 using System.Diagnostics;
 using static SDVCommon.TooltipRenderer;
 
@@ -26,7 +27,7 @@ namespace GiftDiscovery.Helpers
             GiftTooltipBuilder.Initialize();
             NPCGiftTooltipBuilder.Initialize();
 
-            int cnt = 0;
+            int cntgift = 0;
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
                 string harvestKey = IdHelper.CanonicalItemId(obj.QualifiedItemId);
@@ -35,9 +36,25 @@ namespace GiftDiscovery.Helpers
                 if (info != null)
                 {
                     IconInitializers.HarvestIcons(info);
-                    cnt++;
+                    cntgift++;
                 }
             }
+
+            SDVCommonLog.Log(
+                $"[{DateTime.Now:HH:mm:ss}] Start get taste map",
+                LogHelper.DebugOrTrace);
+
+            int cntnpc = 0;
+            foreach (var npc in GiftableNPC.GetAllGiftableNPCs())
+            {
+                GiftKnowledgeService.GetCanonicalTasteMap(npc);
+                cntnpc++;
+            }
+
+            SDVCommonLog.Log(
+                $"[{DateTime.Now:HH:mm:ss}] End get taste map",
+                LogHelper.DebugOrTrace);
+
 
 #if DEBUG //TODO troubleshoot missing icons
             foreach (var obj in GiftableObjectList.AllGiftable)
@@ -67,12 +84,16 @@ namespace GiftDiscovery.Helpers
             SDVCommonLog.Log($"Gift Discovery Initialized",
                 LogHelper.DebugOrTrace);
 
-            SDVCommonLog.Log($"Giftable items: {GiftableObjectList.AllGiftable.Count} | Gift icons: {cnt}",
+            SDVCommonLog.Log($"Giftable items: {GiftableObjectList.AllGiftable.Count} | Gift icons: {cntgift}",
+                LogHelper.DebugOrTrace);
+
+            SDVCommonLog.Log($"Giftable NPCs: {cntnpc}",
                 LogHelper.DebugOrTrace);
 
         }
-        public static void ResetAll(IModHelper helper)
+        public static void ResetAll()
         {
+            HarvestInfoBuilder.Reset();
             GiftableObjectList.Reset();
             GiftTooltipBuilder.Reset();
             NPCGiftTooltipBuilder.Reset();

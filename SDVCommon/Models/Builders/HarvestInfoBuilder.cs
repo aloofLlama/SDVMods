@@ -1,7 +1,7 @@
 ﻿using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Models.Wrappers;
-
+using SDVCommon.Compatibility;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -90,7 +90,8 @@ namespace SDVCommon.Models.Builders
                 Harvest = itemInfo,
                 ShipOne = shipOne,
                 ShipMonoCulture = shipMono,
-                ShipPolyCulture = shipPoly
+                ShipPolyCulture = shipPoly,
+                ModSource = ModSourceHelper.GetModSource(IdHelper.CanonicalItemId(harvestId))
             };
 
             _harvests[harvestId] = new HarvestInfo(data);
