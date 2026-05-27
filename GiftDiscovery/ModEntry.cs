@@ -91,11 +91,14 @@ namespace GiftDiscovery
                 return;
 
             ModEntry.IsInMenuTooltip = true;
+            bool drewNPCMenuTooltip = false;
 
             switch (hover)
             {
+                // Social Menu
                 case { NPC: not null }:
                     NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, hover.NPC!);
+                    drewNPCMenuTooltip = true;
                     break;
 
                 case { Item: StardewValley.Object obj }:
@@ -109,6 +112,17 @@ namespace GiftDiscovery
                         GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, itemObj);
                     break;
             }
+
+            // NPC proximity tooltip (only if not already showing a tooltip for an NPC in the social menu)
+            if (drewNPCMenuTooltip == false)
+            {
+                NPC? nearest = GiftableNPC.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
+                if (nearest != null)
+                {
+                    NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
+                }
+            }
+
         }
 
         private void OnRenderedHud(object? sender, RenderedHudEventArgs e)
