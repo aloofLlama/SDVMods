@@ -90,9 +90,7 @@ namespace HarvestHelper
 
             //var data = Game1.objectData[obj.ItemId];
 
-            if (harvest is null ||
-                !HarvestCategories.IsDesiredCategory(data)
-                )
+            if (harvest is null)
                 return;
 
             var elements = TooltipBuilder.BuildTooltip(harvest, obj);

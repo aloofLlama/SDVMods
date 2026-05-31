@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
 VisualStudioVersion = 18.4.11626.88
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantingDay", "PlantingDay.csproj", "{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlantingDay", "PlantingDay\PlantingDay.csproj", "{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDVData", "..\SDVData\SDVData.csproj", "{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDVData_Tests", "SDVData_Tests\SDVData_Tests.csproj", "{53C49DA5-C1D3-867C-DCB5-76D530E133C2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SDVData_Tests", "..\SDVData_Tests\SDVData_Tests.csproj", "{53C49DA5-C1D3-867C-DCB5-76D530E133C2}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDVCommon", "SDVCommon\SDVCommon.shproj", "{E313B039-E59A-442C-BD5B-A29EFD4825B6}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDVCommon", "..\SDVCommon\SDVCommon.shproj", "{E313B039-E59A-442C-BD5B-A29EFD4825B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarvestHelper", "HarvestHelper\HarvestHelper.csproj", "{5135E47C-B6D4-44FD-9079-BA9A869D6A98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HarvestHelper", "..\HarvestHelper\HarvestHelper.csproj", "{5135E47C-B6D4-44FD-9079-BA9A869D6A98}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GiftDiscovery", "GiftDiscovery\GiftDiscovery.csproj", "{8E2F8D55-B93E-C0A3-213D-A05495F4F8C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GiftDiscovery", "..\GiftDiscovery\GiftDiscovery.csproj", "{8E2F8D55-B93E-C0A3-213D-A05495F4F8C1}"
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SDVData", "SDVData\SDVData.shproj", "{992FE566-D62B-48C7-96F2-02DB588B8B08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,6 @@ Global
 		{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0F65DD0-070F-49C7-6BB7-4039B1330AF0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{ED504991-13D4-6A6A-8B57-0F7E1AE56DA1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53C49DA5-C1D3-867C-DCB5-76D530E133C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -49,9 +45,14 @@ Global
 		SolutionGuid = {C3B4B539-9A3D-44F6-A57B-3ED77153CF02}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		..\SDVCommon\SDVCommon.projitems*{5135e47c-b6d4-44fd-9079-ba9a869d6a98}*SharedItemsImports = 5
-		..\SDVCommon\SDVCommon.projitems*{8e2f8d55-b93e-c0a3-213d-a05495f4f8c1}*SharedItemsImports = 5
-		..\SDVCommon\SDVCommon.projitems*{d0f65dd0-070f-49c7-6bb7-4039b1330af0}*SharedItemsImports = 5
-		..\SDVCommon\SDVCommon.projitems*{e313b039-e59a-442c-bd5b-a29efd4825b6}*SharedItemsImports = 13
+		SDVCommon\SDVCommon.projitems*{5135e47c-b6d4-44fd-9079-ba9a869d6a98}*SharedItemsImports = 5
+		SDVData\SDVData.projitems*{5135e47c-b6d4-44fd-9079-ba9a869d6a98}*SharedItemsImports = 5
+		SDVData\SDVData.projitems*{53c49da5-c1d3-867c-dcb5-76d530e133c2}*SharedItemsImports = 5
+		SDVCommon\SDVCommon.projitems*{8e2f8d55-b93e-c0a3-213d-a05495f4f8c1}*SharedItemsImports = 5
+		SDVData\SDVData.projitems*{8e2f8d55-b93e-c0a3-213d-a05495f4f8c1}*SharedItemsImports = 5
+		SDVData\SDVData.projitems*{992fe566-d62b-48c7-96f2-02db588b8b08}*SharedItemsImports = 13
+		SDVCommon\SDVCommon.projitems*{d0f65dd0-070f-49c7-6bb7-4039b1330af0}*SharedItemsImports = 5
+		SDVData\SDVData.projitems*{d0f65dd0-070f-49c7-6bb7-4039b1330af0}*SharedItemsImports = 5
+		SDVCommon\SDVCommon.projitems*{e313b039-e59a-442c-bd5b-a29efd4825b6}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

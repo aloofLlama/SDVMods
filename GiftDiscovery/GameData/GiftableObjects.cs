@@ -28,6 +28,10 @@ namespace GiftDiscovery.GameData
                 if (!obj.canBeGivenAsGift())
                     continue;
 
+                // Explicit exclusions
+                if (id == "434") // Stardrop is a game object but not a real item to get
+                    continue;
+
                 bool hasLoveOrLike = GiftableNPC.GetAllGiftableNPCs()
                     .Any(npc =>
                     {

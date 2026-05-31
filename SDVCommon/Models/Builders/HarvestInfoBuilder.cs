@@ -49,6 +49,10 @@ namespace SDVCommon.Models.Builders
         {
             foreach (var (id, obj) in Game1.objectData)
             {
+                // Explicit exclusions
+                if (id == "434") // Stardrop is a game object but not a real item to get
+                    continue;
+
                 // Include by category
                 if (HarvestCategories.IsDesiredCategory(obj))
                 {

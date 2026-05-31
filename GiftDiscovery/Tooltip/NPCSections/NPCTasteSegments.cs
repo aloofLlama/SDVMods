@@ -23,7 +23,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
             var list = new List<TooltipElement>();
 
-            AddTaste(list, npc, "Loves", GiftTaste.Love, mode, wrapSize, maxRows);
+            if (ModEntry.ModConfig.SeparateUniversalLoves)
+                AddTasteSeparatedLoves(list, npc, "Loves", mode, wrapSize, maxRows);
+            else
+                AddTaste(list, npc, "Loves", GiftTaste.Love, mode, wrapSize, maxRows);
+
             AddTaste(list, npc, "Likes", GiftTaste.Like, mode, wrapSize, maxRows);
 
             if (!LearnedGiftsHelper.HasDiscoveredAllLovesLikesForNPC(npc, mode))
@@ -75,6 +79,131 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 BuildNPCTasteSection(label, items, unknownCount, wrapSize, maxRows)
             );
         }
+
+        private static void AddTasteSeparatedLoves(
+            List<TooltipElement> list,
+            NPC npc,
+            string label,
+            TasteSourceMode mode,
+            int wrapSize,
+            int maxRows)
+        {
+            var knownIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode);
+
+            var filteredIds = knownIds
+                .Where(id => GiftableObjectList.GiftableIds.Contains(id));
+
+            var allItems = filteredIds
+                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.CanonicalItemId(id)))
+                .Where(info => info is not null)
+                .Cast<HarvestInfo>()
+                .ToList();
+
+            // Split into regular + universal
+            var regular = new List<HarvestInfo>();
+            var universal = new List<HarvestInfo>();
+
+            foreach (var info in allItems)
+            {
+                if (GiftType.IsUniversalLove(info.Data.HarvestId))
+                    universal.Add(info);
+                else
+                    regular.Add(info);
+            }
+
+            // Sort each group
+            regular = regular
+                .OrderByDescending(i => Inventory.IsInBackpack(i.Data.HarvestId))
+                .ThenBy(i => i.Runtime.DisplayName)
+                .ToList();
+
+            universal = universal
+                .OrderByDescending(i => Inventory.IsInBackpack(i.Data.HarvestId))
+                .ThenBy(i => i.Runtime.DisplayName)
+                .ToList();
+
+            // Unknowns: split by universal vs regular
+            int unknownRegular = 0;
+            int unknownUniversal = 0;
+
+            foreach (var id in LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode))
+            {
+                var canonical = IdHelper.CanonicalItemId(id);
+
+                if (GiftType.IsUniversalLove(canonical))
+                    unknownUniversal++;
+                else
+                    unknownRegular++;
+            }
+
+            var segments = new List<InlineSegment>();
+
+            // Regular loves
+            foreach (var info in regular)
+                segments.Add(BuildItemSegment(info));
+
+            if (unknownRegular > 0)
+            {
+                segments.Add(new InlineSegment
+                {
+                    Text = $"({unknownRegular})",
+                    TextColor = TooltipColors.Muted
+                });
+            }
+
+            // Separator
+            if ((regular.Count > 0 || unknownRegular > 0) &&
+                (universal.Count > 0 || unknownUniversal > 0))
+            {
+                segments.Add(new InlineSegment
+                {
+                    Text = "|",
+                    //Bold = true,
+                });
+            }
+
+            // Universal loves
+            foreach (var info in universal)
+                segments.Add(BuildItemSegment(info));
+
+            if (unknownUniversal > 0)
+            {
+                segments.Add(new InlineSegment
+                {
+                    Text = $"({unknownUniversal})",
+                    TextColor = TooltipColors.Muted
+                });
+            }
+
+            // Skip if nothing to show
+            if (segments.Count == 0)
+                return;
+
+            TooltipBuildHelper.AddSectionWithSeparator(list, () =>
+            {
+                var labelSegment = new InlineSegment
+                {
+                    Text = label + ": ",
+                    Bold = true,
+                    TextColor = TooltipColors.Normal
+                };
+
+                var wrapped = TooltipBuildHelper.BuildWrappedSegmentBlock(
+                    startSegments: new List<InlineSegment> { labelSegment },
+                    collapsibleSegments: segments,
+                    endSegments: new List<InlineSegment>(),
+                    wrapSize: wrapSize,
+                    maxRows: maxRows,
+                    useCommas: false
+                );
+
+                return new List<TooltipElement>
+                {
+                    new TooltipElement { InlineSegments = wrapped }
+                };
+            });
+        }
+
 
         private static List<TooltipElement> BuildNPCTasteSection(
             string label,

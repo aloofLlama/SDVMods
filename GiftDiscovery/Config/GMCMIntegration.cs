@@ -63,6 +63,31 @@ namespace GiftDiscovery.Config
 
             gmcm.AddBoolOption(
                 mod: manifest,
+                name: () => "Show in Collections Menu",
+                tooltip: () => "If enabled, show when hovering over an item in the collections menu.",
+                getValue: () => ModEntry.ModConfig.ShowInCollectionsMenu,
+                setValue: value => ModEntry.ModConfig.ShowInCollectionsMenu = value
+            );
+
+            gmcm.AddBoolOption(
+                mod: manifest,
+                name: () => "Show in Cooking Menu",
+                tooltip: () => "If enabled, show when hovering over an item in the cooking menu.",
+                getValue: () => ModEntry.ModConfig.ShowInCoookingMenu,
+                setValue: value => ModEntry.ModConfig.ShowInCoookingMenu = value
+            );
+
+            gmcm.AddBoolOption(
+                mod: manifest,
+                name: () => "Show in Crafting Menu",
+                tooltip: () => "If enabled, show when hovering over an item in the crafting menu.",
+                getValue: () => ModEntry.ModConfig.ShowInCraftingMenu,
+                setValue: value => ModEntry.ModConfig.ShowInCraftingMenu = value
+            );
+
+
+            gmcm.AddBoolOption(
+                mod: manifest,
                 name: () => "Highlight Friendship",
                 tooltip: () => "If enabled, NPCs who are not at max hearts will be highlighted in the tooltip.",
                 getValue: () => ModEntry.ModConfig.HighlightNotMaxFriendship,
@@ -212,6 +237,15 @@ namespace GiftDiscovery.Config
                 getValue: () => ModEntry.ModConfig.ShowLocation,
                 setValue: value => ModEntry.ModConfig.ShowLocation = value
             );
+
+            gmcm.AddBoolOption(
+                mod: manifest,
+                name: () => "Separate Universal Loves",
+                tooltip: () => "If enabled, the Loves section will be separated into Love items | Universal love items",
+                getValue: () => ModEntry.ModConfig.SeparateUniversalLoves,
+                setValue: value => ModEntry.ModConfig.SeparateUniversalLoves = value
+            );
+
 
         }
     }

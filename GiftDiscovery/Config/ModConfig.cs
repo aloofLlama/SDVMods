@@ -20,18 +20,24 @@ namespace GiftDiscovery.Config
         //-------------------
         public bool HighlightNotMaxFriendship { get; set; } = true;
         public bool DeemphasizeAlreadyGifted { get; set; } = true;
+        public bool ShowInCollectionsMenu { get; set; } = true;
+        public bool ShowInCoookingMenu { get; set; } = true;
+        public bool ShowInCraftingMenu { get; set; } = true;
+
+
+
 
         // Extra options to highlight nearby NPCs
         public bool EmphasizeNearbyNPCs { get; set; } = true;
         public int NearbyRangeTilesGiftTooltip { get; set; } = 15;
-        public int WrapSizeGift { get; set; } = 6; //How many names to show before wrapping
+        public int WrapSizeGift { get; set; } = 3; //How many names to show before wrapping
 
 
         public bool ShowLoves { get; set; } = true;
         public bool ShowLikes { get; set; } = true;
-        public bool ShowNeutral { get; set; } = false;
-        public bool ShowDislikes { get; set; } = false;
-        public bool ShowHates { get; set; } = false;
+        public bool ShowNeutral { get; set; } = true;
+        public bool ShowDislikes { get; set; } = true;
+        public bool ShowHates { get; set; } = true;
         public bool ShowUndiscovered { get; set; } = true;
         public bool ShowModSource { get; set; } = true;
 
@@ -43,6 +49,8 @@ namespace GiftDiscovery.Config
         public int WrapSizeNPC { get; set; } = 8; //How many names to show before wrapping
         public int MaxRowsNPC { get; set; } = 8; //How many names to show before wrapping
         public bool ShowLocation { get; set; } = true;
+        public bool SeparateUniversalLoves { get; set; } = true;
+
 
 
     }

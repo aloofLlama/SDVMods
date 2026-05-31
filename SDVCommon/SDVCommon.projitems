@@ -9,6 +9,8 @@
     <Import_RootNamespace>SDVCommon</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\BetterCraftingCompat.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\IBetterCraftingApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\CustomBushCompat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ICustomBushApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\DataOverrides.cs" />

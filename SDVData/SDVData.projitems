@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>992fe566-d62b-48c7-96f2-02db588b8b08</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SDVData</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)CookingInfoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GrowthContext.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HarvestInfoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IconRef.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ItemInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)ModSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)MonsterDropInfoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PlantInfoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)PurchaseInfoData.cs" />
+  </ItemGroup>
+</Project>

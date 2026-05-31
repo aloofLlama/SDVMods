@@ -15,7 +15,6 @@ namespace SDVCommon.Helpers
             if (obj.Price <= 0)
                 return false;
 
-
             int category = obj.Category;
 
             // CATEGORY-BASED MATCHES

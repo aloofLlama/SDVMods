@@ -109,7 +109,7 @@ namespace GiftDiscovery.GameData
             string id = loc.Name;
             var data = loc.GetData();
 
-            // 1. map data DisplayName
+            // map data DisplayName
             if (data != null)
             {
                 string name = TokenParser.ParseText(data.DisplayName);
@@ -117,27 +117,7 @@ namespace GiftDiscovery.GameData
                     return name;
             }
 
-            // 2. vanilla: Strings/Locations:<id>_Name
-            //string key1 = $"Strings\\Locations:{id}_Name";
-            //string? s1 = Game1.content.LoadStringReturnNullIfNotFound(key1);
-            //if (!string.IsNullOrWhiteSpace(s1) && !s1.StartsWith("Strings\\"))
-            //    return s1;
-
-            // 3. vanilla: Strings/Locations:<id>
-            //string key2 = $"Strings\\Locations:{id}";
-            //string? s2 = Game1.content.LoadStringReturnNullIfNotFound(key2);
-            //if (!string.IsNullOrWhiteSpace(s2) && !s2.StartsWith("Strings\\"))
-            //    return s2;
-
-            // 4. localization key (StringsFromCSFiles)
-            //if (id.StartsWith("Strings\\"))
-            //{
-            //    string? s3 = Game1.content.LoadStringReturnNullIfNotFound(id);
-            //    if (!string.IsNullOrWhiteSpace(s3))
-            //        return s3;
-            //}
-
-            // 5. fallback
+            //fallback
             return id;
         }
 

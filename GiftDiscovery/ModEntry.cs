@@ -93,6 +93,25 @@ namespace GiftDiscovery
             ModEntry.IsInMenuTooltip = true;
             bool drewNPCMenuTooltip = false;
 
+            // Apply config based on hover.Source
+            switch (hover.Source)
+            {
+                case HoverSource.CollectionsPage:
+                    if (!ModEntry.ModConfig.ShowInCollectionsMenu)
+                        return;
+                    break;
+
+                case HoverSource.CookingPage:
+                    if (!ModEntry.ModConfig.ShowInCoookingMenu)
+                        return;
+                    break;
+
+                case HoverSource.CraftingPage:
+                    if (!ModEntry.ModConfig.ShowInCraftingMenu)
+                        return;
+                    break;
+            }
+
             switch (hover)
             {
                 // Social Menu
@@ -103,13 +122,6 @@ namespace GiftDiscovery
 
                 case { Item: StardewValley.Object obj }:
                     GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
-                    break;
-
-                case { ItemId: not null }:
-                    var itemObj = GameObject.GetObjectFromId(hover.ItemId!);
-
-                    if (itemObj != null)
-                        GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, itemObj);
                     break;
             }
 

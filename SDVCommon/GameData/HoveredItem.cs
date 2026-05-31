@@ -1,4 +1,5 @@
 ﻿using SDVCommon.Helpers;
+using SDVCommon.Compatibility;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -9,37 +10,62 @@ namespace SDVCommon.GameData
 
     public readonly struct HoverResult
     {
-        public Item? Item { get; }
-        public NPC? NPC { get; }
-        public string? ItemId { get; }
+        public Item? Item { get; init; }
+        public NPC? NPC { get; init; }
+        public HoverSource Source { get; init; }
 
-        public bool HasValue => Item != null || NPC != null || ItemId != null;
+        public bool HasValue => Item != null || NPC != null;
 
-        public HoverResult(Item item) { Item = item; NPC = null; ItemId = null; }
-        public HoverResult(NPC npc) { Item = null; NPC = npc; ItemId = null; }
-        public HoverResult(string id) { Item = null; NPC = null; ItemId = id; }
+        private HoverResult(Item? item, NPC? npc, HoverSource source)
+        {
+            Item = item;
+            NPC = npc;
+            Source = source;
+        }
 
-        public static HoverResult None => new();
+        public static HoverResult FromItem(Item item, HoverSource source)
+            => new HoverResult(item, null, source);
+
+        public static HoverResult FromNPC(NPC npc, HoverSource source)
+            => new HoverResult(null, npc, source);
+
+        public static HoverResult None { get; } = new HoverResult(null, null, HoverSource.None);
     }
 
     internal class HoveredItem
     {
         public static HoverResult Get()
         {
-            // 1. Item hover
-            var item = GetItemFromMenus();
-            if (item != null)
-                return new HoverResult(item);
+            // Item hover (menus, inventory, chests, shops, etc.)
+            var menuItem = GetItemFromMenus();
+            if (menuItem != null)
+                return HoverResult.FromItem(menuItem, HoverSource.Menu);
 
-            // 2. NPC hover (Social Page)
+            // NPC hover (Social Page)
             var npc = GetNPCFromSocialPage();
             if (npc != null)
-                return new HoverResult(npc);
+                return HoverResult.FromNPC(npc, HoverSource.SocialPage);
 
-            // 3. Collections Page
-            var id = GetItemIdFromCollectionsPage();
-            if (id != null)
-                return new HoverResult(id);
+            // Collections Page
+            var collItem = GetItemFromCollectionsPage();
+            if (collItem != null)
+                return HoverResult.FromItem(collItem, HoverSource.CollectionsPage);
+
+
+            // BetterCrafting first (it replaces vanilla)
+            var (bcItem, bcSource) = BetterCraftingCompat.GetItemFromBetterCraftingPage();
+            if (bcItem != null)
+                return HoverResult.FromItem(bcItem, bcSource);
+
+            // Cooking Page
+            var cookingItem = GetItemFromCookingPage();
+            if (cookingItem != null)
+                return HoverResult.FromItem(cookingItem, HoverSource.CookingPage);
+
+            // Crafting Page
+            var craftingItem = GetItemFromCraftingPage();
+            if (craftingItem != null)
+                return HoverResult.FromItem(craftingItem, HoverSource.CraftingPage);
 
             return HoverResult.None;
         
@@ -121,7 +147,7 @@ namespace SDVCommon.GameData
             return null;
         }
 
-        private static string? GetItemIdFromCollectionsPage()
+        private static Item? GetItemFromCollectionsPage()
         {
             if (Game1.activeClickableMenu is not GameMenu gm)
                 return null;
@@ -129,105 +155,109 @@ namespace SDVCommon.GameData
             if (gm.currentTab != GameMenu.collectionsTab)
                 return null;
 
-            var pages = gm.pages;
-            if (pages.Count <= GameMenu.collectionsTab)
+            if (gm.pages.Count <= GameMenu.collectionsTab)
                 return null;
 
-            if (pages[GameMenu.collectionsTab] is not CollectionsPage cp)
+            if (gm.pages[GameMenu.collectionsTab] is not CollectionsPage cp)
                 return null;
 
-            var field = typeof(CollectionsPage).GetField("hoveredItemId",
-                BindingFlags.Instance | BindingFlags.NonPublic);
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
 
-            if (field == null)
-                return null;
+            foreach (var kvp in cp.collections)
+            {
+                foreach (var page in kvp.Value)
+                {
+                    foreach (var comp in page)
+                    {
+                        if (comp?.bounds.Contains(mouseX, mouseY) == true)
+                        {
+                            // Extract only the item ID
+                            string raw = comp.name ?? "";
+                            string id = raw.Split(new[] { ' ', '|' }, StringSplitOptions.RemoveEmptyEntries)[0];
 
-            return field.GetValue(cp) as string;
+                            return ItemRegistry.Create(id);
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
-        //////public static Item? GetFromMenus()
-        //////{
-        //////    IClickableMenu menu = Game1.activeClickableMenu;
-        //////    if (menu == null)
-        //////        return null;
+        private static Item? GetItemFromCookingPage()
+        {
+            if (Game1.activeClickableMenu is not CraftingPage cp)
+                return null;
 
-        //////    switch (menu)
-        //////    {
-        //////        // Inventory (GameMenu → InventoryPage)
-        //////        case GameMenu gm:
-        //////            if (gm.currentTab != GameMenu.inventoryTab)
-        //////                return null;
+            if (!cp.cooking)
+                return null;
 
-        //////            var invPage = gm.pages
-        //////                .OfType<InventoryPage>()
-        //////                .FirstOrDefault();
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
 
-        //////            return invPage?.hoveredItem;
+            if (cp.pagesOfCraftingRecipes is List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pages)
+            {
+                foreach (var dict in pages)
+                {
+                    foreach (var kvp in dict)
+                    {
+                        var comp = kvp.Key;
+                        var recipe = kvp.Value;
 
-        //////        // Chests, Fridges, Dressers, Junimo Chests, etc.
-        //////        case StardewValley.Menus.ItemGrabMenu chest:
-        //////            return chest.hoveredItem;
+                        if (comp.bounds.Contains(mouseX, mouseY))
+                        {
+                            return new CraftingRecipe(recipe.name, true).createItem();
+                        }
+                    }
+                }
+            }
 
-        //////        // Pierre’s shop, Traveling Cart, Krobus, Qi, etc.
-        //////        case StardewValley.Menus.ShopMenu shop:
-        //////            return shop.hoveredItem as Item;
+            return null;
+        }
 
-        //////    }
+        private static Item? GetItemFromCraftingPage()
+        {
+            if (Game1.activeClickableMenu is not CraftingPage cp)
+                return null;
 
+            if (cp.cooking)
+                return null;
 
+            int mouseX = Game1.getMouseX();
+            int mouseY = Game1.getMouseY();
 
-        //////    //if (menu.GetType().FullName == "StardewValley.Menus.CookMenu")
-        //////    //{
-        //////    //    var t = menu.GetType();
+            if (cp.pagesOfCraftingRecipes is List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pages)
+            {
+                foreach (var dict in pages)
+                {
+                    foreach (var kvp in dict)
+                    {
+                        var comp = kvp.Key;
+                        var recipe = kvp.Value;
 
-        //////    //    var prop = t.GetProperty("hoveredItem");
-        //////    //    if (prop != null)
-        //////    //        return prop.GetValue(menu) as Item;
+                        if (comp.bounds.Contains(mouseX, mouseY))
+                            return recipe.createItem();
+                    }
+                }
+            }
 
-        //////    //    var field = t.GetField("hoveredItem");
-        //////    //    if (field != null)
-        //////    //        return field.GetValue(menu) as Item;
-        //////    //}
-
-        //////    //// Better Crafting support (reflection)
-        //////    //var type = menu.GetType();
-
-        //////    //if (type.FullName == "BetterCrafting.BetterCraftingPage")
-        //////    //{
-        //////    //    // Get the root UI element
-        //////    //    var rootField = type.GetField("root", BindingFlags.NonPublic | BindingFlags.Instance);
-        //////    //    if (rootField == null)
-        //////    //        return null;
-
-        //////    //    var root = rootField.GetValue(menu);
-        //////    //    if (root == null)
-        //////    //        return null;
-
-        //////    //    // root is a UIElement — find the element under the mouse
-        //////    //    var method = root.GetType().GetMethod("GetElementAt", BindingFlags.Public | BindingFlags.Instance);
-        //////    //    if (method == null)
-        //////    //        return null;
-
-        //////    //    var element = method.Invoke(root, new object[] { Game1.getMouseX(), Game1.getMouseY() });
-        //////    //    if (element == null)
-        //////    //        return null;
-
-        //////    //    // Many BC elements expose an Item property
-        //////    //    var itemProp = element.GetType().GetProperty("Item");
-        //////    //    if (itemProp != null)
-        //////    //        return itemProp.GetValue(element) as Item;
-
-        //////    //    // Some expose HeldItem instead
-        //////    //    var heldProp = element.GetType().GetProperty("HeldItem");
-        //////    //    if (heldProp != null)
-        //////    //        return heldProp.GetValue(element) as Item;
-
-        //////    //}
-        //////    return null;
-
-        //////}
-
+            return null;
+        }
 
 
     }
+
+    public enum HoverSource
+{
+    None,
+    Menu,
+    SocialPage,
+    CollectionsPage,
+    CookingPage,
+    CraftingPage
 }
+
+}
+
+

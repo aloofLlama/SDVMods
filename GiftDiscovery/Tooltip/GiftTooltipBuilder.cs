@@ -4,6 +4,7 @@ using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using GiftDiscovery.Models.Builders;
 using GiftDiscovery.Services;
+using GiftDiscovery.Compatibility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
@@ -202,7 +203,7 @@ namespace GiftDiscovery.Tooltip
 
                 if (modSource != ModSource.Stardew)
                 {
-                    string? sourceText = DisplayHelper.ModToText(modSource);
+                    string? sourceText = ModCompat.ModToText(modSource);
 
                     if (!string.IsNullOrEmpty(sourceText))
                     {

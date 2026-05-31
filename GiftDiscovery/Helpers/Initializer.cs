@@ -1,4 +1,5 @@
-﻿using GiftDiscovery.GameData;
+﻿using GiftDiscovery.Compatibility;
+using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
@@ -18,6 +19,8 @@ namespace GiftDiscovery.Helpers
         public static void InitializeAll(IModHelper helper)
         {
             TooltipIcons.Initialize();
+            APIManager.LoadApis(helper);
+
             HarvestInfoBuilder.Initialize();
             GiftableObjectList.Initialize();
 
@@ -44,11 +47,9 @@ namespace GiftDiscovery.Helpers
                 $"[{DateTime.Now:HH:mm:ss}] Start get taste map",
                 LogHelper.DebugOrTrace);
 
-            int cntnpc = 0;
             foreach (var npc in GiftableNPC.GetAllGiftableNPCs())
             {
                 GiftKnowledgeService.GetCanonicalTasteMap(npc);
-                cntnpc++;
             }
 
             SDVCommonLog.Log(
@@ -87,8 +88,10 @@ namespace GiftDiscovery.Helpers
             SDVCommonLog.Log($"Giftable items: {GiftableObjectList.AllGiftable.Count} | Gift icons: {cntgift}",
                 LogHelper.DebugOrTrace);
 
-            SDVCommonLog.Log($"Giftable NPCs: {cntnpc}",
+            SDVCommonLog.Log($"Giftable NPCs: {GiftableNPC.GetAllGiftableNPCs().Count()}",
                 LogHelper.DebugOrTrace);
+
+    
 
         }
         public static void ResetAll()

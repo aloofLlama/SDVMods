@@ -39,7 +39,7 @@ namespace GiftDiscovery.Helpers
             if (!Game1.player.friendshipData.TryGetValue(npc.Name, out Friendship f))
                 return 0;
 
-            // marriage and roommate → 14 (roommate is marrier + a roommatemarriage flag)
+            // marriage and roommate → 14 (roommate is married + a roommate marriage flag)
             if (f.Status == FriendshipStatus.Married)
                 return 14;
 

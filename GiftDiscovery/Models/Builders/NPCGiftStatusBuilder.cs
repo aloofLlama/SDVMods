@@ -50,11 +50,11 @@ namespace GiftDiscovery.Models.Builders
             if (f.GiftsToday >= 1)
                 return true;
 
-            // Weekly limit bypass for spouse or birthday
-            bool isRealSpouse = f.IsMarried() && !f.RoommateMarriage;
+            // Weekly limit bypass for spouse, roommate or birthday
+            bool isMovedIn = f.IsMarried(); //roommate is also flagged as married
             bool isBirthday = npc.isBirthday();
 
-            if (isRealSpouse || isBirthday)
+            if (isMovedIn || isBirthday)
                 return false;
 
             // Weekly limit (everyone else)
