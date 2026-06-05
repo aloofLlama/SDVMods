@@ -3,7 +3,7 @@ using SDVCommon.Models.Wrappers;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Shops;
-using static SDVData.PurchaseInfoData;
+using SDVData;
 
 namespace SDVCommon.GameData
 {
@@ -53,7 +53,7 @@ namespace SDVCommon.GameData
 
                 // Expanded
                 "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor" => "Junimo Woods",
-                "FlashShifter.StardewValleyExpandedCP_ZoeyVendor" => "Zoey",
+                "FlashShifter.StardewValleyExpandedCP_ZoeyVendor" => "Joja Emporium",
 
                 // Sunberry
                 "skellady.SBVCP_AriMarket" => "Ari",
@@ -66,13 +66,13 @@ namespace SDVCommon.GameData
                 "Lemurkat.EastScarp_JojaMetroMart" => "Joja Metro Mart",
 
                 // Mount Vapius
-                "Lumisteria.MtVapius_ForestHiddenShop" => "Forest Hidden Shop",
+                "Lumisteria.MtVapius_ForestHiddenShop" => "Forest Hidden",
                 "Lumisteria.MtVapius_AbdonShop" => "Abdon",
                 "Lumisteria.MtVapius_AsterShop" => "Aster",
 
 
                 //Unknown (Mouse Friends in the Forest?)
-                "EnD.MouseShop" => "Mouse Shop",
+                "EnD.MouseShop" => "Mouse",
 
 
                 _ => FallbackVendorName(shopId)
@@ -100,28 +100,13 @@ namespace SDVCommon.GameData
         {
             return GetVendorType(purchase.Data.VendorId) switch
             {
-                VendorType.Pierre => "SeedShop",
+                //VendorType.Pierre => "SeedShop",
                 VendorType.NightMarket => "NightMarket",
                 VendorType.DesertFestival => "DesertFestival",
                 _ => purchase.Data.VendorId
             };
         }
 
-        // ------------------------------------------------------------
-        // SORTING KEY (used by VendorListBuilder)
-        // ------------------------------------------------------------
-        //public static int SortKey(PurchaseInfoRuntime v)
-        //{
-        //    return GetVendorType(v.Data.VendorId) switch
-        //    {
-        //        VendorType.Pierre => 0,
-        //        //VendorType.NightMarket => 4, // always last
-        //        //VendorType.TravelingCart => 1, // gold vendor
-        //        VendorType.ValleyFair => 3, // trade vendor
-        //        VendorType.DesertFestival => 3,
-        //        _ => v.Data.GoldPrice.HasValue ? 1 : 2
-        //    };
-        //}
 
         // ------------------------------------------------------------
         // CLASSIFICATION HELPERS
@@ -134,8 +119,8 @@ namespace SDVCommon.GameData
             if (vendorId.Contains ("Joja", StringComparison.OrdinalIgnoreCase))
                 return VendorType.Joja;
 
-            if (vendorId.Contains("FlashShifter.StardewValleyExpandedCP_ZoeyVendor", StringComparison.OrdinalIgnoreCase))
-                return VendorType.JojaEmporium;
+            //if (vendorId.Contains("FlashShifter.StardewValleyExpandedCP_ZoeyVendor", StringComparison.OrdinalIgnoreCase))
+            //    return VendorType.JojaEmporium;
 
             if (vendorId.Contains("NightMarket", StringComparison.OrdinalIgnoreCase))
                 return VendorType.NightMarket;

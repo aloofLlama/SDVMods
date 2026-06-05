@@ -21,6 +21,17 @@ namespace SDVCommon
             DrawTooltipAt(b, elements, font, style, x, y, width, height);
         }
 
+        public static void DrawLeftandAboveCursor(SpriteBatch b, List<TooltipElement> elements)
+        {
+            SpriteFont font = Game1.smallFont;
+            TooltipStyle style = TooltipStyle.Default;
+
+            var (width, height) = MeasureTooltip(elements, font, style);
+            var (x, y) = PositionLeftAboveCursor(width, height);
+
+            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+        }
+
 
         public static void DrawBottomLeft(SpriteBatch b, List<TooltipElement> elements)
         {
@@ -176,6 +187,34 @@ namespace SDVCommon
 
             return (x, y);
         }
+
+        private static (int x, int y) PositionLeftAboveCursor(int width, int height)
+        {
+            int x, y;
+
+            bool isShippingMenu = Game1.activeClickableMenu is ShippingMenu;
+
+            if (isShippingMenu)
+            {
+                // Shipping menu cursor is shifted right → move tooltip left more
+                x = Game1.getMouseX() - width - 64;
+            }
+            else
+            {
+                x = Game1.getMouseX() - width - 32;
+            }
+
+            y = Game1.getMouseY() - height;
+
+            if (x < 0)
+                x = 0;
+
+            if (y < 0)
+                y = 0;
+
+            return (x, y);
+        }
+
 
         private static (int x, int y) PositionBottomLeft(int height)
         {

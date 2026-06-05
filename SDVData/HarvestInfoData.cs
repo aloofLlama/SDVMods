@@ -8,10 +8,9 @@ namespace SDVData
 {
     public class HarvestInfoData
     {
-        public string HarvestId { get; set; } = "";
-        public string? SeedId { get; set; } = "";
+        public string HarvestId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
+        public string? SeedId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
         public ItemInfo? Harvest { get; set; } = new ItemInfo();
-        //public ModSource ModSource { get; set; } = ModSource.Unknown; 
         public string ModSource { get; set; } = ""; 
 
 

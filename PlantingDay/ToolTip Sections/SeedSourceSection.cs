@@ -116,8 +116,8 @@ namespace PlantingDay.ToolTip_Sections
                 case PurchaseInfoData.VendorType.Joja:
                     return null;
 
-                case PurchaseInfoData.VendorType.JojaEmporium: //SDV Expanded
-                    return null;
+                //case PurchaseInfoData.VendorType.JojaEmporium: //SDV Expanded
+                //    return null;
 
                 case PurchaseInfoData.VendorType.ValleyFair:
                     return new[]

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace HarvestHelper.Helpers
 {
+    //TODO: PART OF DETERMINING IF SEED MAKER IS ECONOMICAL
     public static class EconomicsHelper
     {
         public static int? GetMinSeedPriceFromMainVendors(PlantInfoData plant)

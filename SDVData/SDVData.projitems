@@ -12,9 +12,8 @@
     <Compile Include="$(MSBuildThisFileDirectory)CookingInfoData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GrowthContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HarvestInfoData.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)IconRef.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OBSIconRef.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)OBSModSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MonsterDropInfoData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlantInfoData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PurchaseInfoData.cs" />

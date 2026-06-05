@@ -95,7 +95,9 @@ namespace HarvestHelper
 
             var elements = TooltipBuilder.BuildTooltip(harvest, obj);
 
-            TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
+            //Temp move above cursor to work with both HH and PD same time on seed items that are both
+            //TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
+            TooltipRenderer.DrawLeftandAboveCursor(e.SpriteBatch, elements);
 
         }
 

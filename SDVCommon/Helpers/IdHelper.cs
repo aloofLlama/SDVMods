@@ -17,11 +17,6 @@ namespace SDVCommon.Helpers
     item's type ID and unqualified item ID, like (O)128 for object ID 128.
     */
 
-    //TODO Clean up IDs
-    // Was Canonical -> change to ItemId
-    // Was toGameId -> change to ItemId
-    // Was toQualifiedId -> keep as is 
-
     /* Where possible, always use unqualified ID (do not have (O) prefix)
      * Call them: ItemId in general, or HarvestId, SeedId, etc according to context
      * 
