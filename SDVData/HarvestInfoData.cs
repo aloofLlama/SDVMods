@@ -11,7 +11,9 @@ namespace SDVData
         public string HarvestId { get; set; } = "";
         public string? SeedId { get; set; } = "";
         public ItemInfo? Harvest { get; set; } = new ItemInfo();
-        public ModSource ModSource { get; set; } = ModSource.Unknown; 
+        //public ModSource ModSource { get; set; } = ModSource.Unknown; 
+        public string ModSource { get; set; } = ""; 
+
 
         // Shipping Achievements
         public bool ShipOne { get; set; }

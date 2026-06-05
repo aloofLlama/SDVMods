@@ -6,6 +6,25 @@ namespace SDVCommon.Compatibility
     public static class DataOverrides
     {
 
+        public static readonly Dictionary<string, string?> ModSource =
+            new(StringComparer.OrdinalIgnoreCase)
+            {
+                    { "StardewValley", "Stardew Valley" }, //base game obviously does not have a mod name
+                    { "EastScarp", "East Scarp" },
+                    { "Lemurkat.EastScarp", "East Scarp" },
+                    { "skellady.SBVCP", "Sunberry Village" },
+                    { "Lumisteria.MtVapius", "Visit Mount Vapius" },
+
+
+                    { "slimerrain.uncleirohapprovedteacp", "Uncle Iroh Approved Tea" },
+                    { "slimerrain.grainsoverhullcp", "Grains Overhull" },
+                    { "Cornucopia", "Cornucopia" },
+                    { "MNF.MoreNewFish", "More New Fish" },
+                    { "NatInValley", "Nature in the Valley" },
+
+            };
+
+
         // Key: seedId
         // Value: list of (monsterName, dropChance)
         public static readonly Dictionary<string, List<(string Monster, double Chance)>> MonsterDrops

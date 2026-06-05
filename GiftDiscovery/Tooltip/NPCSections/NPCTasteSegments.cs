@@ -55,7 +55,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 .Where(id => GiftableObjectList.GiftableIds.Contains(id));
 
             var items = filteredIds
-                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.CanonicalItemId(id)))
+                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.ToItemId(id)))
                 .Where(info => info is not null)
                 .Cast<HarvestInfo>()
                 .ToList();
@@ -94,7 +94,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 .Where(id => GiftableObjectList.GiftableIds.Contains(id));
 
             var allItems = filteredIds
-                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.CanonicalItemId(id)))
+                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.ToItemId(id)))
                 .Where(info => info is not null)
                 .Cast<HarvestInfo>()
                 .ToList();
@@ -126,11 +126,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
             int unknownRegular = 0;
             int unknownUniversal = 0;
 
-            foreach (var id in LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode))
+            foreach (var qualifiedId in LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode))
             {
-                var canonical = IdHelper.CanonicalItemId(id);
+                var ItemId = IdHelper.ToItemId(qualifiedId);
 
-                if (GiftType.IsUniversalLove(canonical))
+                if (GiftType.IsUniversalLove(ItemId))
                     unknownUniversal++;
                 else
                     unknownRegular++;

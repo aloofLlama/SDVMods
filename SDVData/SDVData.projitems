@@ -14,7 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)HarvestInfoData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)IconRef.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ModSource.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)OBSModSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MonsterDropInfoData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PlantInfoData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PurchaseInfoData.cs" />

@@ -16,7 +16,6 @@ namespace SDVCommon.Icons.IconProviders
 
         public Icon? LoadIcon(string id)
         {
-            // Extract canonical item ID
             string harvestId = id.Substring("harvest:".Length);
 
             var item = ItemRegistry.Create(harvestId);

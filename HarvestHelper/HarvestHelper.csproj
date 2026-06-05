@@ -15,21 +15,21 @@
 	<ItemGroup>
 		<None Include="i18n\**\*.json" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Reference Include="0Harmony">
+	    <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\smapi-internal\0Harmony.dll</HintPath>
+	  </Reference>
+	  <Reference Include="GenericModConfigMenu">
+	    <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\GenericModConfigMenu\GenericModConfigMenu.dll</HintPath>
+	    <Private>False</Private>
+	  </Reference>
+	</ItemGroup>
 	
 
   <Import Project="..\SDVCommon\SDVCommon.projitems" Label="Shared" />
 	
 
   <Import Project="..\SDVData\SDVData.projitems" Label="Shared" />
-
-  <ItemGroup>
-    <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\smapi-internal\0Harmony.dll</HintPath>
-    </Reference>
-	  <Reference Include="GenericModConfigMenu">
-		  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Stardew Valley\Mods\GenericModConfigMenu\GenericModConfigMenu.dll</HintPath>
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
 
 </Project>

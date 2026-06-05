@@ -18,10 +18,9 @@ namespace SDVCommon.Icons.IconProviders
 
         public Icon? LoadIcon(string id)
         {
-            // Extract canonical item ID
             string seedId = id.Substring("seed:".Length);
 
-            // Create the item from the canonical ID
+            // Create the item
             var item = ItemRegistry.Create(seedId);
             if (item == null)
                 return null;

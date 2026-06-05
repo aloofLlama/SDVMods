@@ -199,24 +199,19 @@ namespace GiftDiscovery.Tooltip
             // ---------------------------------------------------------
             if (ModEntry.ModConfig.ShowModSource)
             {
-                var modSource = giftItem?.Data?.ModSource ?? ModSource.Stardew;
+                var modSource = giftItem?.Data?.ModSource;
 
-                if (modSource != ModSource.Stardew)
+                if (!string.IsNullOrEmpty(modSource))
                 {
-                    string? sourceText = ModCompat.ModToText(modSource);
-
-                    if (!string.IsNullOrEmpty(sourceText))
-                    {
-                        TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-                            new List<TooltipElement>
+                    TooltipBuildHelper.AddSectionWithSeparator(list, () =>
+                        new List<TooltipElement>
+                        {
+                            new TooltipElement
                             {
-                                new TooltipElement
-                                {
-                                    Text = sourceText,
-                                }
+                                Text = modSource,
                             }
-                        );
-                    }
+                        }
+                    );
                 }
             }
 

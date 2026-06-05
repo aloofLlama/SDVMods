@@ -1,4 +1,5 @@
 ﻿using PlantingDay.Compatibility;
+using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
@@ -12,6 +13,8 @@ namespace PlantingDay.Helpers
         {
             TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
+            ModSourceHelper.Initialize(helper);
+
             MonsterDropBuilder.Initialize();
             PlantInfoBuilder.Initialize();
             HarvestInfoBuilder.Initialize();

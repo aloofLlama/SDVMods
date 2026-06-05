@@ -1,5 +1,6 @@
-﻿using SDVCommon.Models.Wrappers;
-using SDVCommon.Helpers;
+﻿using SDVCommon.Helpers;
+using SDVCommon.Models.Wrappers;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.GameData.Shops;
 using static SDVData.PurchaseInfoData;
@@ -20,7 +21,10 @@ namespace SDVCommon.GameData
                 "AnimalShop" => "Marnie",
                 "IslandTrade" => "Island Trader",
                 "DesertTrade" => "Desert Trader",
-                //"Traveler" => "Traveling Cart",
+                "Joja" => "Joja",
+                "Traveler" => "Traveling Cart",
+                "Dwarf" => "Dwarf",
+                "Raccoon" => "Raccoon",
 
                 // Festivals
                 "Festival_Luau_Pierre" => "Luau",
@@ -29,7 +33,6 @@ namespace SDVCommon.GameData
                 "Festival_FlowerDance_Pierre" => "Flower Dance",
                 "Festival_FestivalOfIce_TravelingMerchant" => "Festival of Ice",
 
-
                 // Remove Desert Festival header
                 _ when shopId.StartsWith("DesertFestival", StringComparison.OrdinalIgnoreCase)
                     => string.Join(", ",
@@ -37,16 +40,58 @@ namespace SDVCommon.GameData
                               .Select(id => id.Replace("DesertFestival_", ""))
                     ),
 
+                //Night Market
+                _ when shopId.StartsWith("Festival_NightMarket", StringComparison.OrdinalIgnoreCase)
+                    => "Festival_NightMarket",
+
+
+                //MODS
+                //
+                //Wildflour
+                "Wildflour.AtelierGoods_FlorianShop" => "Florian",
+                "Wildflour.AtelierGoods_StoutShop" => "Stout",
+
                 // Expanded
                 "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor" => "Junimo Woods",
+                "FlashShifter.StardewValleyExpandedCP_ZoeyVendor" => "Zoey",
 
                 // Sunberry
                 "skellady.SBVCP_AriMarket" => "Ari",
                 "skellady.SBVCP_JumanaShop" => "Jumana",
+                "skellady.SBVCP_MoonberryShop" => "Moonberry",
 
-                _ => shopId // fallback
+                // East Scarp
+                "Lemurkat.EastScarp_AideenFlowerShop" => "Aideen",
+                "Lemurkat.EastScarp_JessieSeedShop" => "Jessie",
+                "Lemurkat.EastScarp_JojaMetroMart" => "Joja Metro Mart",
+
+                // Mount Vapius
+                "Lumisteria.MtVapius_ForestHiddenShop" => "Forest Hidden Shop",
+                "Lumisteria.MtVapius_AbdonShop" => "Abdon",
+                "Lumisteria.MtVapius_AsterShop" => "Aster",
+
+
+                //Unknown (Mouse Friends in the Forest?)
+                "EnD.MouseShop" => "Mouse Shop",
+
+
+                _ => FallbackVendorName(shopId)
+                
             };
         }
+
+        private static string FallbackVendorName(string shopId)
+        {
+            string shopName = IdHelper.RemoveModPrefix(shopId);
+
+            SDVCommonLog.Log(
+                $"Fallback vendor mapping hit for {shopId} -> {shopName}",
+                LogHelper.DebugOrTrace
+            );
+
+            return shopName;
+        }
+
 
         // ------------------------------------------------------------
         // GROUPING KEY (used to collapse duplicates)
@@ -119,7 +164,7 @@ namespace SDVCommon.GameData
             if (!entry.PerItemCondition.Contains("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            Item item = ItemRegistry.Create(IdHelper.ToGameId(itemId));
+            Item item = ItemRegistry.Create(IdHelper.ToItemId(itemId));
             if (item == null)
                 return false;
 
@@ -172,8 +217,8 @@ namespace SDVCommon.GameData
                     if (part.Contains("ITEM_ID Target"))
                     {
                         var target = part.Split(' ', StringSplitOptions.RemoveEmptyEntries).Last();
-                        if (IdHelper.CanonicalItemId(itemId)
-                                .Equals(IdHelper.CanonicalItemId(target), StringComparison.OrdinalIgnoreCase))
+                        if (IdHelper.ToItemId(itemId)
+                                .Equals(IdHelper.ToItemId(target), StringComparison.OrdinalIgnoreCase))
                             return true;
                     }
                 }
@@ -207,8 +252,8 @@ namespace SDVCommon.GameData
             foreach (var p in parts)
             {
                 string candidate = p.Trim();
-                if (IdHelper.CanonicalItemId(candidate)
-                        .Equals(IdHelper.CanonicalItemId(itemId), StringComparison.OrdinalIgnoreCase))
+                if (IdHelper.ToItemId(candidate)
+                        .Equals(IdHelper.ToItemId(itemId), StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 

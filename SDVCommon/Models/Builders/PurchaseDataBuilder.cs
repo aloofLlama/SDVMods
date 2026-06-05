@@ -31,8 +31,8 @@ namespace SDVCommon.Models.Builders
                     // Is the shop entry a seed
                     // -----------------------------
                     bool directMatch =
-                        IdHelper.CanonicalItemId(entry.ItemId)
-                            .Equals(IdHelper.CanonicalItemId(itemId), StringComparison.OrdinalIgnoreCase);
+                        IdHelper.ToItemId(entry.ItemId)
+                            .Equals(IdHelper.ToItemId(itemId), StringComparison.OrdinalIgnoreCase);
 
                     bool wildcardMatch =
                         entry.ItemId == "ALL_ITEMS (O)" &&
@@ -85,7 +85,7 @@ namespace SDVCommon.Models.Builders
         // --------------------------------------
         private static int? GetGoldPrice(string itemId, ShopData shop, ShopItemData entry)
         {
-            var item = ItemRegistry.Create(IdHelper.ToGameId(itemId));
+            var item = ItemRegistry.Create(IdHelper.ToItemId(itemId));
             if (item == null)
                 return null;
 

@@ -10,13 +10,12 @@ namespace SDVCommon.GameData
     {
         public static int CountPlanted(string id)
         {
-            // Always canonicalize the input
-            string canonicalId = IdHelper.CanonicalItemId(id);
+            string itemId = IdHelper.ToItemId(id);
 
             int total = 0;
 
             SDVCommonLog.Log(
-                $"[PlantedHelper] CountPlanted for canonicalId={canonicalId}",
+                $"[PlantedHelper] CountPlanted for itemId={itemId}",
                 LogLevel.Info);
 
             bool IsAccessible(GameLocation loc)
@@ -53,9 +52,9 @@ namespace SDVCommon.GameData
                             if (data != null)
                             {
                                 string harvestId = data.QualifiedItemId; // e.g. "(O)Cornucopia_Shiitake"
-                                string canonical = IdHelper.CanonicalItemId(harvestId);
+                                string canonical = IdHelper.ToItemId(harvestId);
 
-                                if (canonical == canonicalId)
+                                if (canonical == itemId)
                                     total++;
                                 SDVCommonLog.Log(
                                                         $"[PlantedHelper] MATCH CROP in {location.Name}: harvest={harvestId}",
@@ -72,9 +71,9 @@ namespace SDVCommon.GameData
                             if (fruitEntry != null)
                             {
                                 string fruitId = fruitEntry.ItemId;
-                                string canonical = IdHelper.CanonicalItemId(fruitId);
+                                string canonical = IdHelper.ToItemId(fruitId);
 
-                                if (canonical == canonicalId)
+                                if (canonical == itemId)
                                 {
                                     total++;
                                     SDVCommonLog.Log(
@@ -98,7 +97,7 @@ namespace SDVCommon.GameData
                 //            api.TryGetBush(bush, out var bushData, out string? bushId))
                 //        {
                 //            //custom bush gives the planted bush the seed Id
-                //            string seedId = IdHelper.CanonicalItemId(bushId);
+                //            string seedId = IdHelper.ToItemId(bushId);
 
                 //            var plant = ;
 
@@ -106,10 +105,10 @@ namespace SDVCommon.GameData
                 //            // NEW: map seed → harvest
                 //            if (PlantDatabase.TryGetBySeedId(canon, out var plantInfo))
                 //            {
-                //                canon = IdHelper.CanonicalItemId(plantInfo.HarvestId);
+                //                canon = IdHelper.ToItemId(plantInfo.HarvestId);
                 //            }
 
-                //            if (canon == canonicalId)
+                //            if (canon == itemId)
                 //            {
                 //                total++; total++;
 
@@ -120,7 +119,7 @@ namespace SDVCommon.GameData
                 //            else
                 //            {
                 //                SDVCommonLog.Log(
-                //                                            $"[PlantedHelper] NO MATCH BUSH in {location.Name}: bushId={bushId} canon={canon} vs target={canonicalId}",
+                //                                            $"[PlantedHelper] NO MATCH BUSH in {location.Name}: bushId={bushId} canon={canon} vs target={itemId}",
                 //                    LogLevel.Info);
                 //            }
                 //        }
@@ -130,7 +129,7 @@ namespace SDVCommon.GameData
         }
 
             SDVCommonLog.Log(
-                    $"[PlantedHelper] DONE for canonicalId={canonicalId}, total={total}",
+                    $"[PlantedHelper] DONE for itemId={itemId}, total={total}",
                     LogLevel.Info);
 
             return total;

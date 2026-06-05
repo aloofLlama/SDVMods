@@ -95,7 +95,7 @@ namespace SDVCommon.Models.Builders
                 ShipOne = shipOne,
                 ShipMonoCulture = shipMono,
                 ShipPolyCulture = shipPoly,
-                ModSource = ModSourceHelper.GetModSource(IdHelper.CanonicalItemId(harvestId))
+                ModSource = ModSourceHelper.GetModSource(harvestId)
             };
 
             _harvests[harvestId] = new HarvestInfo(data);

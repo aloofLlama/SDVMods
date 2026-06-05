@@ -3,6 +3,7 @@ using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
+using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
@@ -20,6 +21,7 @@ namespace GiftDiscovery.Helpers
         {
             TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
+            ModSourceHelper.Initialize(helper);
 
             HarvestInfoBuilder.Initialize();
             GiftableObjectList.Initialize();
@@ -33,7 +35,7 @@ namespace GiftDiscovery.Helpers
             int cntgift = 0;
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
-                string harvestKey = IdHelper.CanonicalItemId(obj.QualifiedItemId);
+                string harvestKey = IdHelper.ToItemId(obj.QualifiedItemId);
                 var info = HarvestInfoBuilder.LookupFromKey(harvestKey);
 
                 if (info != null)
@@ -60,22 +62,23 @@ namespace GiftDiscovery.Helpers
 #if DEBUG //TODO troubleshoot missing icons
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
-                string harvestKey = IdHelper.CanonicalItemId(obj.QualifiedItemId);
-                var info = HarvestInfoBuilder.LookupFromKey(harvestKey);
+                string harvestId = IdHelper.ToItemId(obj.QualifiedItemId);
+                var info = HarvestInfoBuilder.LookupFromKey(harvestId);
 
                 if (info == null)
                 {
-                    SDVCommonLog.Log(
-                        $"Missing HarvestInfo for {obj.QualifiedItemId} (canonical={harvestKey})",
-                        LogHelper.DebugOrTrace
-                    );
+                    // TODO put back in after fixing the all seeds are not in the giftable list issue
+                    //SDVCommonLog.Log(
+                    //    $"Missing HarvestInfo for {obj.QualifiedItemId} (HarvestId={harvestId})",
+                    //    LogHelper.DebugOrTrace
+                    //);
                     continue;
                 }
 
                 if (info.Runtime.HarvestIcon == null)
                 {
                     SDVCommonLog.Log(
-                        $"Missing ICON for {obj.QualifiedItemId} (canonical={harvestKey})",
+                        $"Missing ICON for {obj.QualifiedItemId} (HarvestId={harvestId})",
                         LogHelper.DebugOrTrace
                     );
                 }

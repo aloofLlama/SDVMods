@@ -12,6 +12,8 @@ namespace GiftDiscovery.Services
     // This service manages the knowledge of gift tastes for NPCs and items.
     // Saves the learned information
     // Reads the information for use
+    // uses qualifiedItemId
+
     public static class GiftKnowledgeService
     {
         private static readonly Dictionary<string, Dictionary<string, GiftTaste>> CanonicalTasteCache
@@ -59,18 +61,18 @@ namespace GiftDiscovery.Services
         }
 
 
-        public static void LearnTaste(string itemId, string npcName, GiftTaste taste)
+        public static void LearnTaste(string qualifiedItemId, string npcName, GiftTaste taste)
         {
-            if (!_globalData.KnownTastes.TryGetValue(itemId, out var npcDict))
+            if (!_globalData.KnownTastes.TryGetValue(qualifiedItemId, out var npcDict))
             {
                 npcDict = new Dictionary<string, string>();
-                _globalData.KnownTastes[itemId] = npcDict;
+                _globalData.KnownTastes[qualifiedItemId] = npcDict;
             }
 
-            if (!_localData.KnownTastes.TryGetValue(itemId, out var localNPCDict))
+            if (!_localData.KnownTastes.TryGetValue(qualifiedItemId, out var localNPCDict))
             {
                 localNPCDict = new Dictionary<string, string>();
-                _localData.KnownTastes[itemId] = localNPCDict;
+                _localData.KnownTastes[qualifiedItemId] = localNPCDict;
             }
             localNPCDict[npcName] = taste.ToString();
 
@@ -81,11 +83,11 @@ namespace GiftDiscovery.Services
 
         }
 
-        public static bool TryGetGlobalKnownTaste(string itemId, string npcName, out GiftTaste? taste)
+        public static bool TryGetGlobalKnownTaste(string qualifiedItemId, string npcName, out GiftTaste? taste)
         {
             taste = null;
 
-            if (_globalData.KnownTastes.TryGetValue(itemId, out var npcDict) &&
+            if (_globalData.KnownTastes.TryGetValue(qualifiedItemId, out var npcDict) &&
                 npcDict.TryGetValue(npcName, out var s) &&
                 Enum.TryParse<GiftTaste>(s, out var parsed))
             {
@@ -96,11 +98,11 @@ namespace GiftDiscovery.Services
             return false;
         }
 
-        public static bool TryGetLocalKnownTaste(string itemId, string npcName, out GiftTaste? taste)
+        public static bool TryGetLocalKnownTaste(string qualifiedItemId, string npcName, out GiftTaste? taste)
         {
             taste = null;
 
-            if (_localData.KnownTastes.TryGetValue(itemId, out var npcDict) &&
+            if (_localData.KnownTastes.TryGetValue(qualifiedItemId, out var npcDict) &&
                 npcDict.TryGetValue(npcName, out var s) &&
                 Enum.TryParse<GiftTaste>(s, out var parsed))
             {

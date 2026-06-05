@@ -56,7 +56,7 @@ namespace HarvestHelper
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-            Initializer.InitializeAll();
+            Initializer.InitializeAll(ModHelper);
         }
 
 
@@ -81,9 +81,9 @@ namespace HarvestHelper
             string lookupKey = obj.ItemId;
 
             var harvest = HarvestInfoBuilder.LookupFromKey(lookupKey);
-            string canonicalId = IdHelper.CanonicalItemId(obj.QualifiedItemId);
+            string itemId = IdHelper.ToItemId(obj.QualifiedItemId);
 
-            if (!Game1.objectData.TryGetValue(canonicalId, out var data))
+            if (!Game1.objectData.TryGetValue(itemId, out var data))
             {
                 return;
             }
@@ -106,7 +106,7 @@ namespace HarvestHelper
             if (e.Button != SButton.F5)
                 return;
             HarvestInfoBuilder.Reset();
-            Initializer.InitializeAll();
+            Initializer.InitializeAll(ModHelper);
             ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
 
 

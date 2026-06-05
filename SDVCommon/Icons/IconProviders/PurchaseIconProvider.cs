@@ -18,16 +18,12 @@ namespace SDVCommon.Icons.IconProviders
         {
             try
             {
-                // Extract canonical item ID
-                string canonicalId = id["item:".Length..];
+                string ItemId = id["item:".Length..];
 
-                if (string.IsNullOrWhiteSpace(canonicalId))
+                if (string.IsNullOrWhiteSpace(ItemId))
                     return null;
 
-                // Convert canonical → game ID
-                string gameId = IdHelper.ToGameId(canonicalId);
-
-                Item item = ItemRegistry.Create(gameId);
+                Item item = ItemRegistry.Create(ItemId);
                 if (item == null)
                     return null;
 

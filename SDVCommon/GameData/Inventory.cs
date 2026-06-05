@@ -9,54 +9,54 @@ namespace SDVCommon.GameData
 {
     public class Inventory
     {
-        public static int CountOwned(string canonicalId)
+        public static int CountOwned(string itemId)
         {
             int total = 0;
             HashSet<Item> seen = new();
 
             // 1. Inventory
-            ScanItem(Game1.player, Game1.player.Items, canonicalId, ref total, seen);
+            ScanItem(Game1.player, Game1.player.Items, itemId, ref total, seen);
 
             // 2. All locations
             foreach (var location in GetAllLocations())
             {
                 //Vanilla farmhouse fridge
                 if (location is FarmHouse fh && fh.fridge.Value is Chest vanillaFridge)
-                    ScanItem(location, vanillaFridge, canonicalId, ref total, seen);
+                    ScanItem(location, vanillaFridge, itemId, ref total, seen);
 
                 //Island farmhouse fridge
                 if (location is IslandFarmHouse ifh && ifh.fridge.Value is Chest islandFridge)
-                    ScanItem(location, islandFridge, canonicalId, ref total, seen);
+                    ScanItem(location, islandFridge, itemId, ref total, seen);
 
                 //placed fridges (SBV, modded, mini-fridges)
                 foreach (var obj in location.objects.Values)
                 {
                     if (obj is Chest chest && chest.fridge.Value)
-                        ScanItem(location, chest, canonicalId, ref total, seen);
+                        ScanItem(location, chest, itemId, ref total, seen);
                 }
 
                 // building chests + Junimo huts
                 foreach (var building in location.buildings)
                 {
                     foreach (var chest in building.buildingChests)
-                        ScanItem(building, chest, canonicalId, ref total, seen);
+                        ScanItem(building, chest, itemId, ref total, seen);
 
                     if (building is JunimoHut hut)
-                        ScanItem(hut, hut.GetOutputChest(), canonicalId, ref total, seen);
+                        ScanItem(hut, hut.GetOutputChest(), itemId, ref total, seen);
                 }
 
                 // placed chests + non‑spawned objects
                 foreach (var obj in location.objects.Values)
                 {
                     if (obj is Chest chest)
-                        ScanItem(location, chest, canonicalId, ref total, seen);
+                        ScanItem(location, chest, itemId, ref total, seen);
                     else if (!IsWorldItem(obj))
-                        ScanItem(location, obj, canonicalId, ref total, seen);
+                        ScanItem(location, obj, itemId, ref total, seen);
                 }
             }
 
             // 3. Hay
-            if (canonicalId == "178")
+            if (itemId == "178")
             {
                 int hayCount = Game1.getFarm()?.piecesOfHay.Value ?? 0;
                 total += hayCount;
@@ -64,7 +64,7 @@ namespace SDVCommon.GameData
 
             return total;
         }
-        public static int CountOwnedInMainFarmhouseFridges(string canonicalId)
+        public static int CountOwnedInMainFarmhouseFridges(string itemId)
         {
             int total = 0;
             HashSet<Item> seen = new(); // reference equality
@@ -76,13 +76,13 @@ namespace SDVCommon.GameData
 
             // 1. Main farmhouse built‑in fridge
             if (farmhouse.fridge?.Value is Chest mainFridge)
-                ScanItem(farmhouse, mainFridge, canonicalId, ref total, seen);
+                ScanItem(farmhouse, mainFridge, itemId, ref total, seen);
 
             // 2. Mini‑fridges placed INSIDE the main farmhouse
             foreach (var obj in farmhouse.objects.Values)
             {
                 if (obj is Chest chest && chest.fridge.Value)
-                    ScanItem(farmhouse, chest, canonicalId, ref total, seen);
+                    ScanItem(farmhouse, chest, itemId, ref total, seen);
             }
 
             return total;
@@ -93,21 +93,21 @@ namespace SDVCommon.GameData
             foreach (var item in Game1.player.Items)
             {
                 if (item is not null &&
-                    IdHelper.CanonicalItemId(item.QualifiedItemId)
-                        .Equals(IdHelper.CanonicalItemId(itemId), StringComparison.OrdinalIgnoreCase))
+                    IdHelper.ToItemId(item.QualifiedItemId)
+                        .Equals(IdHelper.ToItemId(itemId), StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 
             return false;
         }
 
-        private static void ScanItem(object parent, IEnumerable<Item> roots, string canonicalId, ref int total, HashSet<Item> seen)
+        private static void ScanItem(object parent, IEnumerable<Item> roots, string itemId, ref int total, HashSet<Item> seen)
         {
             foreach (var item in roots)
-                ScanItem(parent, item, canonicalId, ref total, seen);
+                ScanItem(parent, item, itemId, ref total, seen);
         }
 
-        private static void ScanItem(object parent, Item root, string canonicalId, ref int total, HashSet<Item> seen)
+        private static void ScanItem(object parent, Item root, string itemId, ref int total, HashSet<Item> seen)
         {
             if (root == null || seen.Contains(root))
                 return;
@@ -117,8 +117,8 @@ namespace SDVCommon.GameData
             // Count only StardewValley.Object
             if (root is StardewValley.Object obj && !obj.bigCraftable.Value)
             {
-                string id = IdHelper.CanonicalItemId(obj.QualifiedItemId);
-                if (id == canonicalId)
+                string id = IdHelper.ToItemId(obj.QualifiedItemId);
+                if (id == itemId)
                     total += obj.Stack;
             }
 
@@ -126,14 +126,14 @@ namespace SDVCommon.GameData
             if (root is Chest chest)
             {
                 foreach (var item in chest.Items)
-                    ScanItem(chest, item, canonicalId, ref total, seen);
+                    ScanItem(chest, item, itemId, ref total, seen);
             }
 
             // Recurse into storage furniture (dressers, fridges)
             if (root is StorageFurniture sf)
             {
                 foreach (var item in sf.heldItems)
-                    ScanItem(sf, item, canonicalId, ref total, seen);
+                    ScanItem(sf, item, itemId, ref total, seen);
             }
         }
 

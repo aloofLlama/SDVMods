@@ -28,7 +28,7 @@ namespace SDVCommon.Icons
 
                 if (!string.IsNullOrEmpty(vendor.Data.TradeItemId))
                 {
-                    vendor.Runtime.CurrencyIcon = IconRegistry.GetIcon($"item:{IdHelper.CanonicalItemId(vendor.Data.TradeItemId)}");
+                    vendor.Runtime.CurrencyIcon = IconRegistry.GetIcon($"item:{IdHelper.ToItemId(vendor.Data.TradeItemId)}");
                 }
             }
 

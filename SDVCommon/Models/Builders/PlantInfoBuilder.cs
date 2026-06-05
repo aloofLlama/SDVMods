@@ -103,7 +103,7 @@ namespace SDVCommon.Models.Builders
                 var fruitEntry = fruitTreeData.Fruit.FirstOrDefault();
 
                 //string fruitId = fruitEntry?.ItemId ?? "";
-                string fruitId = IdHelper.CanonicalItemId(fruitEntry?.ItemId);
+                string fruitId = IdHelper.ToItemId(fruitEntry?.ItemId);
 
 
                 var harvestInfo = GameObject.FromObject(fruitId);

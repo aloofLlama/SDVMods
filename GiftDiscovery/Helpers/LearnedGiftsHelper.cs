@@ -88,14 +88,14 @@ namespace GiftDiscovery.Helpers
         {
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
-                string id = obj.QualifiedItemId;
+                string qualifiedId = obj.QualifiedItemId;
 
-                var canonical = TasteResolver.GetCanonicalTaste(id, npc);
+                var canonical = TasteResolver.GetCanonicalTaste(qualifiedId, npc);
                 if (canonical != taste)
                     continue;
 
-                if (TasteResolver.IsKnown(id, npc, mode))
-                    yield return id;
+                if (TasteResolver.IsKnown(qualifiedId, npc, mode))
+                    yield return qualifiedId;
             }
         }
 
@@ -112,14 +112,14 @@ namespace GiftDiscovery.Helpers
 
             foreach (var obj in GiftableObjectList.AllGiftable)
             {
-                string id = obj.QualifiedItemId;
+                string qualifiedItemId = obj.QualifiedItemId;
 
-                var canonical = TasteResolver.GetCanonicalTaste(id, npc);
+                var canonical = TasteResolver.GetCanonicalTaste(qualifiedItemId, npc);
                 if (canonical != taste)
                     continue;
 
-                if (TasteResolver.IsUnknown(id, npc, mode))
-                    yield return id;
+                if (TasteResolver.IsUnknown(qualifiedItemId, npc, mode))
+                    yield return qualifiedItemId;
             }
         }
 

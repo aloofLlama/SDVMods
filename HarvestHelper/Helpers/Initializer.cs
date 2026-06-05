@@ -1,4 +1,5 @@
 ﻿using SDVCommon;
+using SDVCommon.Compatibility;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
@@ -9,9 +10,10 @@ namespace HarvestHelper.Helpers
 {
     public static class Initializer
     {
-        public static void InitializeAll()
+        public static void InitializeAll(IModHelper helper)
         {
             TooltipIcons.Initialize();
+            ModSourceHelper.Initialize(helper);
             GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
             CookingInfoBuilder.BuildAll();

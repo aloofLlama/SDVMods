@@ -52,12 +52,12 @@ namespace SDVCommon.Models.Builders
             {
                 RecipeName = recipe.name,
                 DisplayName = recipe.DisplayName,
-                OutputId = IdHelper.CanonicalItemId(recipe.itemToProduce.First()),
+                OutputId = IdHelper.ToItemId(recipe.itemToProduce.First()),
                 OutputCount = recipe.numberProducedPerCraft,
                 Ingredients = recipe.recipeList
                     .Select(kvp => new RecipeIngredientData
                     {
-                        IngredientId = IdHelper.CanonicalItemId(kvp.Key),
+                        IngredientId = IdHelper.ToItemId(kvp.Key),
                         Count = kvp.Value
                     })
                     .ToList()
