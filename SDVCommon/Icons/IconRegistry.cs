@@ -1,49 +1,36 @@
-﻿using SDVCommon.Icons.IconProviders;
-using StardewModdingAPI;
-using System.Collections.Generic;
+﻿using SDVCommon.Icons;
+using SDVCommon.Helpers;
 
-
-namespace SDVCommon.Icons
+internal static class IconRegistry
 {
-    internal static class IconRegistry
+    private static readonly Dictionary<string, Icon?> Cache = new();
+    private static readonly List<IIconProvider> Providers = new();
+
+    static IconRegistry()
     {
-        private static readonly Dictionary<string, Icon?> Cache = new();
-        private static readonly List<IIconProvider> Providers = new();
+        Providers.Add(new StaticIconProvider());
+        Providers.Add(new ItemIconProvider());
+    }
 
-        static IconRegistry()
+    public static Icon? GetIcon(string id)
+    {
+        // Accepts both qualified and unqualified IDs, as ItemRegistry can resolve either
+        id = IdHelper.ToQualifiedId(id);
+
+        if (Cache.TryGetValue(id, out var cached))
+            return cached;
+
+        foreach (var provider in Providers)
         {
-            Providers.Add(new SeedIconProvider());
-            Providers.Add(new HarvestIconProvider());
-            Providers.Add(new PurchaseIconProvider());
-            Providers.Add(new CookingIconProvider());
-
-            // Later:
-            // Providers.Add(new ArtisanGoodIconProvider());
-            // Providers.Add(new MachineIconProvider());
-            // Providers.Add(new ForageIconProvider());
-            // Providers.Add(new FishIconProvider());
-        }
-
-        public static Icon? GetIcon(string id)
-        {
-            if (Cache.TryGetValue(id, out var cached))
-                return cached;
-
-            foreach (var provider in Providers)
+            if (provider.CanHandle(id))
             {
-
-                if (provider.CanHandle(id))
-                {
-                    var icon = provider.LoadIcon(id);
-                    Cache[id] = icon;
-                    return icon;
-                }
-                else { }
-
+                var icon = provider.LoadIcon(id);
+                Cache[id] = icon;
+                return icon;
             }
-
-            Cache[id] = null;
-            return null;
         }
+
+        Cache[id] = null;
+        return null;
     }
 }

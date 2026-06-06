@@ -1,7 +1,7 @@
 ﻿using HarvestHelper.Helpers;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
-using SDVCommon.Models.Wrappers;
+using SDVData;
 using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
@@ -15,7 +15,7 @@ namespace HarvestHelper.TooltipSections
         {
             var list = new List<TooltipElement>();
 
-            string harvestId = harvest.Data.HarvestId;
+            string harvestId = harvest.HarvestId;
             var (known, unknown) = CookingRecipe.CountRecipesUsing(harvestId);
             var (cooked, uncooked) = CookingRecipe.CountCookedRecipesUsing(harvestId);
             int total = known + unknown;
@@ -47,7 +47,7 @@ namespace HarvestHelper.TooltipSections
                 .GetKnownRecipesUsing(harvestId)
                 .Select(r => new InlineSegment
                 {
-                    Icon = r.Runtime.DishIcon
+                    Icon = IconRegistry.GetIcon(r.OutputId)
                 })
                 .ToList();
 
@@ -161,7 +161,7 @@ namespace HarvestHelper.TooltipSections
             {
                 new InlineSegment
                 {
-                    Icon = TooltipIcons.GetIconForGameObject("(BC)216", 1.2f), //MiniFridge
+                    Icon = IconRegistry.GetIcon("(BC)216")?.WithScale(1.2f), //MiniFridge
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned), 
                         fridgeQty)
                 }
@@ -194,7 +194,7 @@ namespace HarvestHelper.TooltipSections
             // add the plate icon + segments
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.Plate),
+                Icon = IconKey.Plate.GetIcon(),
                 InlineSegments = segments
             });
 

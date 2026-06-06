@@ -19,8 +19,7 @@ namespace PlantingDay.ToolTip_Sections
             if (plant.Data.DaysToProduce <= 0)
                 return list;
 
-            var harvestIcon =
-                HarvestInfoBuilder.LookupFromKey(plant.Data.HarvestId)?.Runtime.HarvestIcon;
+            var harvestIcon = IconRegistry.GetIcon(plant.Data.HarvestId);
 
             GrowthContext growth = BuildGrowthContext(plant);
 
@@ -144,7 +143,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowIndef))
                     
                 });
@@ -173,7 +172,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty)
                 });
@@ -206,7 +205,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty)
                 });
@@ -240,7 +239,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty)
                 });
@@ -269,7 +268,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.Warning),
+                Icon = IconKey.Warning.GetIcon(),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate)),
                 TextColor = TooltipColors.Warning
             });
@@ -293,7 +292,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.WaterSeeds),
+                Icon = IconKey.WaterSeeds.GetIcon(),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.DaysToProduce),
                     growth.PaddyProduceDay),
                 TextColor = TooltipColors.Paddy
@@ -303,7 +302,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.PaddyRegrowQty),
                     TextColor = TooltipColors.Paddy
@@ -326,7 +325,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.WaterSeeds),
+                Icon = IconKey.WaterSeeds.GetIcon(),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.ReadyOn),
                     growth.PaddyProduceDay,
                     SeasonHelper.Translate(growth.CurrentSeason),
@@ -338,7 +337,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.PaddyRegrowQty),
                     TextColor = TooltipColors.Paddy
@@ -362,7 +361,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.WaterSeeds),
+                Icon = IconKey.WaterSeeds.GetIcon(),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.ReadyOn),
                     growth.PaddyProduceDay,
                     SeasonHelper.Translate(growth.NextSeason),
@@ -374,7 +373,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.PaddyRegrowQty),
                     TextColor = TooltipColors.Paddy
@@ -398,7 +397,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.WaterSeeds),
+                Icon = IconKey.WaterSeeds.GetIcon(),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.DaysToProduce),
                     growth.PaddyProduceDay),
                 TextColor = TooltipColors.Paddy
@@ -406,7 +405,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.Warning),
+                Icon = IconKey.Warning.GetIcon(),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.TooLate)),
                 TextColor = TooltipColors.Warning
             });
@@ -440,7 +439,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty)
                 });
@@ -469,7 +468,7 @@ namespace PlantingDay.ToolTip_Sections
             {
                 list.Add(new TooltipElement
                 {
-                    Icon = TooltipIcons.Get(IconKey.Spiral),
+                    Icon = IconKey.Spiral.GetIcon(),
                     Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.RegrowQty),
                         growth.RegrowQty)
                 });

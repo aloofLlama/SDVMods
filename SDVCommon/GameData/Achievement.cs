@@ -1,4 +1,4 @@
-﻿using SDVCommon.Models.Wrappers;
+﻿using SDVData;
 using StardewValley;
 
 
@@ -15,10 +15,10 @@ namespace SDVCommon.GameData
         public static bool NeedsShippedOne(HarvestInfo harvest)
         {
 
-            if (!harvest.Data.ShipOne)
+            if (!harvest.ShipOne)
                 return false; // not eligible
 
-            if (Game1.player.basicShipped.TryGetValue(harvest.Data.HarvestId, out int count))
+            if (Game1.player.basicShipped.TryGetValue(harvest.HarvestId, out int count))
                 return count == 0;
 
             return true; // never shipped
@@ -27,7 +27,7 @@ namespace SDVCommon.GameData
         public static bool NeedsMonoCultureShipped(HarvestInfo harvest)
         {
             // Not a monoculture crop
-            if (!harvest.Data.ShipMonoCulture)
+            if (!harvest.ShipMonoCulture)
                 return false;
 
             // Achievement already earned
@@ -39,10 +39,10 @@ namespace SDVCommon.GameData
 
         public static bool NeedsPolyCultureShipped(HarvestInfo harvest)
         {
-            if (!harvest.Data.ShipPolyCulture)
+            if (!harvest.ShipPolyCulture)
                 return false; // not eligible
 
-            if (Game1.player.basicShipped.TryGetValue(harvest.Data.HarvestId, out int count))
+            if (Game1.player.basicShipped.TryGetValue(harvest.HarvestId, out int count))
                 return count < 15;
 
             return true; // never shipped

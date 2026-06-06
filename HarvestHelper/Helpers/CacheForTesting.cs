@@ -9,7 +9,7 @@ namespace HarvestHelper.Helpers
         {
             // Serialize ONLY the data portion
             var dataOnly = HarvestInfoBuilder.AllHarvests
-                .Select(h => h.Data)
+                //.Select(h => h)
                 .ToList();
 
             string json = JsonConvert.SerializeObject(

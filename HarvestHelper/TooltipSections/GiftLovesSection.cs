@@ -85,10 +85,9 @@ namespace HarvestHelper.TooltipSections
 
             );
 
-            // Add tooltip element with heart icon
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.Heart),
+                Icon = IconKey.Heart.GetIcon(),
                 InlineSegments = wrapped
             });
 

@@ -10,34 +10,13 @@ namespace SDVCommon.Helpers.Tooltip
                 list.Add(element);
         }
 
-        public static bool SectionHasVisibleContent(IEnumerable<TooltipElement> section)
-        {
-            return section.Any(IsVisible);
-        }
-
-        public static bool IsVisible(TooltipElement e)
-        {
-            bool hasInline = e.InlineSegments != null &&
-                             e.InlineSegments.Any(seg =>
-                                 !string.IsNullOrWhiteSpace(seg.Text) ||
-                                 seg.Icon != null);
-
-            return
-                hasInline ||
-                !string.IsNullOrWhiteSpace(e.Text) ||
-                e.IconTexture != null ||
-                e.IsSeparator;
-        }
-
         public static void AddSectionWithSeparator(
             List<TooltipElement> list,
-            Func<IEnumerable<TooltipElement>> sectionBuilder,
-            int paddingTop = 3,
-            int paddingBottom = 3
+            Func<IEnumerable<TooltipElement>> sectionBuilder
             )
         {
             var section = sectionBuilder()?.ToList();
-            if (section == null || !SectionHasVisibleContent(section))
+            if (section == null || !section.Any(IsVisible))
                 return;
 
             if (list.Count > 0)
@@ -45,8 +24,6 @@ namespace SDVCommon.Helpers.Tooltip
                 list.Add(new TooltipElement
                 {
                     IsSeparator = true,
-                    PaddingTop = paddingTop,
-                    PaddingBottom = paddingBottom
                 });
             }
 
@@ -92,47 +69,6 @@ namespace SDVCommon.Helpers.Tooltip
             return result;
 
         }
-
-        public static List<InlineSegment> BuildInlineSegmentsWithCommas<T>(
-    IEnumerable<T> items,
-    Func<T, IEnumerable<InlineSegment>> buildSegments)
-        {
-            var result = new List<InlineSegment>();
-            var list = items.ToList();
-
-            for (int i = 0; i < list.Count; i++)
-            {
-                // Build segments for this item
-                var segs = buildSegments(list[i]).ToList();
-
-                if (segs.Count == 0)
-                    continue;
-
-                // Add the segments
-                result.AddRange(segs);
-
-                // Look ahead: does the next item produce segments?
-                for (int j = i + 1; j < list.Count; j++)
-                {
-                    var nextSegs = buildSegments(list[j]);
-                    if (nextSegs != null && nextSegs.Any())
-                    {
-                        // Add comma matching previous segment color
-                        result.Add(new InlineSegment
-                        {
-                            Text = ", ",
-                            TextColor = result.Last().TextColor,   // inherit color
-                            Bold = false
-                        });
-                        break;
-                    }
-                }
-            }
-
-            return result;
-        }
-
-
 
         public static List<InlineSegment> BuildWrappedSegmentBlock(
             List<InlineSegment> startSegments,
@@ -231,7 +167,6 @@ namespace SDVCommon.Helpers.Tooltip
                     {
                         result.Add(new InlineSegment
                         {
-                            Text = " ",
                             TextColor = seg.TextColor
                         });
 
@@ -244,6 +179,19 @@ namespace SDVCommon.Helpers.Tooltip
             return result;
         }
 
+        public static bool IsVisible(TooltipElement e)
+        {
+            bool hasInline = e.InlineSegments != null &&
+                             e.InlineSegments.Any(seg =>
+                                 !string.IsNullOrWhiteSpace(seg.Text) ||
+                                 seg.Icon != null);
+
+            return
+                hasInline ||
+                !string.IsNullOrWhiteSpace(e.Text) ||
+                //e.IconTexture != null ||
+                e.IsSeparator;
+        }
 
 
 

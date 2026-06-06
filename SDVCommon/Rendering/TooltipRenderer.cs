@@ -1,11 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SDVCommon.Helpers;
+using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
+using SDVCommon.Services;
 using StardewValley;
 using StardewValley.Menus;
 
 
-namespace SDVCommon
+namespace SDVCommon.Rendering
 {
 
     public static class TooltipRenderer
@@ -13,112 +16,127 @@ namespace SDVCommon
 
         public static void DrawLeftOfCursor(SpriteBatch b, List<TooltipElement> elements)
         {
-            SpriteFont font = Game1.smallFont;
             TooltipStyle style = TooltipStyle.Default;
 
-            var (width, height) = MeasureTooltip(elements, font, style);
+            var (width, height) = GetTooltipSize(elements, style);
             var (x, y) = PositionLeftOfCursor(width, height);
-            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+            DrawTooltipAt(b, elements, style, x, y, width, height);
         }
 
         public static void DrawLeftandAboveCursor(SpriteBatch b, List<TooltipElement> elements)
         {
-            SpriteFont font = Game1.smallFont;
             TooltipStyle style = TooltipStyle.Default;
 
-            var (width, height) = MeasureTooltip(elements, font, style);
+            var (width, height) = GetTooltipSize(elements, style);
             var (x, y) = PositionLeftAboveCursor(width, height);
 
-            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+            DrawTooltipAt(b, elements, style, x, y, width, height);
         }
 
 
         public static void DrawBottomLeft(SpriteBatch b, List<TooltipElement> elements)
         {
-            SpriteFont font = Game1.smallFont;
             TooltipStyle style = TooltipStyle.Default;
 
-            var (width, height) = MeasureTooltip(elements, font, style);
+            var (width, height) = GetTooltipSize(elements, style);
             var (x, y) = PositionBottomLeft(height);
-            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+            DrawTooltipAt(b, elements, style, x, y, width, height);
         }
 
         public static void DrawBottomRight(SpriteBatch b, List<TooltipElement> elements)
         {
-            SpriteFont font = Game1.smallFont;
             TooltipStyle style = TooltipStyle.Default;
 
-            var (width, height) = MeasureTooltip(elements, font, style);
+            var (width, height) = GetTooltipSize(elements, style);
             var (x, y) = PositionBottomRight(width, height);
-            DrawTooltipAt(b, elements, font, style, x, y, width, height);
+            DrawTooltipAt(b, elements, style, x, y, width, height);
         }
-
-
-        public struct TooltipStyle
-        {
-            public int IconRenderSize;
-            public int IconColumnWidth;
-            public int SeparatorPadding;
-            public int InlineIconWidthPadding;
-
-            public static TooltipStyle Default => new()
-            {
-                IconRenderSize = 32,
-                IconColumnWidth = 34,
-                SeparatorPadding = 12,
-                InlineIconWidthPadding = 2
-            };
-        }
-
 
 
         private static (int width, int height) MeasureTooltip(
             List<TooltipElement> elements,
-            SpriteFont font,
             TooltipStyle style)
-        { 
+        {
             int width = 0;
             int height = 0;
-            int maxIconColumnWidth = 0;
+            //int IconColumnWidth = style.IconColumnWidth;
 
-            //
-            // PASS 1 — Measure height + icon column width
-            //
+            //SDVCommonLog.Log($"[{DateTime.Now:HH:mm:ss}] NEW MEASURE**************************************************************************************",
+              //              LogHelper.DebugAlert);
+
+            int cnt = 0;
+
+            // Measure Height
             foreach (var el in elements)
             {
-                int lineHeight = font.LineSpacing;
+                cnt++;
+                //SDVCommonLog.Log($"       Element {cnt}", LogHelper.DebugDebug);
 
                 if (el.IsSeparator)
                 {
-                    height += el.PaddingTop + style.SeparatorPadding + el.PaddingBottom;
+                    height += style.SeparatorRowHeight;
+                    //SDVCommonLog.Log($"       Sep Height {style.SeparatorRowHeight}", LogHelper.DebugDebug);
+                    //SDVCommonLog.Log($"{height} - HEIGHT", LogHelper.DebugInfo);
                     continue;
                 }
 
-                if (el.IconTexture != null || el.Icon.HasValue)
-                {
-                    int iconSize = style.IconRenderSize;
-                    lineHeight = Math.Max(lineHeight, iconSize + 2);
-                    maxIconColumnWidth = Math.Max(maxIconColumnWidth, style.IconColumnWidth);
-                }
+                int rowHeight = TextRowHeight(style);
 
-                int lineCount = 1;
 
+
+                int cntInline = 1; //start at one since hitting the line break increments
                 if (el.InlineSegments != null)
                 {
-                    lineCount = 1 + el.InlineSegments.Count(s => s.IsLineBreak);
+                    rowHeight = InlineRowHeight(el.InlineSegments, style);
+
+                    foreach (var seg in el.InlineSegments)
+                    {
+                        if (seg.IsLineBreak)
+                        {
+                            cntInline++;
+                            continue;
+                        }
+                    }
+
+                    height += rowHeight * cntInline;
+                    //SDVCommonLog.Log($"{height} - HEIGHT | Inline row count  {cntInline}", LogHelper.DebugInfo);
+
+                    continue;
+                }
+                else
+                {
+                    if (el.Icon.HasValue)
+                    {
+                        var icon = el.Icon.Value;
+                        int iconRowHeight = IconRowHeight(icon, style);
+                        rowHeight = Math.Max(rowHeight, iconRowHeight);
+                    }
+
+                    height += rowHeight;
+                    //SDVCommonLog.Log($"       Non inline row {rowHeight}", LogHelper.DebugDebug);
+
                 }
 
-                height += el.PaddingTop + lineHeight * lineCount + el.PaddingBottom;
+                //SDVCommonLog.Log($"{height} - HEIGHT", LogHelper.DebugInfo);
+
             }
 
-            // PASS 2 — Measure width
+            // Measure Width
             foreach (var el in elements)
             {
                 int lineWidth = 0;
 
-                // Always account for icon column if there's an icon
-                if (el.IconTexture != null || el.Icon.HasValue)
-                    lineWidth += maxIconColumnWidth;
+                if (el.Icon.HasValue)
+                {
+                    int columnWidth = IconColumnWidth(el.Icon.Value, style);
+                    lineWidth += columnWidth;
+                }
+
+                if (!string.IsNullOrEmpty(el.Text))
+                {
+                    lineWidth += TextWidth(el.Text, style);
+                }
+
 
                 if (el.InlineSegments != null)
                 {
@@ -136,30 +154,370 @@ namespace SDVCommon
 
                         if (seg.Icon.HasValue)
                         {
-                            int iconSize = style.IconRenderSize;
-                            currentLineWidth += iconSize + style.InlineIconWidthPadding;
+                            int columnWidth = IconColumnWidth(seg.Icon.Value, style);
+                            currentLineWidth += columnWidth;
                         }
 
                         if (!string.IsNullOrEmpty(seg.Text))
-                            currentLineWidth += (int)font.MeasureString(seg.Text).X;
+                            currentLineWidth += TextWidth(seg.Text, style);
                     }
 
                     maxLineWidth = Math.Max(maxLineWidth, currentLineWidth);
                     lineWidth += maxLineWidth;
                 }
-                else if (!string.IsNullOrEmpty(el.Text))
-                {
-                    lineWidth += (int)font.MeasureString(el.Text).X;
-                }
 
-                width = Math.Max(width, lineWidth) + el.PaddingRight;
+                //set width according to the widest line
+                width = Math.Max(width, lineWidth);
+
             }
 
-            width += 32;
-            height += 32;
+            width += style.BorderPadding * 2;
+            height += style.BorderPadding * 2;
 
             return (width, height);
         }
+
+        private static void DrawTooltipAt(
+            SpriteBatch b,
+            List<TooltipElement> elements,
+            TooltipStyle style,
+            int x,
+            int y,
+            int width,
+            int height)
+        {
+            //SDVCommonLog.Log($"NEW DRAW", LogHelper.DebugAlert);
+
+            // Draw background
+            IClickableMenu.drawTextureBox(b, x, y, width, height, Color.White);
+
+            //SDVCommonLog.Log($"{0} | START", LogHelper.DebugInfo);
+
+            // Draw content
+            int drawY = y + style.BorderPadding;
+            //SDVCommonLog.Log($"{drawY - y} | Border padding", LogHelper.DebugInfo);
+
+            foreach (var el in elements)
+            {
+                //SDVCommonLog.Log($"{drawY - y} | Start New Element", LogHelper.DebugInfo);
+
+                int drawX = x + style.BorderPadding;
+
+                // Separator
+                if (el.IsSeparator)
+                {
+                    int lineY = drawY + style.SeparatorRowHeight / 2; //draw in the middle vertically
+                    int separatorLength = width - style.BorderPadding * 2; // width of the textbox reduced by the padding on both sides
+
+                    b.Draw(
+                        Game1.staminaRect,
+                        new Rectangle(drawX, lineY, separatorLength, style.SeparatorThickness),
+                        new Color(255, 170, 110)
+                    );
+
+                    drawY += style.SeparatorRowHeight;
+                    //SDVCommonLog.Log($"{drawY - y} | Separator End | dif {style.SeparatorRowHeight}", LogHelper.DebugInfo);
+
+                    continue;
+                }
+
+                int rowHeight = TextRowHeight(style);
+
+                // Icons
+                if (el.Icon.HasValue)
+                {
+                    var icon = el.Icon.Value;
+                    int iconRowHeight = IconRowHeight(icon, style);
+                    rowHeight = Math.Max(rowHeight, iconRowHeight);
+
+                    //SDVCommonLog.Log($"       Basic row height: {rowHeight}", LogHelper.DebugDebug);
+
+                    int usedWidth = DrawPaddedIcon(
+                        b,
+                        icon,
+                        style,
+                        rowHeight,
+                        drawX,
+                        drawY
+                    );
+
+                    drawX += usedWidth;
+                }
+
+
+                // Inline segments
+                if (el.InlineSegments != null)
+                {
+                    //SDVCommonLog.Log($"{drawY - y} | Inline Segment Row Start", LogHelper.DebugInfo);
+                    int xCursor = drawX;
+
+                    rowHeight = InlineRowHeight(el.InlineSegments, style);
+
+                    //SDVCommonLog.Log($"       Inline row height: {rowHeight}", LogHelper.DebugDebug);
+
+                    int tmpcnt = 1;
+                    foreach (var seg in el.InlineSegments)
+                    {
+                        if (seg.IsLineBreak)
+                        {
+                            tmpcnt++;
+                            // Move to next line with top and bottom padding
+                            drawY += rowHeight;
+
+                            // Reset X cursor to start of text column
+                            xCursor = drawX;
+
+                            continue;
+                        }
+
+                        if (seg.Icon.HasValue)
+                        {
+                            var icon = seg.Icon.Value;
+
+                            int usedWidth = DrawPaddedIcon(
+                                b,
+                                icon,
+                                style,
+                                rowHeight,
+                                xCursor,
+                                drawY
+                            );
+
+                            xCursor += usedWidth;
+
+                        }
+
+                        if (!string.IsNullOrEmpty(seg.Text))
+                        {
+
+                            int usedWidth = DrawPaddedText(
+                                seg.Text,
+                                seg.Bold,
+                                seg.Underline,
+                                seg.TextColor,
+                                seg.Font,
+                                b,
+                                style,
+                                rowHeight,
+                                xCursor,
+                                drawY
+                                );
+
+                            xCursor += usedWidth;
+                        }
+                    }
+
+                    //drawY += rowHeight;
+                    //SDVCommonLog.Log($"{drawY - y} | Inline Segment End | dif {tmpcnt * rowHeight}", LogHelper.DebugInfo);
+
+                }
+
+                //Basic row
+
+                    //SDVCommonLog.Log($"       Basic text row height: {rowHeight}", LogHelper.DebugDebug);
+
+
+                    // Normal text
+                    if (!string.IsNullOrEmpty(el.Text))
+                    {
+                        //SDVCommonLog.Log($"{drawY - y} | Normal Text Row Start |", LogHelper.DebugInfo);
+
+                        DrawPaddedText(
+                            el.Text,
+                            el.Bold,
+                            el.Underline,
+                            el.TextColor,
+                            el.Font,
+                            b,
+                            style,
+                            rowHeight,
+                            drawX,
+                            drawY
+                            );
+
+                        //drawY += rowHeight;
+                        //SDVCommonLog.Log($"{drawY - y} | Normal Text Row End | dif {rowHeight}", LogHelper.DebugInfo);
+
+
+                }
+                drawY += rowHeight;
+
+            }
+        }
+
+
+        private static int DrawPaddedIcon(
+             SpriteBatch b,
+             Icon icon,
+             TooltipStyle style,
+             int rowHeight,
+             int x,
+             int y
+             )
+        {
+
+            Texture2D texture = icon.Texture;
+            Rectangle source = icon.Source;
+            float scale = icon.Scale;
+            Color tint = icon.Tint;
+
+            //SDVCommonLog.Log($"                                      {scale} | IconScale |", LogHelper.DebugAlert);
+
+
+            int drawW = (int)(source.Width * scale);
+            int drawH = (int)(source.Height * scale);
+
+
+            int columnWidth = IconColumnWidth(icon, style);
+
+            // Center inside the box
+            int xOffset = x + (columnWidth - drawW) / 2;
+            int yOffset = y + (rowHeight - drawH) / 2;
+
+            b.Draw(texture, new Rectangle(xOffset, yOffset, drawW, drawH), source, tint);
+
+            return columnWidth;
+        }
+
+        private static int DrawPaddedText(
+            string text,
+            bool bold,
+            bool underline,
+            Color color,
+            SpriteFont font,
+            SpriteBatch b,
+            TooltipStyle style,
+            int rowHeight,
+             int x,
+             int y
+             )
+        {
+            if (string.IsNullOrEmpty(text))
+                return 0;
+
+            float textHeight = font.MeasureString(text).Y;
+
+            int verticalOffset = (int)((rowHeight - textHeight) / 2f);
+            int textY = y + verticalOffset;
+
+            if (bold)
+                DrawBoldString(b, font, text, new Vector2(x, textY), color);
+            else
+                b.DrawString(font, text, new Vector2(x, textY), color);
+
+            if (underline)
+            {
+                DrawUnderline(
+                    b,
+                    text,
+                    x,
+                    textY,
+                    color,
+                    style
+                );
+            }
+
+            return (int)font.MeasureString(text).X;
+        }
+
+        private static void DrawBoldString(
+            SpriteBatch b,
+            SpriteFont font,
+            string text,
+            Vector2 position,
+            Color color)
+        {
+            // Shadow/offset pass
+            b.DrawString(font, text, new Vector2(position.X + 1, position.Y), color);
+
+            // Main pass
+            b.DrawString(font, text, position, color);
+        }
+
+        private static void DrawUnderline(
+            SpriteBatch b,
+            string text,
+            int x,
+            int y,
+            Color color,
+            TooltipStyle style)
+        {
+            // Measure the text width/height
+            var size = style.Font.MeasureString(text);
+
+            int thickness = style.UnderlineThickness;
+
+            // Vertical placement of underline
+            float underlineY = y + size.Y - style.UnderlineOffset;
+
+            b.Draw(
+                Game1.staminaRect,
+                new Rectangle(
+                    x,
+                    (int)underlineY,
+                    (int)size.X,
+                    thickness
+                ),
+                color
+            );
+        }
+
+        //-----------------
+        // Height and Width Helpers
+        //-----------------
+
+        private static int TextRowHeight(TooltipStyle style)
+        {
+            return style.Font.LineSpacing + style.LineHeightPadding * 2;
+        }
+
+        private static int TextWidth(string text, TooltipStyle style)
+        {
+            return (int)style.Font.MeasureString(text).X;
+        }
+
+        private static int IconRowHeight(Icon icon, TooltipStyle style)
+        {
+            int iconRenderHeight = (int)(icon.Source.Height * icon.Scale);
+            return iconRenderHeight + style.LineHeightPadding * 2;
+
+        }
+
+        private static int InlineRowHeight(List<InlineSegment> segments, TooltipStyle style)
+        {
+            //first check if any segment is an icon to get the correct row height
+            //assumes all wrapped rows are the same height
+            int rowHeight = TextRowHeight(style);
+
+            foreach (var seg in segments)
+            {
+                if (seg.Icon.HasValue)
+                {
+                    var icon = seg.Icon.Value;
+                    int iconRowHeight = IconRowHeight(icon, style);
+                    rowHeight = Math.Max(rowHeight, iconRowHeight);
+                }
+
+            }
+
+            return rowHeight;
+        }
+
+        private static int IconColumnWidth(Icon icon, TooltipStyle style)
+        {
+            int iconRenderWidth = (int)(icon.Source.Width * icon.Scale);
+            int iconColumnWidth = iconRenderWidth + style.IconWidthPadding * 2;
+            return iconColumnWidth;
+
+        }
+
+
+
+
+
+        //-----------------
+        // Draw positions
+        //-----------------
 
         private static (int x, int y) PositionLeftOfCursor(int width, int height)
         {
@@ -230,254 +588,27 @@ namespace SDVCommon
             return (x, y);
         }
 
+        //----------
+        //Measurement Caching
+        //----------
+        private static readonly Dictionary<List<TooltipElement>, (int w, int h)> _sizeCache
+            = new(ReferenceEqualityComparer<List<TooltipElement>>.Instance);
 
-        private static void DrawTooltipAt(
-            SpriteBatch b,
-            List<TooltipElement> elements,
-            SpriteFont font,
-            TooltipStyle style,
-            int x,
-            int y,
-            int width,
-            int height)
+        private static (int w, int h) GetTooltipSize(List<TooltipElement> elements, TooltipStyle style)
         {
-
-            // Draw background
-            IClickableMenu.drawTextureBox(b, x, y, width, height, Color.White);
-
-            //
-            // PASS 3 — Draw content
-            //
-            int drawY = y + 16;
-
-            foreach (var el in elements)
+            if (!_sizeCache.TryGetValue(elements, out var size))
             {
-                drawY += el.PaddingTop;
-                int drawX = x + 16;
-
-                int lineHeight = font.LineSpacing;
-
-                if (el.IconTexture != null || el.Icon.HasValue)
-                {
-                    int iconSize = style.IconRenderSize;
-                    lineHeight = Math.Max(lineHeight, iconSize + 2);
-                }
-
-                //
-                // Separator
-                //
-                if (el.IsSeparator)
-                {
-                    int lineY = drawY + style.SeparatorPadding / 2;
-
-                    b.Draw(
-                        Game1.staminaRect,
-                        new Rectangle(drawX, lineY, width - 32, 2),
-                        new Color(255, 170, 110)
-                    );
-
-                    drawY += style.SeparatorPadding;
-                    continue;
-                }
-
-                //
-                // Draw icon
-                //
-                if (el.IconTexture != null)
-                {
-                    int iconSize = style.IconRenderSize;
-
-                    int yOffset = drawY + (lineHeight - iconSize) / 2;
-                    int xOffset = drawX + (style.IconColumnWidth - iconSize) / 2;
-
-                    b.Draw(
-                        el.IconTexture,
-                        new Rectangle(xOffset, yOffset, iconSize, iconSize),
-                        Color.White
-                    );
-
-                    drawX += style.IconColumnWidth;
-                }
-                else if (el.Icon.HasValue)
-                {
-                    var icon = el.Icon.Value;
-
-                    int usedWidth = DrawPaddedIcon(
-                        b,
-                        icon.Texture,
-                        icon.Source,
-                        icon.Scale,
-                        style.IconColumnWidth,
-                        drawX,
-                        drawY,
-                        lineHeight
-                    );
-
-                    drawX += style.IconColumnWidth;
-                }
-
-                //
-                // Inline segments
-                //
-                if (el.InlineSegments != null)
-                {
-                    int xCursor = drawX;
-
-                    foreach (var seg in el.InlineSegments)
-                    {
-                        // handle explicit line breaks
-                        if (seg.IsLineBreak)
-                        {
-                            // Move to next line
-                            drawY += lineHeight;
-
-                            // Reset X cursor to start of text column
-                            xCursor = drawX;
-
-                            continue;
-                        }
-
-                        if (seg.Icon.HasValue)
-                        {
-                            var icon = seg.Icon.Value;
-
-                            DrawPaddedIcon(
-                                b,
-                                icon.Texture,
-                                icon.Source,
-                                icon.Scale,
-                                lineHeight,
-                                xCursor,
-                                drawY,
-                                lineHeight
-                            );
-
-                            xCursor += lineHeight + style.InlineIconWidthPadding;
-                        }
-
-                        if (!string.IsNullOrEmpty(seg.Text))
-                        {
-                            if (seg.Bold)
-                            {
-                                b.DrawString(font, seg.Text, new Vector2(xCursor + 1, drawY), seg.TextColor);
-                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.TextColor);
-                            }
-                            else
-                            {
-                                b.DrawString(font, seg.Text, new Vector2(xCursor, drawY), seg.TextColor);
-                            }
-                            var size = font.MeasureString(seg.Text);
-
-
-                            if (seg.Underline)
-                            {
-
-                                int thickness = 2;
-                                float underlineY = drawY + size.Y - 6;
-
-                                b.Draw(
-                                    Game1.staminaRect,
-                                    new Rectangle(
-                                        xCursor,              
-                                        (int)underlineY,
-                                        (int)size.X,
-                                        thickness
-                                    ),
-                                    seg.TextColor
-                                );
-                            }
-
-
-                            xCursor += (int)size.X;
-                        }
-                    }
-
-                    drawY += lineHeight + el.PaddingBottom;
-                    continue;
-                }
-
-                //
-                // Normal text
-                //
-                if (!string.IsNullOrEmpty(el.Text))
-                {
-                    if (el.Bold)
-                    {
-                        b.DrawString(font, el.Text, new Vector2(drawX + 1, drawY), el.TextColor);
-                        b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
-                    }
-                    else
-                    {
-                        b.DrawString(font, el.Text, new Vector2(drawX, drawY), el.TextColor);
-                    }
-
-                    if (el.Underline)
-                    {
-                        var size = font.MeasureString(el.Text);
-
-                        // underline thickness
-                        int thickness = 2;
-
-                        // underline Y position
-                        float underlineY = drawY + size.Y - 6;
-
-                        b.Draw(
-                            Game1.staminaRect,
-                            new Rectangle(
-                                drawX,
-                                (int)underlineY,
-                                (int)size.X,
-                                thickness
-                            ),
-                            el.TextColor
-                        );
-                    }
-
-                    drawY += lineHeight + el.PaddingBottom;
-                }
+                size = MeasureTooltip(elements, style);
+                _sizeCache[elements] = size;
             }
+
+            return size;
         }
 
-
-
-
-
-
-        //-----------------
-        // Building support
-        //-----------------
-
-
-
-        private static int DrawPaddedIcon(
-             SpriteBatch b,
-             Texture2D texture,
-             Rectangle source,
-             float scale,
-             int boxSize,
-             int x,
-             int y,
-             int lineHeight
-             )
+        public static void InvalidateSize(List<TooltipElement> elements)
         {
-            int drawW = (int)(source.Width * scale);
-            int drawH = (int)(source.Height * scale);
-
-            // Center inside the box
-            int xOffset = x + (boxSize - drawW) / 2;
-            int yOffset = y + (lineHeight - drawH) / 2;
-
-            b.Draw(texture, new Rectangle(xOffset, yOffset, drawW, drawH), source, Color.White);
-
-            return drawW;
+            _sizeCache.Remove(elements);
         }
-
-        //private static int MeasureInlineIconWidth(InlineIcon icon, TooltipStyle style)
-        //{
-        //    float scale = icon.Scale <= 0 ? 1f : icon.Scale;
-        //    return (int)(style.IconRenderSize * scale) + style.InlineIconWidthPadding;
-        //}
-
 
     }
 }

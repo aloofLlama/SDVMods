@@ -11,7 +11,7 @@ namespace PlantingDay.Helpers
     {
         public static void InitializeAll(IModHelper helper)
         {
-            TooltipIcons.Initialize();
+            //TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
             ModSourceHelper.Initialize(helper);
 
@@ -19,20 +19,20 @@ namespace PlantingDay.Helpers
             PlantInfoBuilder.Initialize();
             HarvestInfoBuilder.Initialize();
 
-            int cnt = 0;
-            foreach (var plant in PlantInfoBuilder.AllPlants)
-            {
-                // seed, trade currency icons
-                PlantIconInitializer.InitializeIcons(plant);
-                cnt++;
-            }
+            //int cnt = 0;
+            //foreach (var plant in PlantInfoBuilder.AllPlants)
+            //{
+            //    // seed, trade currency icons
+            //    PlantIconInitializer.InitializeIcons(plant);
+            //    cnt++;
+            //}
 
-            int cnt2 = 0;
-            foreach (var harvest in HarvestInfoBuilder.AllHarvests)
-            {
-                IconInitializers.HarvestIcons(harvest);
-                cnt2++;
-            }
+            //int cnt2 = 0;
+            //foreach (var harvest in HarvestInfoBuilder.AllHarvests)
+            //{
+            //    IconInitializers.HarvestIcons(harvest);
+            //    cnt2++;
+            //}
 
 #if DEBUG
             CacheForTesting.DumpPlantInfoToJson();
@@ -40,8 +40,8 @@ namespace PlantingDay.Helpers
 
             SDVCommonLog.Log($"Plant Database Initialized",
                 LogHelper.DebugOrTrace);
-            SDVCommonLog.Log($"Seed icons: {cnt} | Harvest icons: {cnt2}",
-                LogHelper.DebugOrTrace);
+            //SDVCommonLog.Log($"Seed icons: {cnt} | Harvest icons: {cnt2}",
+            //    LogHelper.DebugOrTrace);
 
         }
 

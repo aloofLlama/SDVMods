@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace SDVData
 {
-    public class HarvestInfoData
+    public class HarvestInfo
     {
         public string HarvestId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
+        public string DisplayName { get; set; } = "";
         public string? SeedId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
         public ItemInfo? Harvest { get; set; } = new ItemInfo();
         public string ModSource { get; set; } = ""; 

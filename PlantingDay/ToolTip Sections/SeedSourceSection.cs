@@ -73,13 +73,10 @@ namespace PlantingDay.ToolTip_Sections
             }
 
             // Insert seed icon at the front
-            if (plant.Runtime.SeedIcon != null)
-            {
                 segments.Insert(0, new InlineSegment
                 {
-                    Icon = plant.Runtime.SeedIcon
+                    Icon = IconRegistry.GetIcon(plant.Data.SeedId)
                 });
-            }
 
 
             list.Add(new TooltipElement
@@ -101,7 +98,7 @@ namespace PlantingDay.ToolTip_Sections
 
             switch (data.Type)
             {
-                case PurchaseInfoData.VendorType.Pierre:
+                case VendorType.Pierre:
                     return new[]
                     {
                         new InlineSegment
@@ -113,18 +110,18 @@ namespace PlantingDay.ToolTip_Sections
                         }
                     };
 
-                case PurchaseInfoData.VendorType.Joja:
+                case VendorType.Joja:
                     return null;
 
                 //case PurchaseInfoData.VendorType.JojaEmporium: //SDV Expanded
                 //    return null;
 
-                case PurchaseInfoData.VendorType.ValleyFair:
+                case VendorType.ValleyFair:
                     return new[]
                     {
                         new InlineSegment
                         {
-                            Icon = TooltipIcons.Get(IconKey.StarToken),
+                            Icon = IconKey.StarToken.GetIcon(),
                             Text = string.Format(
                                     ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
                                     data.GoldPrice,
@@ -134,21 +131,21 @@ namespace PlantingDay.ToolTip_Sections
                         }
                     };
 
-                case PurchaseInfoData.VendorType.NightMarket:
+                case VendorType.NightMarket:
                     return new[]
                     {
                         new InlineSegment
-                        {
-                            Icon = TooltipIcons.Get(IconKey.NightStars)
+                        {                    
+                            Icon = IconKey.NightStars.GetIcon(),
                         }
                     };
 
-                case PurchaseInfoData.VendorType.TravelingCart:
+                case VendorType.TravelingCart:
                     return new[]
                     {
                         new InlineSegment
                         {
-                            Icon = TooltipIcons.Get(IconKey.TravelingCart)
+                            Icon = IconKey.TravelingCart.GetIcon(),
                         }
                     };
 
@@ -176,7 +173,9 @@ namespace PlantingDay.ToolTip_Sections
                         {
                             new InlineSegment
                             {
-                                Icon = vendor.Runtime.CurrencyIcon,
+                                Icon = vendor.Data.TradeItemId is { Length: > 0 } tradeId
+                                    ? IconRegistry.GetIcon(tradeId)
+                                    : null,
                                 Text = string.Format(
                                     ModEntry.ModHelper.Translation.Get(TooltipKeys.OtherShopTrade),
                                     data.TradeAmount.ToString(),

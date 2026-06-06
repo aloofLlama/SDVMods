@@ -1,5 +1,4 @@
-﻿
-using SDVCommon.Models.Wrappers;
+﻿using SDVData;
 using StardewValley;
 using SDVCommon.Models.Builders;
 
@@ -13,7 +12,7 @@ namespace SDVCommon.GameData
         public static IEnumerable<CookingInfo> GetRecipesUsing(string ingredientId)
         {
             return CookingInfoBuilder.AllRecipes
-                .Where(r => r.Data.Ingredients.Any(i => i.IngredientId == ingredientId));
+                .Where(r => r.Ingredients.Any(i => i.IngredientId == ingredientId));
         }
 
         public static (int known, int unknown) CountRecipesUsing(string ingredientId)
@@ -37,12 +36,12 @@ namespace SDVCommon.GameData
 
         public static bool IsKnown(CookingInfo recipe)
         {
-            return Game1.player.cookingRecipes.ContainsKey(recipe.Data.RecipeName);
+            return Game1.player.cookingRecipes.ContainsKey(recipe.RecipeName);
         }
 
         public static bool HasCooked(CookingInfo recipe)
         {
-            string cookedKey = recipe.Data.OutputId; // e.g. "612"
+            string cookedKey = recipe.OutputId; // e.g. "612"
 
             return Game1.player.recipesCooked.TryGetValue(cookedKey, out int count)
                    && count > 0;

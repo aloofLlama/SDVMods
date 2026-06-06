@@ -1,17 +1,19 @@
 ﻿using GiftDiscovery;
+using GiftDiscovery.Compatibility;
 using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using GiftDiscovery.Models.Builders;
 using GiftDiscovery.Services;
-using GiftDiscovery.Compatibility;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
+using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
+using SDVCommon.Rendering;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -86,6 +88,7 @@ namespace GiftDiscovery.Tooltip
                 return _cachedTooltip;
 
             _cachedTooltip = BuildTooltip(obj);
+            TooltipRenderer.InvalidateSize(_cachedTooltip);
             _cachedItemId = key;
             _cachedConfigHash = configHash;
             _cachedMenuChanged = menuChanged;
@@ -103,17 +106,11 @@ namespace GiftDiscovery.Tooltip
             int wrapSize = ModEntry.ModConfig.WrapSizeGift;
             var list = new List<TooltipElement>();
 
-            //Icon and display name
-            var giftItem = HarvestInfoBuilder.LookupFromKey(obj.ItemId);
-
-            if (giftItem != null)
-            {
                 list.Add(new TooltipElement
                 {
-                    Icon = giftItem.Runtime.HarvestIcon,
+                    Icon = IconRegistry.GetIcon(obj.ItemId),
                     Text = obj.DisplayName
                 });
-            }
 
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
 
@@ -199,7 +196,7 @@ namespace GiftDiscovery.Tooltip
             // ---------------------------------------------------------
             if (ModEntry.ModConfig.ShowModSource)
             {
-                var modSource = giftItem?.Data?.ModSource;
+                var modSource = ModSourceHelper.GetModSource(obj.ItemId);
 
                 if (!string.IsNullOrEmpty(modSource))
                 {
@@ -214,8 +211,6 @@ namespace GiftDiscovery.Tooltip
                     );
                 }
             }
-
-
 
             return list;
         }
@@ -261,9 +256,9 @@ namespace GiftDiscovery.Tooltip
             );
 
             return new List<TooltipElement>
-        {
-            new() { InlineSegments = wrapped }
-        };
+            {
+                new() { InlineSegments = wrapped }
+            };
         }
 
         // ---------------------------------------------------------

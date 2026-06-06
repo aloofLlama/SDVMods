@@ -17,13 +17,13 @@ namespace HarvestHelper.Helpers
                 return null;
 
             // Allowed mainstream vendors
-            var allowed = new HashSet<PurchaseInfoData.VendorType>
+            var allowed = new HashSet<VendorType>
             {
-                PurchaseInfoData.VendorType.Pierre,
-                PurchaseInfoData.VendorType.Oasis,
-                PurchaseInfoData.VendorType.Marnie,
-                PurchaseInfoData.VendorType.Ari, //Sunberry
-                PurchaseInfoData.VendorType.Jumana //Sunberry
+                VendorType.Pierre,
+                VendorType.Oasis,
+                VendorType.Marnie,
+                //VendorType.Ari, //Sunberry
+                //VendorType.Jumana //Sunberry
             };
 
 

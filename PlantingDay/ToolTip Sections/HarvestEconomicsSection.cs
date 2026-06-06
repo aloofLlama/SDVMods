@@ -22,12 +22,11 @@ namespace PlantingDay.ToolTip_Sections
             if (harvest == null)
                 return list;
 
-            var harvestIcon = harvest.Runtime.HarvestIcon;
             int harvestPrice = EconomicsHelper.GetHarvestSellPriceFromSeed(plant.Data.SeedId);
 
             list.Add(new TooltipElement
             {
-                Icon = harvestIcon,
+                Icon = IconRegistry.GetIcon(harvest.HarvestId),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.BasicPrice),
                     harvestPrice)
             });

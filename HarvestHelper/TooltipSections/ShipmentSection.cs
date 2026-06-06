@@ -1,7 +1,7 @@
 ﻿using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
-using SDVCommon.Models.Wrappers;
+using SDVData;
 using SDVCommon.Models.Tooltip;
 using StardewValley;
 
@@ -13,7 +13,7 @@ namespace HarvestHelper.TooltipSections
         public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
-            string id = harvest.Data.HarvestId;
+            string id = harvest.HarvestId;
 
             bool needsOne = AchievementHelper.NeedsShippedOne(harvest);
             bool needsPoly = AchievementHelper.NeedsPolyCultureShipped(harvest);
@@ -45,7 +45,7 @@ namespace HarvestHelper.TooltipSections
             // Prepend the icon
             segments.Insert(0, new InlineSegment
             {
-                Icon = TooltipIcons.GetIconForGameObject("(BC)248", 1.4f), //Mini Shipping Bin
+                Icon = IconRegistry.GetIcon("(BC)248")?.WithScale(1.4f), //Mini Shipping Bin
             });
 
             list.Add(new TooltipElement

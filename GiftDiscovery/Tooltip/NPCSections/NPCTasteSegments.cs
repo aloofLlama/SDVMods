@@ -8,7 +8,7 @@ using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
-using SDVCommon.Models.Wrappers;
+using SDVData;
 using StardewValley;
 
 namespace GiftDiscovery.Tooltip.NPCSections
@@ -51,20 +51,17 @@ namespace GiftDiscovery.Tooltip.NPCSections
         {
             var knownIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, taste, mode);
 
-            var filteredIds = knownIds
-                .Where(id => GiftableObjectList.GiftableIds.Contains(id));
-
-            var items = filteredIds
-                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.ToItemId(id)))
-                .Where(info => info is not null)
-                .Cast<HarvestInfo>()
+            var items = knownIds
+                .Where(id => GiftableObjectList.GiftableIds.Contains(id))
+                .Select(id => ItemRegistry.Create(id))
+                .Where(item => item is not null)
                 .ToList();
 
-            //sort so backpack items appear first, then alphabetically by name
+            // Sort: backpack first, then alphabetical
             items = items
-            .OrderByDescending(i => Inventory.IsInBackpack(i.Data.HarvestId))
-            .ThenBy(i => i.Runtime.DisplayName)
-            .ToList();
+                .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
+                .ThenBy(item => item.DisplayName)
+                .ToList();
 
             // Unknown count
             int unknownCount = LearnedGiftsHelper
@@ -94,32 +91,32 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 .Where(id => GiftableObjectList.GiftableIds.Contains(id));
 
             var allItems = filteredIds
-                .Select(id => HarvestInfoBuilder.LookupFromKey(IdHelper.ToItemId(id)))
-                .Where(info => info is not null)
-                .Cast<HarvestInfo>()
+                .Where(id => GiftableObjectList.GiftableIds.Contains(id))
+                .Select(id => ItemRegistry.Create(id))
+                .Where(item => item is not null)
                 .ToList();
 
             // Split into regular + universal
-            var regular = new List<HarvestInfo>();
-            var universal = new List<HarvestInfo>();
+            var regular = new List<Item>();
+            var universal = new List<Item>();
 
-            foreach (var info in allItems)
+            foreach (var item in allItems)
             {
-                if (GiftType.IsUniversalLove(info.Data.HarvestId))
-                    universal.Add(info);
+                if (GiftType.IsUniversalLove(item.ItemId))
+                    universal.Add(item);
                 else
-                    regular.Add(info);
+                    regular.Add(item);
             }
 
             // Sort each group
             regular = regular
-                .OrderByDescending(i => Inventory.IsInBackpack(i.Data.HarvestId))
-                .ThenBy(i => i.Runtime.DisplayName)
+                .OrderByDescending(i => Inventory.IsInBackpack(i.ItemId))
+                .ThenBy(i => i.DisplayName)
                 .ToList();
 
             universal = universal
-                .OrderByDescending(i => Inventory.IsInBackpack(i.Data.HarvestId))
-                .ThenBy(i => i.Runtime.DisplayName)
+                .OrderByDescending(i => Inventory.IsInBackpack(i.ItemId))
+                .ThenBy(i => i.DisplayName)
                 .ToList();
 
             // Unknowns: split by universal vs regular
@@ -157,7 +154,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
             {
                 segments.Add(new InlineSegment
                 {
-                    Text = "|",
+                    Text = " | ",
                     //Bold = true,
                 });
             }
@@ -207,7 +204,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
         private static List<TooltipElement> BuildNPCTasteSection(
             string label,
-            List<HarvestInfo> items,
+            List<Item> items,
             int unknownCount,
             int wrapSize,
             int maxRows)
@@ -250,19 +247,18 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 };
         }
 
-        private static InlineSegment BuildItemSegment(HarvestInfo harvest)
+        private static InlineSegment BuildItemSegment(Item item)
         {
-            bool inBackpack = Inventory.IsInBackpack(harvest.Data.HarvestId);
+            bool inBackpack = Inventory.IsInBackpack(item.ItemId);
 
-            string name = inBackpack ? harvest.Runtime.DisplayName : "";
+            string name = inBackpack ? item.DisplayName : "";
 
-            // Add comma *only* if we have a display name
             if (!string.IsNullOrEmpty(name))
                 name += ",";
 
             return new InlineSegment
             {
-                Icon = harvest.Runtime.HarvestIcon,
+                Icon = IconRegistry.GetIcon(item.ItemId),
                 Text = name,
                 TextColor = TooltipColors.Normal,
                 Underline = false

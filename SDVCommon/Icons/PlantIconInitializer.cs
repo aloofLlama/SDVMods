@@ -17,30 +17,30 @@ namespace SDVCommon.Icons
 
         };
 
-        public static void InitializeIcons(PlantInfo plant)
-        {
-            // Seed
-            plant.Runtime.SeedIcon = IconRegistry.GetIcon($"seed:{plant.Data.SeedId}");
+        //public static void InitializeIcons(PlantInfo plant)
+        //{
+        //    // Seed
+        //    plant.Runtime.SeedIcon = IconRegistry.GetIcon($"seed:{plant.Data.SeedId}");
 
-            // Vendor currency icons
-            foreach (var vendor in plant.PurchaseOptions)
-            {
+        //    // Vendor currency icons
+        //    foreach (var vendor in plant.PurchaseOptions)
+        //    {
 
-                if (!string.IsNullOrEmpty(vendor.Data.TradeItemId))
-                {
-                    vendor.Runtime.CurrencyIcon = IconRegistry.GetIcon($"item:{IdHelper.ToItemId(vendor.Data.TradeItemId)}");
-                }
-            }
+        //        if (!string.IsNullOrEmpty(vendor.Data.TradeItemId))
+        //        {
+        //            vendor.Runtime.CurrencyIcon = IconRegistry.GetIcon($"item:{IdHelper.ToItemId(vendor.Data.TradeItemId)}");
+        //        }
+        //    }
 
-            // Monster icons
-            foreach (var drop in plant.MonsterDrops)
-            {
-                var name = drop.Data.MonsterName;
-                if (name is not null && MonsterIconMap.TryGetValue(name, out var key))
-                {
-                    drop.Runtime.MonsterIcon = TooltipIcons.Get(key);
-                }
-            }
-        }
+        //    // Monster icons
+        //    foreach (var drop in plant.MonsterDrops)
+        //    {
+        //        var name = drop.Data.MonsterName;
+        //        if (name is not null && MonsterIconMap.TryGetValue(name, out var key))
+        //        {
+        //            drop.Runtime.MonsterIcon = TooltipIcons.Get(key);
+        //        }
+        //    }
+        //}
     }
 }

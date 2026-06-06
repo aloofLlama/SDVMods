@@ -49,10 +49,13 @@ namespace SDVCommon.Helpers
             if (string.IsNullOrEmpty(id))
                 return id;
 
-            if (id.StartsWith("(O)"))
+            // Already qualified
+            if (id.StartsWith("("))
                 return id;
 
-            return "(O)" + id;
+            // Resolve via ItemRegistry
+            var data = ItemRegistry.GetData(id);
+            return data?.QualifiedItemId ?? id;
         }
 
         public static string GetModPrefix(string itemId)

@@ -116,7 +116,8 @@ namespace SDVCommon.GameData
             if (vendorId == "SeedShop")
                 return VendorType.Pierre;
 
-            if (vendorId.Contains ("Joja", StringComparison.OrdinalIgnoreCase))
+            if (vendorId.Contains("Joja", StringComparison.OrdinalIgnoreCase)
+                || vendorId.Contains("FlashShifter.StardewValleyExpandedCP_ZoeyVendor", StringComparison.OrdinalIgnoreCase))
                 return VendorType.Joja;
 
             //if (vendorId.Contains("FlashShifter.StardewValleyExpandedCP_ZoeyVendor", StringComparison.OrdinalIgnoreCase))

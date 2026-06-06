@@ -1,15 +1,16 @@
-﻿using HarvestHelper.Compatibility;
+﻿using HarmonyLib;
+using HarvestHelper.Compatibility;
 using HarvestHelper.Helpers;
 using HarvestHelper.Services;
-using SDVCommon;
-using SDVCommon.Helpers;
 using SDVCommon.GameData;
-using SDVCommon.OBSGift;
+using SDVCommon.Helpers;
 using SDVCommon.Models.Builders;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.OBSGift;
+using SDVCommon.Rendering;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using HarmonyLib;
 
 
 
@@ -20,6 +21,10 @@ namespace HarvestHelper
         public static ModEntry Instance { get; private set; } = null!;
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
+
+        private StardewValley.Object? _cachedObj;
+        private List<TooltipElement>? _cachedTooltip;
+
 
         //Temp for debug gift detection
         private readonly static Dictionary<string, int> _prevGifts = new();
@@ -77,28 +82,33 @@ namespace HarvestHelper
             if (obj.IsRecipe)
                 return;
 
-
-            string lookupKey = obj.ItemId;
-
-            var harvest = HarvestInfoBuilder.LookupFromKey(lookupKey);
-            string itemId = IdHelper.ToItemId(obj.QualifiedItemId);
-
-            if (!Game1.objectData.TryGetValue(itemId, out var data))
+            // Only rebuild when hovered item changes
+            if (!ReferenceEquals(_cachedObj, obj))
             {
-                return;
+                _cachedObj = obj;
+
+                string itemId = obj.ItemId;
+
+                var harvest = HarvestInfoBuilder.LookupFromKey(itemId);
+
+                if (harvest is null)
+                {
+                    _cachedTooltip = null;
+                    return;
+                }
+
+                if (!Game1.objectData.TryGetValue(itemId, out var data))
+                {
+                    _cachedTooltip = null;
+                    return;
+                }
+
+                _cachedTooltip = TooltipBuilder.BuildTooltip(harvest, obj);
             }
-
-            //var data = Game1.objectData[obj.ItemId];
-
-            if (harvest is null)
-                return;
-
-            var elements = TooltipBuilder.BuildTooltip(harvest, obj);
-
             //Temp move above cursor to work with both HH and PD same time on seed items that are both
             //TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
-            TooltipRenderer.DrawLeftandAboveCursor(e.SpriteBatch, elements);
-
+            if (_cachedTooltip != null)
+                TooltipRenderer.DrawLeftandAboveCursor(e.SpriteBatch, _cachedTooltip);
         }
 
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)

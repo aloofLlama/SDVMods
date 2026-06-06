@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
+using StardewValley;
 
 
 namespace SDVCommon.Models.Tooltip
@@ -12,20 +13,12 @@ namespace SDVCommon.Models.Tooltip
         // Text
         public string? Text { get; set; }
         public Color TextColor { get; set; } = TooltipColors.Normal;
+        public SpriteFont Font { get; set; } = Game1.smallFont;
         public bool Bold { get; set; }
         public bool Underline { get; set; }
 
 
-        // Icon (optional)
-        public Texture2D? IconTexture { get; set; }   // dynamic item icons
-        public Icon? Icon { get; set; }         // static UI icons
-
-
-        // Layout
-        public bool IsLineBreak { get; set; }
-        public int PaddingTop { get; set; } = 2;
-        public int PaddingBottom { get; set; } = 2;
-        public int PaddingRight { get; set; } = 4;
+        public Icon? Icon { get; set; }
 
 
         public List<InlineSegment>? InlineSegments { get; set; }
@@ -38,6 +31,7 @@ namespace SDVCommon.Models.Tooltip
         public Icon? Icon { get; set; }
         public string Text { get; set; } = "";
         public Color TextColor { get; set; } = TooltipColors.Normal;
+        public SpriteFont Font { get; set; } = Game1.smallFont;
         public bool Bold { get; set; }
         public bool Underline { get; set; }
         public bool IsLineBreak { get; set; }

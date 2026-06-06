@@ -1,7 +1,7 @@
 ﻿using HarvestHelper.Helpers;
 using SDVCommon;
 using SDVCommon.GameData;
-using SDVCommon.Models.Wrappers;
+using SDVData;
 using SDVCommon.Models.Tooltip;
 
 
@@ -12,12 +12,12 @@ namespace HarvestHelper.TooltipSections
         public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
-            string harvestId = harvest.Data.HarvestId;
+            string harvestId = harvest.HarvestId;
             int owned = Inventory.CountOwned(harvestId);
 
             list.Add(new TooltipElement
             {
-                Icon = harvest.Runtime.HarvestIcon,
+                Icon = IconRegistry.GetIcon(harvest.HarvestId),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
                     owned)
             });

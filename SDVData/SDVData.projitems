@@ -9,9 +9,9 @@
     <Import_RootNamespace>SDVData</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)CookingInfoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)CookingInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GrowthContext.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)HarvestInfoData.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)HarvestInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OBSIconRef.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ItemInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MonsterDropInfoData.cs" />

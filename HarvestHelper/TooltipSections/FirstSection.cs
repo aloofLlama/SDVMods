@@ -1,4 +1,4 @@
-﻿using SDVCommon.Models.Wrappers;
+﻿using SDVData;
 using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Helpers.Tooltip;
@@ -41,7 +41,7 @@ namespace HarvestHelper.TooltipSections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.Get(IconKey.LittleCoin),
+                Icon = IconKey.LittleCoin.GetIcon(),
                 InlineSegments = segs
             });
 

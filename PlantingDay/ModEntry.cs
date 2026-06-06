@@ -1,12 +1,13 @@
 ﻿using PlantingDay.Helpers;
+using PlantingDay.Services;
+using SDVCommon.GameData;
+using SDVCommon.Helpers;
+using SDVCommon.Models.Builders;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Rendering;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using SDVCommon;
-using SDVCommon.Helpers;
-using SDVCommon.Models.Builders;
-using SDVCommon.GameData;
-using PlantingDay.Services;
 
 
 namespace PlantingDay
@@ -16,6 +17,10 @@ namespace PlantingDay
         public static ModEntry Instance { get; private set; } = null!;
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
+
+        private StardewValley.Object? _cachedObj;
+        private List<TooltipElement>? _cachedTooltip;
+
 
         public override void Entry(IModHelper helper)
         {
@@ -58,21 +63,30 @@ namespace PlantingDay
             if (hover.Item is not StardewValley.Object obj)
                 return;
 
+            // Only rebuild when hovered item changes
+            if (!ReferenceEquals(_cachedObj, obj))
+            {
+                _cachedObj = obj;
 
-            // Use the correct key format O:#### to see if the item is in the plant library
-            string lookupKey = obj.ItemId;
+                string ItemId = obj.ItemId;
 
-            var plant = PlantInfoBuilder.LookupFromKey(lookupKey);
+                var plant = PlantInfoBuilder.LookupFromKey(ItemId);
 
-            if (plant is null)
-                return;
+                if (plant is null)
+                {
+                    _cachedTooltip = null;
+                    return;
+                }
 
+                _cachedTooltip = TooltipBuilder.BuildTooltip(plant);
+            }
 
-            var elements = TooltipBuilder.BuildTooltip(plant);
+                //Temp move above cursor to work with both HH and PD same time on seed items that are both
+                //TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
+                if (_cachedTooltip != null)
+                    TooltipRenderer.DrawLeftandAboveCursor(e.SpriteBatch, _cachedTooltip);
 
-            TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
-
-        }
+            }
 
 
 

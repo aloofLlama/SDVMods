@@ -3,15 +3,8 @@ using SDVCommon.Helpers;
 using SDVCommon.Models.Wrappers;
 using SDVCommon.Compatibility;
 using SDVData;
-using StardewModdingAPI;
 using StardewValley;
-using StardewValley.GameData.Crops;
-using StardewValley.GameData.FruitTrees;
 using StardewValley.GameData.Objects;
-using StardewValley.Objects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using SObject = StardewValley.Object;
 
 
@@ -87,9 +80,10 @@ namespace SDVCommon.Models.Builders
             bool shipMono = seedData?.CountForMonoculture == true;
             bool shipPoly = seedData?.CountForPolyculture == true;
 
-            var data = new HarvestInfoData
+            _harvests[harvestId] = new HarvestInfo
             {
                 HarvestId = harvestId,
+                DisplayName = obj.DisplayName,
                 SeedId = seedId,
                 Harvest = itemInfo,
                 ShipOne = shipOne,
@@ -98,7 +92,6 @@ namespace SDVCommon.Models.Builders
                 ModSource = ModSourceHelper.GetModSource(harvestId)
             };
 
-            _harvests[harvestId] = new HarvestInfo(data);
         }
 
         public static bool IsShipOneCandidate(string itemId, ObjectData data)

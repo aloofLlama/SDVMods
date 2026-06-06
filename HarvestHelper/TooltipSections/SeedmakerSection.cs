@@ -2,7 +2,7 @@
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Icons;
-using SDVCommon.Models.Wrappers;
+using SDVData;
 
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
@@ -15,7 +15,7 @@ namespace HarvestHelper.TooltipSections
         public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
-            string harvestId = harvest.Data.HarvestId;
+            string harvestId = harvest.HarvestId;
 
             // TODOAdd about only displaying if seed cost is half harvest price
 
@@ -29,7 +29,7 @@ namespace HarvestHelper.TooltipSections
 
 
             //var seedData = IdHelper.GetSeedDataForHarvest(harvestId);
-            string? seedId = harvest.Data.SeedId;
+            string? seedId = harvest.SeedId;
 
             if (seedId == null)
                 return list;
@@ -53,7 +53,7 @@ namespace HarvestHelper.TooltipSections
 
             list.Add(new TooltipElement
             {
-                Icon = TooltipIcons.GetIconForGameObject("(BC)25", 1.4f), //seedmaker
+                Icon = IconRegistry.GetIcon("(BC)25")?.WithScale(1.4f), // seedmaker icon
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
                     owned)
             });

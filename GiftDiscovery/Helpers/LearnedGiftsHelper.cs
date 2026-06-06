@@ -10,6 +10,7 @@ namespace GiftDiscovery.Helpers
 {
     internal static class LearnedGiftsHelper
     {
+        //TODO change all these to use itemID not qualified Id (but lookup to the save is in qualifiedId)
         // ---------------------------------------------------------
         // ITEM → NPC (Known)
         // ---------------------------------------------------------

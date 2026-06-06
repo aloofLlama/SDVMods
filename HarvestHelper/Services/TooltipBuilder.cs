@@ -1,10 +1,10 @@
 ﻿using HarvestHelper.Helpers;
 using HarvestHelper.TooltipSections;
+using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
-using SDVCommon.Models.Wrappers;
 using SDVCommon.Models.Tooltip;
-
-
+using SDVData;
+using StardewModdingAPI;
 
 namespace HarvestHelper.Services
 {
@@ -22,7 +22,6 @@ namespace HarvestHelper.Services
             TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedmakerSection.Build(harvest, obj));
             return list;
         }
-
 
     }
 }

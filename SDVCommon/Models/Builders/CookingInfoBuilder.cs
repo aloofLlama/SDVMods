@@ -48,14 +48,14 @@ namespace SDVCommon.Models.Builders
 
         private static CookingInfo Build(CraftingRecipe recipe)
         {
-            var data = new CookingInfoData
+            return new CookingInfo
             {
                 RecipeName = recipe.name,
-                DisplayName = recipe.DisplayName,
+                OutputDisplayName = recipe.DisplayName,
                 OutputId = IdHelper.ToItemId(recipe.itemToProduce.First()),
                 OutputCount = recipe.numberProducedPerCraft,
                 Ingredients = recipe.recipeList
-                    .Select(kvp => new RecipeIngredientData
+                    .Select(kvp => new RecipeIngredient
                     {
                         IngredientId = IdHelper.ToItemId(kvp.Key),
                         Count = kvp.Value
@@ -63,11 +63,6 @@ namespace SDVCommon.Models.Builders
                     .ToList()
             };
 
-            var runtime = new CookingInfoRuntime
-            {
-            };
-
-            return new CookingInfo(data, runtime);
         }
     }
 }

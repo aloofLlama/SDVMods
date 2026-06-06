@@ -17,7 +17,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
         public static TooltipElement Build(NPC npc)
         {
             var portrait = NPCGameData.GetPortraitIcon(npc);
-            portrait = new Icon(portrait.Texture, portrait.Source, portrait.Size, scale: 0.6f);
+            portrait = new Icon(portrait.Texture, portrait.Source, portrait.Size, scale: 0.9f);
 
             var segments = new List<InlineSegment>();
 
@@ -25,7 +25,8 @@ namespace GiftDiscovery.Tooltip.NPCSections
             {
                 Icon = portrait,
                 Text = " " + npc.displayName + "   ",
-                TextColor = DisplayHelper.GetNPCNameColor(npc)
+                TextColor = DisplayHelper.GetNPCNameColor(npc),
+                Font = Game1.dialogueFont
             });
 
             int current = HeartStatus.GetCurrentHearts(npc);
@@ -36,7 +37,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
             {
                 segments.Add(new InlineSegment
                 {
-                    Icon = TooltipIcons.Get(IconKey.Heart),
+                    Icon = IconKey.Heart.GetIcon(),
                     Text = $"{current}/{max}",
                     TextColor = TooltipColors.Perfection
 

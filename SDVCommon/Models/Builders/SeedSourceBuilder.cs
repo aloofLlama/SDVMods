@@ -54,14 +54,14 @@ namespace SDVCommon.Models.Builders
         {
             return v.Data.Type switch
             {
-                PurchaseInfoData.VendorType.Pierre => 0,
-                PurchaseInfoData.VendorType.Joja => 1,
-                PurchaseInfoData.VendorType.ValleyFair => 2,
-                PurchaseInfoData.VendorType.Other => 3,
-                PurchaseInfoData.VendorType.DesertFestival => 4,
+                VendorType.Pierre => 0,
+                VendorType.Joja => 1,
+                VendorType.ValleyFair => 2,
+                VendorType.Other => 3,
+                VendorType.DesertFestival => 4,
 
-                PurchaseInfoData.VendorType.TravelingCart => 6, //monsters set before this, below
-                PurchaseInfoData.VendorType.NightMarket => 7,
+                VendorType.TravelingCart => 6, //monsters set before this, below
+                VendorType.NightMarket => 7,
 
                 _ => 0
             };

@@ -1,19 +1,12 @@
 ﻿using GiftDiscovery.GameData;
-using GiftDiscovery.Helpers;
-using GiftDiscovery.Models;
 using GiftDiscovery.Services;
-using GiftDiscovery.Models.Builders;
 using GiftDiscovery.Tooltip.NPCSections;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
-using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
-using SDVCommon.Icons;
-using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
-using SDVCommon.Models.Wrappers;
+using SDVCommon.Rendering;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -86,7 +79,6 @@ namespace GiftDiscovery.Tooltip
             int giftVersion = GiftKnowledgeService.GiftVersion;
 
             int range = ModEntry.ModConfig.NearbyRangeTilesNPCTooltip;
-            //var nearbyNPCSet = GiftableNPC.GetNearbyNPCNames(range);
 
             bool needsRebuild =
                 _cachedTooltip == null ||
@@ -97,14 +89,13 @@ namespace GiftDiscovery.Tooltip
                 toggleVersion != _cachedToggleVersion ||
                 giftVersion != _cachedGiftVersion;
 
+
             if (!needsRebuild)
                 return _cachedTooltip;
 
-            // Build canonical taste map ONCE per NPC
-            //GiftKnowledgeService.GetCanonicalTasteMap(npc);
-
             // Rebuild
             _cachedTooltip = BuildTooltip(npc);
+            TooltipRenderer.InvalidateSize(_cachedTooltip);
             _cachedNPC = npc;
             _cachedRange = range;
             _cachedConfigHash = configHash;

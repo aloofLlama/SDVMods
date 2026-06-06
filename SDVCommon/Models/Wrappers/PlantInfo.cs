@@ -6,7 +6,7 @@ namespace SDVCommon.Models.Wrappers
     public class PlantInfo
     {
         public PlantInfoData Data { get; }
-        public PlantInfoRuntime Runtime { get; }
+       //public PlantInfoRuntime Runtime { get; }
 
         public List<PurchaseInfo> PurchaseOptions { get; }
         public List<MonsterDropInfo> MonsterDrops { get; }
@@ -14,7 +14,7 @@ namespace SDVCommon.Models.Wrappers
         {
             {
                 Data = data;
-                Runtime = new PlantInfoRuntime();
+                //Runtime = new PlantInfoRuntime();
 
                 PurchaseOptions = data.PurchaseOptions
                     .Select(d => new PurchaseInfo(d))
@@ -31,12 +31,12 @@ namespace SDVCommon.Models.Wrappers
     public class PurchaseInfo
     {
         public PurchaseInfoData Data { get; }
-        public PurchaseInfoRuntime Runtime { get; }
+        //public PurchaseInfoRuntime Runtime { get; }
 
         public PurchaseInfo(PurchaseInfoData data)
         {
             Data = data;
-            Runtime = new PurchaseInfoRuntime();
+            //Runtime = new PurchaseInfoRuntime();
         }
     }
 
