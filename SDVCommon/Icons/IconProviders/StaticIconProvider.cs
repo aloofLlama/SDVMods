@@ -41,7 +41,7 @@ public class StaticIconProvider : IIconProvider
         //_sheets["Fences"] = Game1.content.Load<Texture2D>("LooseSprites/Fence1");
         //_sheets["Debris"] = Game1.content.Load<Texture2D>("Tilesheets/Debris");
         //_sheets["Furniture"] = Game1.content.Load<Texture2D>("Tilesheets/Furniture");
-        _sheets["WizardFurniture"] = Game1.content.Load<Texture2D>("Tilesheets/wizard_furniture");
+        _sheets["WizardFurniture"] = Game1.content.Load<Texture2D>("TileSheets/wizard_furniture");
         //_sheets["Craftables"] = Game1.content.Load<Texture2D>("TileSheets/Craftables");
 
         //Monster sheets

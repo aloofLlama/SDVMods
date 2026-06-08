@@ -34,23 +34,19 @@ namespace SDVCommon.Helpers
             LogLevel.Trace;
 #endif
 
+        #if DEBUG
+
         //Debug Only
         public static LogLevel DebugAlert =>
-#if DEBUG
         LogLevel.Alert;
-#endif
 
         public static LogLevel DebugWarn =>
-#if DEBUG
             LogLevel.Warn;
-#endif
 
         public static LogLevel DebugInfo =>
-#if DEBUG
             LogLevel.Info;
-#endif
+
         public static LogLevel DebugDebug =>
-#if DEBUG
             LogLevel.Debug;
 #endif
 
