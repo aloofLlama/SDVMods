@@ -35,12 +35,12 @@ public class StaticIconProvider : IIconProvider
 
         //Random stuff sheets
         _sheets["Beach"] = Game1.content.Load<Texture2D>("Maps/spring_beach");
-        _sheets["Crops"] = Game1.content.Load<Texture2D>("Tilesheets/crops");
+        _sheets["Crops"] = Game1.content.Load<Texture2D>("TileSheets/crops");
         _sheets["Tools"] = Game1.content.Load<Texture2D>("TileSheets/tools");
         _sheets["Weapons"] = Game1.content.Load<Texture2D>("TileSheets/weapons");
         //_sheets["Fences"] = Game1.content.Load<Texture2D>("LooseSprites/Fence1");
-        //_sheets["Debris"] = Game1.content.Load<Texture2D>("Tilesheets/Debris");
-        //_sheets["Furniture"] = Game1.content.Load<Texture2D>("Tilesheets/Furniture");
+        //_sheets["Debris"] = Game1.content.Load<Texture2D>("TileSheets/Debris");
+        //_sheets["Furniture"] = Game1.content.Load<Texture2D>("TileSheets/Furniture");
         _sheets["WizardFurniture"] = Game1.content.Load<Texture2D>("TileSheets/wizard_furniture");
         //_sheets["Craftables"] = Game1.content.Load<Texture2D>("TileSheets/Craftables");
 
