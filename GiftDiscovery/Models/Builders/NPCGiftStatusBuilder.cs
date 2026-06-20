@@ -11,13 +11,13 @@ namespace GiftDiscovery.Models.Builders
         {
             var name = npc.Name;
 
-            bool isOverrideBlocked = ModCompat.GiftOverrides.NonGiftableNPCs.Contains(name);
-            bool hasGiftTastes = Game1.NPCGiftTastes.ContainsKey(name);
+            //bool isOverrideBlocked = ModCompat.GiftOverrides.NonGiftableNPCs.Contains(name);
+            //bool hasGiftTastes = Game1.NPCGiftTastes.ContainsKey(name);
 
-            bool isGiftable = hasGiftTastes && !isOverrideBlocked;
+            //bool isGiftable = hasGiftTastes && !isOverrideBlocked;
 
             bool isAvailable =
-                isGiftable &&
+                //isGiftable &&
                 npc.CanSocialize &&
                 npc.CanReceiveGifts() &&
                 npc.currentLocation != null;
@@ -33,12 +33,22 @@ namespace GiftDiscovery.Models.Builders
             {
                 NPC = npc,
                 Name = name,
-                IsGiftable = isGiftable,
+                //IsGiftable = isGiftable,
                 IsAvailable = isAvailable,
                 IsMet = isMet,
                 CanGiftToday = canGiftToday,
                 IsMaxHeart = isMaxHeart
             };
+        }
+
+        public static bool IsUnmetNPC(string npcName)
+        {
+            var npc = Utility.getAllCharacters().FirstOrDefault(n => n.Name == npcName);
+            if (npc == null)
+                return false;
+
+            var c = NPCGiftStatusBuilder.GiftStatus(npc);
+            return c.IsUnmet;
         }
 
         private static bool MaxGiftsReached(NPC npc)

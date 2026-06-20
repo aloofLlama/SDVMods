@@ -73,7 +73,7 @@ namespace GiftDiscovery.Tooltip
             int toggleVersion = ModEntry.ToggleVersion;
             int giftVersion = GiftKnowledgeService.GiftVersion;
 
-            var nearbyNPCSet = GiftableNPC.GetNearbyNPCNames(ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
+            var nearbyNPCSet = NPCLocation.GetNearbyNPCNames(ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
 
             bool needsRebuild =
                 _cachedTooltip == null ||
@@ -104,6 +104,8 @@ namespace GiftDiscovery.Tooltip
             StardewValley.Object obj)
         {
             int wrapSize = ModEntry.ModConfig.WrapSizeGift;
+            int maxRows = ModEntry.ModConfig.MaxRowsGift;
+
             var list = new List<TooltipElement>();
 
                 list.Add(new TooltipElement
@@ -144,7 +146,7 @@ namespace GiftDiscovery.Tooltip
                 int unknownCount = UnknownCount(t);
 
                 TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-                    BuildTasteSection(label, known, unknownCount, wrapSize)
+                    BuildTasteSection(label, known, unknownCount, wrapSize, maxRows)
                 );
             }
 
@@ -222,7 +224,8 @@ namespace GiftDiscovery.Tooltip
             string label,
             IEnumerable<NPCGiftStatus> known,
             int unknownCount,
-            int wrapSize)
+            int wrapSize,
+            int maxRows)
         {
             var collapsible = known
                 .OrderBy(c => c.NPC.displayName)
@@ -251,7 +254,7 @@ namespace GiftDiscovery.Tooltip
                 collapsibleSegments: collapsible,
                 endSegments: end,
                 wrapSize: wrapSize,
-                maxRows: 20,
+                maxRows: maxRows,
                 useCommas: true
             );
 
@@ -315,7 +318,7 @@ namespace GiftDiscovery.Tooltip
 
             bool isNearby =
                 ModEntry.ModConfig.EmphasizeNearbyNPCs &&
-                GiftableNPC.IsNPCNearby(npc, ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
+                NPCLocation.IsNPCNearby(npc, ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
             bool isBold = false;
 
             if (isNearby)

@@ -31,6 +31,8 @@ namespace GiftDiscovery.Config
         public bool EmphasizeNearbyNPCs { get; set; } = true;
         public int NearbyRangeTilesGiftTooltip { get; set; } = 15;
         public int WrapSizeGift { get; set; } = 3; //How many names to show before wrapping
+        public int MaxRowsGift { get; set; } = 20; //How many rows to show
+
 
 
         public bool ShowLoves { get; set; } = true;
@@ -46,8 +48,8 @@ namespace GiftDiscovery.Config
         //NPC tooltip bottom right
         //-------------------
         public int NearbyRangeTilesNPCTooltip { get; set; } = 3;
-        public int WrapSizeNPC { get; set; } = 8; //How many names to show before wrapping
-        public int MaxRowsNPC { get; set; } = 8; //How many names to show before wrapping
+        public int WrapSizeNPC { get; set; } = 8; //How many gifts to show before wrapping
+        public int MaxRowsNPC { get; set; } = 8; //How many rows to show
         public bool ShowLocation { get; set; } = true;
         public bool SeparateUniversalLoves { get; set; } = true;
 

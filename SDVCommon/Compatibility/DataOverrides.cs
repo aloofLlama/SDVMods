@@ -21,6 +21,7 @@ namespace SDVCommon.Compatibility
                     { "Cornucopia", "Cornucopia" },
                     { "MNF.MoreNewFish", "More New Fish" },
                     { "NatInValley", "Nature in the Valley" },
+                    { "Wildflour.SASS", "Rose and the Alchemist"},
 
             };
 

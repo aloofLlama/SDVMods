@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GiftDiscovery.Tooltip.NPCSections
 {
-    public class NPCLocation
+    public class NPCLocationSegment
     {
         public static List<TooltipElement> Build(NPC npc)
         {
@@ -19,7 +19,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
             if (!ModEntry.IsInMenuTooltip || !ModEntry.ModConfig.ShowLocation)
                 return new List<TooltipElement>();
 
-            string name = GiftableNPC.GetNPCLocation(npc);
+            string name =NPCLocation.GetNPCLocation(npc);
 
             var segments = new List<InlineSegment>
             {

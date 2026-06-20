@@ -1,9 +1,6 @@
 ﻿using SDVCommon.GameData;
 using SDVCommon.Helpers;
-using SDVData;
 using StardewModdingAPI;
-using StardewValley;
-using System.ComponentModel.Design;
 
 namespace SDVCommon.Compatibility
 {

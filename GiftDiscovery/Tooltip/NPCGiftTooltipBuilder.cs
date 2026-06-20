@@ -58,7 +58,7 @@ namespace GiftDiscovery.Tooltip
 
             // World hover
             int range = ModEntry.ModConfig.NearbyRangeTilesNPCTooltip;
-            NPC? nearest = GiftableNPC.GetClosestNearbyNPC(range);
+            NPC? nearest = NPCLocation.GetClosestNearbyNPC(range);
 
             if (nearest is null)
             {
@@ -114,7 +114,7 @@ namespace GiftDiscovery.Tooltip
 
             TooltipBuildHelper.AddIfNotNull(list, NPCHeader.Build(npc));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCTasteSegments.Build(npc));
-            TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCLocation.Build(npc));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCLocationSegment.Build(npc));
 
             return list;
         }

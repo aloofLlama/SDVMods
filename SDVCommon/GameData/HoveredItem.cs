@@ -57,15 +57,16 @@ namespace SDVCommon.GameData
             if (bcItem != null)
                 return HoverResult.FromItem(bcItem, bcSource);
 
+            // Crafting Page - workbench and game menu tab
+            var craftingItem = GetItemFromCraftingPage();
+            if (craftingItem != null)
+                return HoverResult.FromItem(craftingItem, HoverSource.CraftingPage);
+
             // Cooking Page
             var cookingItem = GetItemFromCookingPage();
             if (cookingItem != null)
                 return HoverResult.FromItem(cookingItem, HoverSource.CookingPage);
 
-            // Crafting Page
-            var craftingItem = GetItemFromCraftingPage();
-            if (craftingItem != null)
-                return HoverResult.FromItem(craftingItem, HoverSource.CraftingPage);
 
             return HoverResult.None;
         
@@ -147,6 +148,8 @@ namespace SDVCommon.GameData
             return null;
         }
 
+
+
         private static Item? GetItemFromCollectionsPage()
         {
             if (Game1.activeClickableMenu is not GameMenu gm)
@@ -155,30 +158,39 @@ namespace SDVCommon.GameData
             if (gm.currentTab != GameMenu.collectionsTab)
                 return null;
 
-            if (gm.pages.Count <= GameMenu.collectionsTab)
-                return null;
-
             if (gm.pages[GameMenu.collectionsTab] is not CollectionsPage cp)
                 return null;
+
+            int tab = cp.currentTab;
+            int page = cp.currentPage;
+
+            // Ensure tab exists
+            if (!cp.collections.TryGetValue(tab, out var tabPages))
+                return null;
+
+            // Skip Achievements tab entirely
+            // Collection pages return numberic ID, achievements also have numeric ID and will pop for the objects of the same number
+            if (cp.currentTab == CollectionsPage.achievementsTab)
+                return null;
+
+            // Ensure page exists
+            if (page < 0 || page >= tabPages.Count)
+                return null;
+
+            var visiblePage = tabPages[page];
 
             int mouseX = Game1.getMouseX();
             int mouseY = Game1.getMouseY();
 
-            foreach (var kvp in cp.collections)
+            foreach (var comp in visiblePage)
             {
-                foreach (var page in kvp.Value)
+                if (comp?.bounds.Contains(mouseX, mouseY) == true)
                 {
-                    foreach (var comp in page)
-                    {
-                        if (comp?.bounds.Contains(mouseX, mouseY) == true)
-                        {
-                            // Extract only the item ID
-                            string raw = comp.name ?? "";
-                            string id = raw.Split(new[] { ' ', '|' }, StringSplitOptions.RemoveEmptyEntries)[0];
+                    string raw = comp.name ?? "";
 
-                            return ItemRegistry.Create(id);
-                        }
-                    }
+                    string id = raw.Split(new[] { ' ', '|' }, StringSplitOptions.RemoveEmptyEntries)[0];
+
+                    return ItemRegistry.Create(id);
                 }
             }
 
@@ -196,20 +208,24 @@ namespace SDVCommon.GameData
             int mouseX = Game1.getMouseX();
             int mouseY = Game1.getMouseY();
 
-            if (cp.pagesOfCraftingRecipes is List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pages)
-            {
-                foreach (var dict in pages)
-                {
-                    foreach (var kvp in dict)
-                    {
-                        var comp = kvp.Key;
-                        var recipe = kvp.Value;
+            int page = cp.currentCraftingPage;
 
-                        if (comp.bounds.Contains(mouseX, mouseY))
-                        {
-                            return new CraftingRecipe(recipe.name, true).createItem();
-                        }
-                    }
+            if (page < 0 || page >= cp.pagesOfCraftingRecipes.Count)
+                return null;
+
+            // This page is a Dictionary<ClickableTextureComponent, CraftingRecipe>
+            var dict = cp.pagesOfCraftingRecipes[page];
+
+            foreach (var kvp in dict)
+            {
+                var comp = kvp.Key;      // ClickableTextureComponent
+                var recipe = kvp.Value;  // CraftingRecipe
+
+                if (comp.bounds.Contains(mouseX, mouseY))
+                {
+                    // recipe.name is the internal recipe ID
+                    var cooked = new CraftingRecipe(recipe.name, isCookingRecipe: true);
+                    return cooked.createItem();
                 }
             }
 
@@ -218,27 +234,45 @@ namespace SDVCommon.GameData
 
         private static Item? GetItemFromCraftingPage()
         {
-            if (Game1.activeClickableMenu is not CraftingPage cp)
-                return null;
+            // Case 1: Standalone crafting menu (workbench, toolbar)
+            if (Game1.activeClickableMenu is CraftingPage direct && !direct.cooking)
+                return GetFromCraftingPage(direct);
 
-            if (cp.cooking)
-                return null;
+            // Case 2: Crafting tab inside the ESC menu
+            if (Game1.activeClickableMenu is GameMenu gm)
+            {
+                if (gm.currentTab == GameMenu.craftingTab &&
+                    gm.pages[GameMenu.craftingTab] is CraftingPage cp &&
+                    !cp.cooking)
+                {
+                    return GetFromCraftingPage(cp);
+                }
+            }
+
+            return null;
+        }
+
+        private static Item? GetFromCraftingPage(CraftingPage cp)
+        {
 
             int mouseX = Game1.getMouseX();
             int mouseY = Game1.getMouseY();
 
-            if (cp.pagesOfCraftingRecipes is List<Dictionary<ClickableTextureComponent, CraftingRecipe>> pages)
-            {
-                foreach (var dict in pages)
-                {
-                    foreach (var kvp in dict)
-                    {
-                        var comp = kvp.Key;
-                        var recipe = kvp.Value;
+            int page = cp.currentCraftingPage;
 
-                        if (comp.bounds.Contains(mouseX, mouseY))
-                            return recipe.createItem();
-                    }
+            if (page < 0 || page >= cp.pagesOfCraftingRecipes.Count)
+                return null;
+
+            var dict = cp.pagesOfCraftingRecipes[page];
+
+            foreach (var kvp in dict)
+            {
+                var comp = kvp.Key;      // ClickableTextureComponent
+                var recipe = kvp.Value;  // CraftingRecipe
+
+                if (comp.bounds.Contains(mouseX, mouseY))
+                {
+                    return recipe.createItem();
                 }
             }
 

@@ -22,7 +22,6 @@ namespace GiftDiscovery.Helpers
             APIManager.LoadApis(helper);
             ModSourceHelper.Initialize(helper);
 
-            HarvestInfoBuilder.Initialize();
             GiftableObjectList.Initialize();
 
             GiftKnowledgeService.InitializeGlobal(helper);

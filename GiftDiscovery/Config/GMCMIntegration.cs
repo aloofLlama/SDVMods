@@ -130,6 +130,17 @@ namespace GiftDiscovery.Config
                 max: 6
             );
 
+            gmcm.AddNumberOption(
+                mod: manifest,
+                name: () => "Maximum Rows",
+                tooltip: () => "Maximum number of name rows to display in each category.",
+                getValue: () => ModEntry.ModConfig.MaxRowsGift,
+                setValue: value => ModEntry.ModConfig.MaxRowsGift = value,
+                min: 5,
+                max: 30
+                );
+
+
 
             gmcm.AddBoolOption(
                 mod: manifest,

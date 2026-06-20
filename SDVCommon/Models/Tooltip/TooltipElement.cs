@@ -13,7 +13,7 @@ namespace SDVCommon.Models.Tooltip
         // Text
         public string? Text { get; set; }
         public Color TextColor { get; set; } = TooltipColors.Normal;
-        public SpriteFont Font { get; set; } = Game1.smallFont;
+        public SpriteFont Font { get; set; } = Game1.smallFont; //TODO - renderer measurement uses style font not element font
         public bool Bold { get; set; }
         public bool Underline { get; set; }
 
@@ -31,7 +31,7 @@ namespace SDVCommon.Models.Tooltip
         public Icon? Icon { get; set; }
         public string Text { get; set; } = "";
         public Color TextColor { get; set; } = TooltipColors.Normal;
-        public SpriteFont Font { get; set; } = Game1.smallFont;
+        public SpriteFont Font { get; set; } = Game1.smallFont; //TODO - renderer measurement uses style font not element font
         public bool Bold { get; set; }
         public bool Underline { get; set; }
         public bool IsLineBreak { get; set; }

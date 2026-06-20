@@ -11,6 +11,7 @@ using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.GameData.Characters;
 
 
 namespace GiftDiscovery
@@ -128,7 +129,7 @@ namespace GiftDiscovery
             // NPC proximity tooltip (only if not already showing a tooltip for an NPC in the social menu)
             if (drewNPCMenuTooltip == false)
             {
-                NPC? nearest = GiftableNPC.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
+                NPC? nearest = NPCLocation.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
                 if (nearest != null)
                 {
                     NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
@@ -152,7 +153,7 @@ namespace GiftDiscovery
             ModEntry.IsInMenuTooltip = false;
 
             // NPC proximity tooltip
-            NPC? nearest = GiftableNPC.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
+            NPC? nearest = NPCLocation.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
             if (nearest != null)
             {
                 NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
@@ -184,6 +185,7 @@ namespace GiftDiscovery
                 GiftKnowledgeService.InitializeGlobal(ModHelper);
                 Initializer.InitializeAll(ModHelper);
                 ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+
             }
 
 #endif

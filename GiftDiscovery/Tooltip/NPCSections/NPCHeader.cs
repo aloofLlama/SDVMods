@@ -26,7 +26,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 Icon = portrait,
                 Text = " " + npc.displayName + "   ",
                 TextColor = DisplayHelper.GetNPCNameColor(npc),
-                Font = Game1.dialogueFont
+                Bold = true
             });
 
             int current = HeartStatus.GetCurrentHearts(npc);
@@ -40,7 +40,6 @@ namespace GiftDiscovery.Tooltip.NPCSections
                     Icon = IconKey.Heart.GetIcon(),
                     Text = $"{current}/{max}",
                     TextColor = TooltipColors.Perfection
-
                 });
             }
 
