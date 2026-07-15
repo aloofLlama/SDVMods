@@ -17,7 +17,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
         public static TooltipElement Build(NPC npc)
         {
             var portrait = NPCGameData.GetPortraitIcon(npc);
-            portrait = new Icon(portrait.Texture, portrait.Source, portrait.Size, scale: 0.9f);
+            portrait = new Icon(portrait.Texture, portrait.Source, portrait.Size, scale: 0.7f);
 
             var segments = new List<InlineSegment>();
 

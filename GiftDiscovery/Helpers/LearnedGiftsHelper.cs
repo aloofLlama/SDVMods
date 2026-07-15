@@ -21,7 +21,7 @@ namespace GiftDiscovery.Helpers
         {
             return GiftableNPC.GetAllGiftableNPCs()
                 .Select(NPCGiftStatusBuilder.GiftStatus)
-                .Where(c => c.IsAvailable)
+                //.Where(c => c.IsAvailable) //with this included e.g. Sandy wont show up until met
                 .Where(c =>
                 {
                     var canonical = TasteResolver.GetCanonicalTasteForItem(qualifiedItemId, c.NPC);

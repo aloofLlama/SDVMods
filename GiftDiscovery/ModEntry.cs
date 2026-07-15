@@ -67,21 +67,6 @@ namespace GiftDiscovery
             Initializer.InitializeAll(ModHelper);
         }
 
-        //private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
-        //{
-        //    //Show tooltip when toggled on, holding a giftable item that has loves and/or likes
-        //    //
-        //    if (!Context.IsWorldReady
-        //        || !_showTooltip)
-        //        return;
-
-        //    //must be an object
-        //    if (HoveredItem.GetFromAnyMenu() is not StardewValley.Object obj)
-        //        return;
-
-        //    GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
-
-        //}
         private void OnRenderedActiveMenu(object? sender, RenderedActiveMenuEventArgs e)
         {
             if (!Context.IsWorldReady || !_showTooltip)
@@ -175,6 +160,22 @@ namespace GiftDiscovery
                 _showTooltip = !_showTooltip;
                 ModEntry.IncrementToggleVersion();
             }
+
+#if DEBUG
+            // Debug outputs
+
+            if (e.Button == SButton.F6)
+            {
+                SDVCommonLog.Log($"[{DateTime.Now:HH:mm:ss}]",LogLevel.Alert);
+                GiftableNPC.GetAllGiftableNPCs();
+                SDVCommonLog.Log($"Giftable NPCs: {GiftableNPC.GetAllGiftableNPCs().Count()}",LogHelper.DebugOrTrace);
+
+                SDVCommonLog.Log($"DONE", LogLevel.Alert);
+
+
+            }
+#endif
+
 
 
             // Reinitialize for debug

@@ -24,6 +24,8 @@ public static class GiftHelperOLD
                 GiftOverrides.NonGiftableNPCs.Contains(realNPC.Name))
                 continue;
 
+            //SDVCommonLog.Log($"HH: {realNPC.Name}", LogHelper.DebugOrTrace);
+
             GiftTaste? taste = null;
 
             try

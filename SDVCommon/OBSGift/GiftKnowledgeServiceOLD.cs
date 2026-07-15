@@ -22,7 +22,7 @@ namespace SDVCommon.OBSGift
 
         }
 
-        // ⭐ Accept enum
+        // Accept enum
         public static void LearnTaste(string itemId, string npcName, GiftTaste taste)
         {
             if (!_data.KnownTastes.TryGetValue(itemId, out var npcDict))
@@ -31,12 +31,12 @@ namespace SDVCommon.OBSGift
                 _data.KnownTastes[itemId] = npcDict;
             }
 
-            // ⭐ Store enum as string
+            // Store enum as string
             npcDict[npcName] = taste.ToString();
             Save();
         }
 
-        // ⭐ Return enum instead of string
+        // Return enum instead of string
         public static bool TryGetKnownTaste(string itemId, string npcName, out GiftTaste? taste)
         {
             taste = null;
@@ -52,7 +52,7 @@ namespace SDVCommon.OBSGift
             return false;
         }
 
-        // ⭐ Return dictionary of enums
+        // Return dictionary of enums
         public static Dictionary<string, GiftTaste>? GetKnownTastesForItem(string itemId)
         {
             if (!_data.KnownTastes.TryGetValue(itemId, out var npcDict))

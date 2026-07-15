@@ -1,10 +1,6 @@
 ﻿using GiftDiscovery.Compatibility;
-using GiftDiscovery.Models.Builders;
-using Microsoft.Xna.Framework;
+using SDVCommon.Helpers;
 using StardewValley;
-using StardewValley.GameData.Characters;
-using StardewValley.TokenizableStrings;
-using static GiftDiscovery.Helpers.DisplayHelper;
 
 
 namespace GiftDiscovery.GameData
@@ -15,6 +11,8 @@ namespace GiftDiscovery.GameData
         /// NPCs may be currently available or not (e.g. Leo/Sandy)
         public static IEnumerable<NPC> GetAllGiftableNPCs()
         {
+            //SDVCommonLog.Log($"start", LogHelper.DebugAlert);
+
             return Utility.getAllCharacters()
                 .OfType<NPC>()
                 .Where(npc =>
@@ -28,6 +26,8 @@ namespace GiftDiscovery.GameData
                     // skip explicitly non-giftable NPCs
                     if (ModCompat.GiftOverrides.NonGiftableNPCs.Contains(name))
                         return false;
+
+                    //SDVCommonLog.Log($"{name}",LogHelper.DebugOrTrace);
 
                     return true;
                 });

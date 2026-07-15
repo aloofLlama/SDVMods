@@ -1,6 +1,7 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.Models.Builders;
 using Microsoft.Xna.Framework;
+using SDVCommon.Helpers;
 using StardewValley;
 using StardewValley.TokenizableStrings;
 
@@ -27,6 +28,7 @@ namespace GiftDiscovery.GameData
                     Vector2.Distance(npc.Tile, playerTile) <= range)
                 .Select(npc => npc.Name)
                 .ToHashSet();
+
         }
 
 

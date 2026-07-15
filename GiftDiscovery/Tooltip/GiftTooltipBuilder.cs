@@ -72,7 +72,6 @@ namespace GiftDiscovery.Tooltip
             bool menuChanged = ModEntry.MenuStateChanged;
             int toggleVersion = ModEntry.ToggleVersion;
             int giftVersion = GiftKnowledgeService.GiftVersion;
-
             var nearbyNPCSet = NPCLocation.GetNearbyNPCNames(ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
 
             bool needsRebuild =
@@ -188,7 +187,7 @@ namespace GiftDiscovery.Tooltip
                 if (unknownNPCs.Count > 0 || unmet > 0)
                 {
                     TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-                        BuildUndiscoveredSection(unknownNPCs, unmet, wrapSize)
+                        BuildUndiscoveredSection(unknownNPCs, unmet, wrapSize, maxRows)
                     );
                 }
             }
@@ -270,7 +269,8 @@ namespace GiftDiscovery.Tooltip
         private static List<TooltipElement> BuildUndiscoveredSection(
             IEnumerable<NPCGiftStatus> unknownNPCs,
             int unmetCount,
-            int wrapSize)
+            int wrapSize,
+            int maxRows)
         {
             var collapsible = unknownNPCs
                 .OrderBy(c => c.NPC.displayName)
@@ -301,7 +301,7 @@ namespace GiftDiscovery.Tooltip
                 collapsibleSegments: collapsible,
                 endSegments: end,
                 wrapSize: wrapSize,
-                maxRows: 20,
+                maxRows: maxRows,
                 useCommas: true
             );
 
