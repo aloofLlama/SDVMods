@@ -1,21 +1,14 @@
-﻿using GiftDiscovery;
-using GiftDiscovery.Compatibility;
-using GiftDiscovery.GameData;
+﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using GiftDiscovery.Models.Builders;
 using GiftDiscovery.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SDVCommon;
 using SDVCommon.Compatibility;
-using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
-using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
-using SDVData;
-using StardewModdingAPI;
 using StardewValley;
 
 

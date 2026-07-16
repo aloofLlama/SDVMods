@@ -8,7 +8,7 @@ namespace SDVCommon.Helpers
     https://stardewvalleywiki.com/Modding:Items
     Every item is identified in the game data using a unique item ID. This has two forms:
     
-    The unqualified item ID(item.ItemId) is a unique string ID for the item, like 128 (vanilla item)
+    The unqualified item ID(item.ItemId) is a string ID for the item, like 128 (vanilla item)
     or Example.ModId_Watermelon(custom item). For legacy reasons, the unqualified ID for vanilla items
     may not be globally unique; for example, Pufferfish(object 128) and Mushroom Box(bigcraftable 128)
     both have item ID 128.
@@ -43,7 +43,7 @@ namespace SDVCommon.Helpers
             return raw;
         }
 
-        //Adds the (O) prefix to Ids
+        //Adds the correct prefix to Ids (usually (O))
         public static string ToQualifiedId(string id)
         {
             if (string.IsNullOrEmpty(id))

@@ -1,7 +1,9 @@
-﻿using System;
+﻿using StardewModdingAPI;
+using StardewValley;
+using StardewValley.GameData.Objects;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using StardewValley.GameData.Objects;
 using SObject = StardewValley.Object;
 
 
@@ -16,6 +18,7 @@ namespace SDVCommon.Helpers
                 return false;
 
             int category = obj.Category;
+
 
             // CATEGORY-BASED MATCHES
             if (category is
@@ -57,15 +60,14 @@ namespace SDVCommon.Helpers
             // CATEGORY 0 SPECIAL CASES
             if (category == 0)
             {
-               if (obj.Type == "Arch" || // Artifacts (Bone Flute, Ancient Doll, Golden Mask, etc.)
-                    obj.Type == "Basic" || //vinegar, pearl, etc
-                    //obj.Type == "Crafting" ||   //coffee, field snack
-                    obj.Type == "0" || //SDV Expanded items e.g. trasurechest, grampleton chicken
-                    obj.Type == "Fish" //algae, seaweed, cave jelly, etc (not actual fish, which are category 1
-                    )
+                if (obj.Type == "Arch" || // Artifacts (Bone Flute, Ancient Doll, Golden Mask, etc.)
+                     obj.Type == "Basic" || //vinegar, pearl, etc
+                     obj.Type == "0" || //SDV Expanded items e.g. trasurechest, grampleton chicken
+                     obj.Type == "Fish" //algae, seaweed, cave jelly, etc (not actual fish, which are category 1
+                     )
                     return true;
-            }    
-            
+            }
+
             // acorn, maple seed, coffee, brick floor, torches
             if (obj.Type == "Crafting")
                 return true;

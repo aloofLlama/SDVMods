@@ -43,18 +43,10 @@ namespace GiftDiscovery.Helpers
             //    }
             //}
 
-            SDVCommonLog.Log(
-                $"[{DateTime.Now:HH:mm:ss}] Start get taste map",
-                LogHelper.DebugOrTrace);
-
             foreach (var npc in GiftableNPC.GetAllGiftableNPCs())
             {
                 GiftKnowledgeService.GetCanonicalTasteMap(npc);
             }
-
-            SDVCommonLog.Log(
-                $"[{DateTime.Now:HH:mm:ss}] End get taste map",
-                LogHelper.DebugOrTrace);
 
 
 //#if DEBUG //TODO troubleshoot missing icons

@@ -47,7 +47,7 @@ namespace GiftDiscovery
 
             GiftKnowledgeService.InitializeGlobal(helper);
 
-            // Harmony patch for gift detection
+            // Harmony patch for gift detection of modded items
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.Patch(
                 original: AccessTools.Method(typeof(NPC), nameof(NPC.receiveGift)),
@@ -63,7 +63,6 @@ namespace GiftDiscovery
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
-
             Initializer.InitializeAll(ModHelper);
         }
 

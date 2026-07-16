@@ -76,7 +76,7 @@ namespace GiftDiscovery.GameData
             if (loc is null)
                 return "???";
 
-            string id = loc.Name;
+            string location = loc.Name;
             var data = loc.GetData();
 
             // map data DisplayName
@@ -88,7 +88,7 @@ namespace GiftDiscovery.GameData
             }
 
             //fallback
-            return id;
+            return location;
         }
 
     }

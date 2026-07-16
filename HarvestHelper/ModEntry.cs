@@ -11,6 +11,7 @@ using SDVCommon.Rendering;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Objects;
 
 
 
@@ -42,13 +43,10 @@ namespace HarvestHelper
 
             helper.Events.Input.ButtonPressed += OnButtonPressed;
 
-            //Temp for debug gift detection
-            //helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
-
             // Initialize shared gift knowledge
             GiftKnowledgeServiceOLD.Initialize(helper);
 
-            // Harmony patch for perfect gift detection
+            // Harmony patch for modded gift detection
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.Patch(
                 original: AccessTools.Method(typeof(NPC), nameof(NPC.receiveGift)),
@@ -78,9 +76,15 @@ namespace HarvestHelper
             if (hover.Item is not StardewValley.Object obj)
                 return;
 
-            //skip recipes
-            if (obj.IsRecipe)
+            //skip recipes and big crafting
+            if (obj.IsRecipe ||
+                obj.Category == StardewValley.Object.BigCraftableCategory ||
+                obj is Furniture ||
+                obj is Wallpaper)
                 return;
+
+            SDVCommonLog.Log($"Category: {obj.Category} | Type: {obj.Type}", LogHelper.DebugOrTrace);
+
 
             // Only rebuild when hovered item changes
             if (!ReferenceEquals(_cachedObj, obj))
