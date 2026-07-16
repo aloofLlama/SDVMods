@@ -83,9 +83,6 @@ namespace HarvestHelper
                 obj is Wallpaper)
                 return;
 
-            SDVCommonLog.Log($"Category: {obj.Category} | Type: {obj.Type}", LogHelper.DebugOrTrace);
-
-
             // Only rebuild when hovered item changes
             if (!ReferenceEquals(_cachedObj, obj))
             {

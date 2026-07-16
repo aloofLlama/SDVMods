@@ -18,7 +18,8 @@ namespace HarvestHelper.Services
             TooltipBuildHelper.AddSectionWithSeparator(list, () => InventorySection.Build(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => GiftLovesSection.Build(obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => ShipmentSection.Build(harvest, obj));
-            TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.Build(harvest));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.BuildSpecific(harvest));
+            TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.BuildGeneric(harvest));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedmakerSection.Build(harvest, obj));
             return list;
         }

@@ -14,14 +14,7 @@ namespace SDVCommon.GameData
         {
             if (!Game1.objectData.TryGetValue(objectId, out var obj))
             {
-                //// 2) Fallback: extract numeric ID for "(O)638" / "O:638" / "638"
-                //string numeric = new(objectId.Where(char.IsDigit).ToArray());
-
-                //if (string.IsNullOrEmpty(numeric) ||
-                //    !Game1.objectData.TryGetValue(numeric, out obj))
-                //{
                     return null;
-                //}
             }
 
             return new ItemInfo

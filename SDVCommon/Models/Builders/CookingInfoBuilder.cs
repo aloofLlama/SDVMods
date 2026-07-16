@@ -13,7 +13,7 @@ namespace SDVCommon.Models.Builders
 
         public static IEnumerable<CookingInfo> AllRecipes => _recipes.Values;
 
-        public static void BuildAll()
+        public static void Initialize()
         {
             _recipes.Clear();
 
@@ -57,7 +57,8 @@ namespace SDVCommon.Models.Builders
                 Ingredients = recipe.recipeList
                     .Select(kvp => new RecipeIngredient
                     {
-                        IngredientId = IdHelper.ToItemId(kvp.Key),
+                        //IngredientId = IdHelper.ToItemId(kvp.Key),
+                        IngredientId = kvp.Key,
                         Count = kvp.Value
                     })
                     .ToList()

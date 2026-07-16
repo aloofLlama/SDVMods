@@ -1,17 +1,19 @@
 ﻿using HarvestHelper.Helpers;
-using SDVCommon.Helpers;
-using SDVCommon.Icons;
-using SDVData;
 using SDVCommon.GameData;
+using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
+using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
+using SDVData;
+using System.Net;
 
 
 namespace HarvestHelper.TooltipSections
 {
     public static class CookingSection
     {
-        public static List<TooltipElement> Build(HarvestInfo harvest)
+        //Cooking section using the specific ingredient
+        public static List<TooltipElement> BuildSpecific(HarvestInfo harvest)
         {
             var list = new List<TooltipElement>();
 
@@ -23,28 +25,127 @@ namespace HarvestHelper.TooltipSections
             if (known == 0 && unknown == 0)
                 return list;
 
-            List<InlineSegment> achievementSegment;
-
-            if (cooked != total)
-            {
-                achievementSegment = new List<InlineSegment>
+            var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
+                new[]
                 {
-                    new InlineSegment
-                    {
-                        Text = $"{cooked}/{total}",
-                        TextColor = TooltipColors.Perfection
-                    }
-                };
-            }
-            else
-            {
-                achievementSegment = new List<InlineSegment>();
-            }
+                    BuildAchievementSegment(cooked, total),
+                    BuildKnownRecipeSegment(harvestId, known, unknown),
+                    BuildFridgeQuantity(harvestId)
+                },
+                x => x
+            );
 
+
+            // add the plate icon + segments
+            list.Add(new TooltipElement
+            {
+                Icon = IconKey.Plate.GetIcon(),
+                InlineSegments = segments
+            });
+
+            return list;
+        }
+
+        //Cooking section using the ingredient category (e.g. Any egg)
+        public static List<TooltipElement> BuildGeneric(HarvestInfo harvest)
+        {
+            var list = new List<TooltipElement>();
+
+            if (harvest.Harvest == null)
+                return list;
+
+            int categoryId = harvest.Harvest.Category;
+
+            string category = $"{categoryId}";
+            SDVCommonLog.Log($"{category}", LogHelper.DebugOrTrace);
+
+            var (known, unknown) = CookingRecipe.CountRecipesUsing(category);
+            var (cooked, uncooked) = CookingRecipe.CountCookedRecipesUsing(category);
+            int total = known + unknown;
+
+            if (known == 0 && unknown == 0)
+                return list;
+
+            var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
+                new[]
+                {
+                    BuildAchievementSegment(cooked, total),
+                    BuildKnownRecipeSegment(category, known, unknown),
+                    BuildFridgeQuantitybyCategory(categoryId)
+                },
+                x => x
+            );
+
+            list.Add(new TooltipElement
+            {
+                //Icon = IconKey.Plate.GetIcon(),
+                InlineSegments = segments
+            });
+
+            return list;
+        }
+
+
+
+        private static InlineSegment[] BuildAchievementSegment(int cooked, int total)
+        {
+            if (cooked == total)
+                return Array.Empty<InlineSegment>();
+
+            return new[]
+            {
+                new InlineSegment
+                {
+                    Text = $"{cooked}/{total}",
+                    TextColor = TooltipColors.Perfection
+                }
+            };
+
+        }
+
+        private static InlineSegment[] BuildFridgeQuantity(string harvestId)
+        {
+            int fridgeQty = Inventory.CountOwnedInMainFarmhouseFridges(harvestId);
+
+            var fridgeSegment = new[]
+            {
+                new InlineSegment
+                {
+                    Icon = IconRegistry.GetIcon("(BC)216")?.WithScale(1.2f), //MiniFridge
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
+                        fridgeQty)
+                }
+            };
+
+            return fridgeSegment;
+        }
+
+        private static InlineSegment[] BuildFridgeQuantitybyCategory(int categoryId)
+        {
+            int fridgeQty = Inventory.CountOwnedInMainFarmhouseFridgesByCategory(categoryId);
+
+            var fridgeSegment = new[]
+            {
+                new InlineSegment
+                {
+                    Icon = IconRegistry.GetIcon("(BC)216")?.WithScale(1.2f), //MiniFridge
+                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
+                        fridgeQty)
+                }
+            };
+
+            return fridgeSegment;
+        }
+
+
+
+
+        private static InlineSegment[] BuildKnownRecipeSegment(string ingredientId, int known, int unknown)
+        {
             List<InlineSegment> knownUnknownCombined;
 
             var knownIconSegments = CookingRecipe
-                .GetKnownRecipesUsing(harvestId)
+                .GetKnownRecipesUsing(ingredientId)
                 .Select(r => new InlineSegment
                 {
                     Icon = IconRegistry.GetIcon(r.OutputId)
@@ -154,51 +255,10 @@ namespace HarvestHelper.TooltipSections
                     });
                 }
             }
+            return knownUnknownCombined.ToArray();
 
-            int fridgeQty = Inventory.CountOwnedInMainFarmhouseFridges(harvestId);
-
-            var fridgeSegment = new[]
-            {
-                new InlineSegment
-                {
-                    Icon = IconRegistry.GetIcon("(BC)216")?.WithScale(1.2f), //MiniFridge
-                    Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned), 
-                        fridgeQty)
-                }
-            };
-
-
-
-            var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
-                new[]
-                {
-                    new { Type = "Achievement" },
-                    new { Type = "KnownUnknown" },
-                    new { Type = "Fridge" }
-                },
-                x =>
-                {
-                    if (x.Type == "Achievement")
-                        return achievementSegment;
-
-                    if (x.Type == "KnownUnknown")
-                        return knownUnknownCombined;
-
-                    if (x.Type == "Fridge")
-                        return fridgeSegment;
-
-                    return Enumerable.Empty<InlineSegment>();
-                }
-            );
-
-            // add the plate icon + segments
-            list.Add(new TooltipElement
-            {
-                Icon = IconKey.Plate.GetIcon(),
-                InlineSegments = segments
-            });
-
-            return list;
         }
+
     }
+
 }

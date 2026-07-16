@@ -16,7 +16,7 @@ namespace HarvestHelper.Helpers
             ModSourceHelper.Initialize(helper);
             GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
-            CookingInfoBuilder.BuildAll();
+            CookingInfoBuilder.Initialize();
 
             //int cnt = 0;
             //foreach (var harvest in HarvestInfoBuilder.AllHarvests)
