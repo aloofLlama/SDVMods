@@ -1,6 +1,8 @@
 ﻿using HarvestHelper.Helpers;
 using SDVCommon.GameData;
+using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
+using SDVCommon.Services;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
@@ -18,8 +20,12 @@ namespace HarvestHelper.TooltipSections
             var list = new List<TooltipElement>();
 
             string harvestId = harvest.HarvestId;
-            var (known, unknown) = CookingRecipe.CountRecipesUsing(harvestId);
-            var (cooked, uncooked) = CookingRecipe.CountCookedRecipesUsing(harvestId);
+
+            var known = CookingRecipe.GetKnownRecipesUsing(harvestId).Count();
+            var unknown = CookingRecipe.GetUnknownRecipesUsing(harvestId).Count();
+            var cooked = CookingRecipe.GetCookedRecipesUsing(harvestId).Count();
+            var uncooked = CookingRecipe.GetUncookedRecipesUsing(harvestId).Count();
+
             int total = known + unknown;
 
             if (known == 0 && unknown == 0)
@@ -57,18 +63,29 @@ namespace HarvestHelper.TooltipSections
             int categoryId = harvest.Harvest.Category;
 
             string category = $"{categoryId}";
-            SDVCommonLog.Log($"{category}", LogHelper.DebugOrTrace);
 
-            var (known, unknown) = CookingRecipe.CountRecipesUsing(category);
-            var (cooked, uncooked) = CookingRecipe.CountCookedRecipesUsing(category);
+            var known = CookingRecipe.GetKnownRecipesUsing(category).Count();
+            var unknown = CookingRecipe.GetUnknownRecipesUsing(category).Count();
+            var cooked = CookingRecipe.GetCookedRecipesUsing(category).Count();
+            var uncooked = CookingRecipe.GetUncookedRecipesUsing(category).Count();
+
             int total = known + unknown;
 
             if (known == 0 && unknown == 0)
                 return list;
 
+            var headingSegment = new[]
+            {
+                new InlineSegment
+                {
+                    Text = "(Any)"
+                }
+            };
+
             var segments = TooltipBuildHelper.BuildInlineSegmentswithSeparators(
                 new[]
                 {
+                    headingSegment,
                     BuildAchievementSegment(cooked, total),
                     BuildKnownRecipeSegment(category, known, unknown),
                     BuildFridgeQuantitybyCategory(categoryId)
@@ -78,7 +95,7 @@ namespace HarvestHelper.TooltipSections
 
             list.Add(new TooltipElement
             {
-                //Icon = IconKey.Plate.GetIcon(),
+                Icon = IconKey.Plate.GetIcon(),
                 InlineSegments = segments
             });
 
@@ -136,8 +153,6 @@ namespace HarvestHelper.TooltipSections
 
             return fridgeSegment;
         }
-
-
 
 
         private static InlineSegment[] BuildKnownRecipeSegment(string ingredientId, int known, int unknown)

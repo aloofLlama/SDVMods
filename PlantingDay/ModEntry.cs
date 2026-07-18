@@ -1,10 +1,12 @@
 ﻿using PlantingDay.Helpers;
 using PlantingDay.Services;
+using SDVCommon;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -28,8 +30,7 @@ namespace PlantingDay
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            SDVCommonLog.Initialize(this.Monitor);
-
+            SDVCommonServices.Initialize(helper, Monitor);
 
             //helper.Events.GameLoop.GameLaunched += OnGameLaunched;
 

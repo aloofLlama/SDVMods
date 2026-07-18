@@ -14,6 +14,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\CustomBushCompat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ICustomBushApi.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\DataOverrides.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\SpaceCoreCompat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\Achievement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\NPCGameData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTOREconomicsHelper.cs" />
@@ -30,7 +31,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\HarvestCategories.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Wrappers\PlantInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\PurchaseDataBuilder.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Helpers\Logging.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Services\Logging.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\GameObject.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\SeedSourceBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\Vendor.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Rendering\TooltipRenderer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\PlantIconInitializer.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\PlantInfoBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)services\CommonServices.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)services\ReferenceEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -2,16 +2,21 @@
 using HarvestHelper.Compatibility;
 using HarvestHelper.Helpers;
 using HarvestHelper.Services;
+using SDVCommon;
+using SDVCommon.Compatibility;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.OBSGift;
 using SDVCommon.Rendering;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.Objects;
+using System.Collections;
+using System.Reflection;
 
 
 
@@ -26,17 +31,13 @@ namespace HarvestHelper
         private StardewValley.Object? _cachedObj;
         private List<TooltipElement>? _cachedTooltip;
 
-
-        //Temp for debug gift detection
-        private readonly static Dictionary<string, int> _prevGifts = new();
-
         public override void Entry(IModHelper helper)
         {
             Instance = this;
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            SDVCommonLog.Initialize(this.Monitor);
+            SDVCommonServices.Initialize(helper, Monitor);
 
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
@@ -116,12 +117,32 @@ namespace HarvestHelper
         {
 #if DEBUG
             // Only run when the player presses F5
-            if (e.Button != SButton.F5)
-                return;
-            HarvestInfoBuilder.Reset();
-            Initializer.InitializeAll(ModHelper);
-            ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+            if (e.Button == SButton.F5)
+            {
+                HarvestInfoBuilder.Reset();
+                Initializer.InitializeAll(ModHelper);
+                ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+            }
 
+            if (e.Button == SButton.F7)
+            {
+                SDVCommonLog.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Alert);
+
+               //var recipe = new CraftingRecipe("HeyKatu.CulinaryDelight_chocolate_cupcake", isCookingRecipe: true);
+
+               // var info = CookingInfoBuilder.BuildIngredientfs(recipe);
+
+               // foreach (var ing in info)
+               // {
+               //     SDVCommonLog.Log(
+               //         $"ingredient {ing.IngredientId}",
+               //         LogHelper.DebugOrTrace
+               //     );
+               // }
+
+                SDVCommonLog.Log($"DONE", LogLevel.Alert);
+
+            }
 
             //KEEP Debug to output desired database variable from a list
             //foreach (var plant in PlantInfoBuilder.AllPlants)
@@ -136,31 +157,6 @@ namespace HarvestHelper
             //}
 
 
-            //ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}] RAN BUTTON PRESS", LogLevel.Alert);
-
-            //foreach (var pair in Game1.player.friendshipData.Pairs)
-            //{
-            //    string npcName = pair.Key;
-            //    Friendship f = pair.Value;
-
-            //    NPC npc = Game1.getCharacterFromName(npcName, mustBeVillager: false);
-            //    if (npc == null)
-            //    {
-            //        ModEntry.Instance.Monitor.Log($"[Friendship] {npcName}: NPC not found.", LogLevel.Warn);
-            //        continue;
-            //    }
-
-            //    int maxHearts = GiftHelperOLD.GetMaxHearts(npc);
-            //    int maxPoints = maxHearts * 250;
-
-            //    int currentPoints = f.Points;
-            //    int currentHearts = currentPoints / 250;
-
-            //    ModEntry.Instance.Monitor.Log(
-            //        $"[Friendship] {npcName}: {currentHearts}/{maxHearts} hearts ({currentPoints}/{maxPoints} points)",
-            //        LogLevel.Info
-            //    );
-            //}
 #endif
 
         }

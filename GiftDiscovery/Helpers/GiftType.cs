@@ -1,7 +1,7 @@
 ﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Models.Builders;
-using SDVCommon.Helpers;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewValley;
 using System;

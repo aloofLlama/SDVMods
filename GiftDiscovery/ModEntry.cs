@@ -5,9 +5,10 @@ using GiftDiscovery.Helpers;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
 using HarmonyLib;
+using SDVCommon;
 using SDVCommon.GameData;
-using SDVCommon.Helpers;
 using SDVCommon.Models.Builders;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
@@ -33,7 +34,7 @@ namespace GiftDiscovery
             ModHelper = helper;
             ModEntry.ModMonitor = base.Monitor;
 
-            SDVCommonLog.Initialize(this.Monitor);
+            SDVCommonServices.Initialize(helper, Monitor);
             ModConfig = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.GameLaunched += OnGameLaunched;

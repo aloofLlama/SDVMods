@@ -1,4 +1,5 @@
 ﻿using SDVCommon.Helpers;
+using SDVCommon.Services;
 using SDVCommon.Models.Wrappers;
 using StardewModdingAPI;
 using StardewValley;
@@ -55,15 +56,20 @@ namespace SDVCommon.GameData
                 "FlashShifter.StardewValleyExpandedCP_YellowJunimoVendor" => "Junimo Woods",
                 "FlashShifter.StardewValleyExpandedCP_ZoeyVendor" => "Joja Emporium",
 
-                // Sunberry
+                // Sunberry + extras
                 "skellady.SBVCP_AriMarket" => "Ari",
                 "skellady.SBVCP_JumanaShop" => "Jumana",
                 "skellady.SBVCP_MoonberryShop" => "Moonberry",
+                "Wildflour.SASS_AlchemistShop" => "Alchemist",
 
                 // East Scarp
                 "Lemurkat.EastScarp_AideenFlowerShop" => "Aideen",
                 "Lemurkat.EastScarp_JessieSeedShop" => "Jessie",
                 "Lemurkat.EastScarp_JojaMetroMart" => "Joja Metro Mart",
+
+                // Ridgeside Villiage
+                "RSVJericShop" => "Jeric",
+                "RSVKimpoiShop" => "Kimpoi",
 
                 // Mount Vapius
                 "Lumisteria.MtVapius_ForestHiddenShop" => "Forest Hidden",

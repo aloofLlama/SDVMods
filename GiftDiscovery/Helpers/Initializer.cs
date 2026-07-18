@@ -4,7 +4,7 @@ using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
 using SDVCommon.Compatibility;
-using SDVCommon.Helpers;
+using SDVCommon.Services;
 using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
 using StardewModdingAPI;

@@ -1,6 +1,6 @@
 ﻿using SDVCommon.Helpers;
-using SDVCommon.Models.Runtime;
-using SDVCommon.Models.Wrappers;
+using SDVCommon.Services;
+using SDVCommon.Compatibility;
 using SDVData;
 using StardewModdingAPI;
 using StardewValley;
@@ -29,13 +29,16 @@ namespace SDVCommon.Models.Builders
 
             //foreach (var r in _recipes.Values)
             //{
-            //    foreach (var ing in r.Data.Ingredients)
+            //if (r.RecipeName == "HeyKatu.CulinaryDelight_chocolate_cupcake")
+            //{ 
+            //    foreach (var ing in r.Ingredients)
             //    {
             //        SDVCommonLog.Log(
-            //            $"RECIPE {r.Data.RecipeName} uses ingredient {ing.IngredientId}",
-            //            LogLevel.Info
+            //            $"RECIPE {r.RecipeName} uses ingredient {ing.IngredientId}",
+            //            LogHelper.DebugOrTrace
             //        );
             //    }
+            //}
             //}
 
         }
@@ -48,22 +51,65 @@ namespace SDVCommon.Models.Builders
 
         private static CookingInfo Build(CraftingRecipe recipe)
         {
+
             return new CookingInfo
             {
                 RecipeName = recipe.name,
                 OutputDisplayName = recipe.DisplayName,
                 OutputId = IdHelper.ToItemId(recipe.itemToProduce.First()),
                 OutputCount = recipe.numberProducedPerCraft,
-                Ingredients = recipe.recipeList
-                    .Select(kvp => new RecipeIngredient
-                    {
-                        //IngredientId = IdHelper.ToItemId(kvp.Key),
-                        IngredientId = kvp.Key,
-                        Count = kvp.Value
-                    })
-                    .ToList()
+                Ingredients = BuildIngredients(recipe)
             };
 
         }
+
+        private static List<RecipeIngredient> BuildIngredients(CraftingRecipe recipe)
+        {
+            // 1. SpaceCore override JSON
+            //var scOverride = SpaceCoreCompat.GetOverrideIngredients(recipe.name);
+            //if (scOverride != null)
+            //    return scOverride;
+
+            // 2. Vanilla SDV ingredients
+            var ingredients = new List<RecipeIngredient>();
+
+            foreach (var kvp in recipe.recipeList)
+            {
+                ingredients.Add(new RecipeIngredient
+                {
+                    IngredientId = kvp.Key,
+                    Count = kvp.Value
+                });
+            }
+
+            return ingredients;
+        }
+
+        //public static List<RecipeIngredient> BuildIngredientfs(CraftingRecipe recipe)
+        //{
+
+        //    // 1. SpaceCore override JSON
+        //    var scOverride = SpaceCoreCompat.GetOverrideIngredients(recipe.name);
+        //    if (scOverride != null)
+        //    {
+
+        //        return scOverride;
+        //    }
+
+        //    // 2. Vanilla SDV ingredients
+        //    var ingredients = new List<RecipeIngredient>();
+
+        //    foreach (var kvp in recipe.recipeList)
+        //    {
+        //        ingredients.Add(new RecipeIngredient
+        //        {
+        //            IngredientId = kvp.Key,
+        //            Count = kvp.Value
+        //        });
+        //    }
+
+        //    return ingredients;
+        //}
+
     }
 }
