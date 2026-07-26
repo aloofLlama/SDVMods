@@ -128,17 +128,20 @@ namespace HarvestHelper
             {
                 SDVCommonLog.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Alert);
 
-               //var recipe = new CraftingRecipe("HeyKatu.CulinaryDelight_chocolate_cupcake", isCookingRecipe: true);
+                ArtisanInfoBuilder.Initialize();
 
-               // var info = CookingInfoBuilder.BuildIngredientfs(recipe);
+                //FOR DEBUGGING CONTEXT TAGS COOKING RECIPES
+                //var recipe = new CraftingRecipe("HeyKatu.CulinaryDelight_chocolate_cupcake", isCookingRecipe: true);
 
-               // foreach (var ing in info)
-               // {
-               //     SDVCommonLog.Log(
-               //         $"ingredient {ing.IngredientId}",
-               //         LogHelper.DebugOrTrace
-               //     );
-               // }
+                // var info = CookingInfoBuilder.BuildIngredientfs(recipe);
+
+                // foreach (var ing in info)
+                // {
+                //     SDVCommonLog.Log(
+                //         $"ingredient {ing.IngredientId}",
+                //         LogHelper.DebugOrTrace
+                //     );
+                // }
 
                 SDVCommonLog.Log($"DONE", LogLevel.Alert);
 

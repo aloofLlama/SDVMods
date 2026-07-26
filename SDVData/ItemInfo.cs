@@ -3,7 +3,7 @@
     public class ItemInfo
     {
         public string Id { get; set; } = ""; //unqualified ID (do not have (O) prefix)
-        public string Name { get; set; } = "";
+        public string DisplayName { get; set; } = "";
         public string Description { get; set; } = "";
         public string Type { get; set; } = ""; // e.g. Crafting, Fish, Cooking, Seeds, Ring 
 

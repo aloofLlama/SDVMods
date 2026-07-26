@@ -1,7 +1,8 @@
-﻿using SDVCommon.GameData;
+﻿using SDVCommon.Compatibility;
+using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Compatibility;
+using SDVCommon.Services;
 using SDVData;
 using StardewValley;
 using StardewValley.GameData.Objects;
@@ -83,7 +84,8 @@ namespace SDVCommon.Models.Builders
             _harvests[harvestId] = new HarvestInfo
             {
                 HarvestId = harvestId,
-                DisplayName = obj.DisplayName,
+                //DisplayName = obj.DisplayName,
+                DisplayName = itemInfo.DisplayName,
                 SeedId = seedId,
                 Harvest = itemInfo,
                 ShipOne = shipOne,

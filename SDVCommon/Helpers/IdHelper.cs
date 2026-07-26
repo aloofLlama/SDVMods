@@ -26,19 +26,19 @@ namespace SDVCommon.Helpers
 
     public static class IdHelper
     {
-        //Removes the (O) prefix from Ids
+        //Removes the (O) or (BC) prefix from Ids
         public static string ToItemId(string? raw)
         {
             if (string.IsNullOrEmpty(raw))
                 return string.Empty;
 
-            // Vanilla object: (O)### → ###
-            if (raw.StartsWith("(O)") && int.TryParse(raw.AsSpan(3), out int num))
-                return num.ToString();
-
-            // Modded object: (O)StringId → StringId
+            // (O)StringId → StringId
             if (raw.StartsWith("(O)"))
                 return raw.Substring(3);
+
+            // (BC)StringId → StringId
+            if (raw.StartsWith("(BC)"))
+                return raw.Substring(4);
 
             return raw;
         }

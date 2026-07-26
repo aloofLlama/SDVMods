@@ -9,6 +9,7 @@
     <Import_RootNamespace>SDVData</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)ArtisanInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CookingInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GrowthContext.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HarvestInfo.cs" />

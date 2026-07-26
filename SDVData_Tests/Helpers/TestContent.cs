@@ -53,7 +53,7 @@ namespace SDVData_Tests.Helpers
             {
 
                 string seedId = plant.SeedId;
-                string seedName = TestHelpers.TrimSeedName(plant.Seed?.Name ?? "null");
+                string seedName = TestHelpers.TrimSeedName(plant.Seed?.DisplayName ?? "null");
 
                 // CASE 1: plant has NO purchase options
                 //if (plant.PurchaseOptions == null || plant.PurchaseOptions.Count == 0)
@@ -136,7 +136,7 @@ namespace SDVData_Tests.Helpers
             foreach (var plant in _plants)
             {
                 string seedId = plant.SeedId;
-                string seedName = TestHelpers.TrimSeedName(plant.Seed?.Name ?? "null");
+                string seedName = TestHelpers.TrimSeedName(plant.Seed?.DisplayName ?? "null");
 
                 foreach (var option in plant.PurchaseOptions)
                 {

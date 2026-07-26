@@ -30,7 +30,6 @@ namespace SDVCommon.GameData
                 .Where(r => !HasCooked(r));
         }
 
-
         /// <summary>
         /// Returns all CookingInfo entries whose ingredients include this ingredient.
         /// </summary>

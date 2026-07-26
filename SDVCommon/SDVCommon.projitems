@@ -20,9 +20,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTOREconomicsHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTORGameDataHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ModSourceHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)helpers\NameHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)icons\IconExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)icons\iconproviders\ItemIconProvider.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)icons\iconproviders\StaticIconProvider.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)models\builders\ArtisanInfoBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)models\tooltip\TooltipStyle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OBSGift\GiftHelperOLD.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\MonsterDropBuilder.cs" />

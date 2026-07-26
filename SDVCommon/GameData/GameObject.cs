@@ -17,14 +17,16 @@ namespace SDVCommon.GameData
                     return null;
             }
 
+            var objInstance = new StardewValley.Object(objectId, 1);
+
             return new ItemInfo
             {
                 Id = objectId,
-                Name = obj.Name,
-                Description = obj.Description,
-                Price = obj.Price,
+                DisplayName = objInstance.DisplayName,
+                //Description = obj.Description,
+                //Price = obj.Price,
                 Category = obj.Category,
-                Edibility = obj.Edibility,
+                //Edibility = obj.Edibility,
                 Type = obj.Type,
                 ContextTags = obj.ContextTags?.ToList()
             };
