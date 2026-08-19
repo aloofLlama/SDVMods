@@ -1,13 +1,9 @@
 ﻿using HarvestHelper.Helpers;
 using SDVCommon.GameData;
-using SDVCommon.Compatibility;
-using SDVCommon.Helpers;
-using SDVCommon.Services;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
 using SDVData;
-using System.Net;
 
 
 namespace HarvestHelper.TooltipSections

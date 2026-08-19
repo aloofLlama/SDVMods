@@ -1,6 +1,8 @@
 ﻿
+using SDVCommon.Services;
 using StardewValley;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace SDVCommon.Helpers
 {
@@ -55,6 +57,7 @@ namespace SDVCommon.Helpers
 
             // Resolve via ItemRegistry
             var data = ItemRegistry.GetData(id);
+            //SDVCommonLog.Log($"ToQualifiedId: {id} → {data?.QualifiedItemId}", LogHelper.DebugInfo);
             return data?.QualifiedItemId ?? id;
         }
 

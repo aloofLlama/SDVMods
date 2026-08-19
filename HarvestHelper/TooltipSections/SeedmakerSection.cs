@@ -48,7 +48,7 @@ namespace HarvestHelper.TooltipSections
 
             if (seedId != null)
             {
-                owned = Inventory.CountOwned(seedId);
+                owned = Inventory.CountOwned(IdHelper.ToQualifiedId(seedId));
             }
 
             list.Add(new TooltipElement

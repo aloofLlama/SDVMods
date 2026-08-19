@@ -1,5 +1,5 @@
 ﻿using HarvestHelper.Helpers;
-using SDVCommon;
+using SDVCommon.Helpers;
 using SDVCommon.GameData;
 using SDVData;
 using SDVCommon.Models.Tooltip;
@@ -13,7 +13,7 @@ namespace HarvestHelper.TooltipSections
         {
             var list = new List<TooltipElement>();
             string harvestId = harvest.HarvestId;
-            int owned = Inventory.CountOwned(harvestId);
+            int owned = Inventory.CountOwned(IdHelper.ToQualifiedId(harvestId));
 
             list.Add(new TooltipElement
             {

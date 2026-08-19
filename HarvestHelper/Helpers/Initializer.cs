@@ -3,7 +3,6 @@ using SDVCommon.Compatibility;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Services;
-using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 
@@ -18,28 +17,13 @@ namespace HarvestHelper.Helpers
             GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
             HarvestInfoBuilder.Initialize();
             CookingInfoBuilder.Initialize();
-
-            //int cnt = 0;
-            //foreach (var harvest in HarvestInfoBuilder.AllHarvests)
-            //{
-            //    IconInitializers.HarvestIcons(harvest);
-            //    cnt++;
-            //}
-
-            //int cnt2 = 0;
-            //foreach (var recipe in CookingInfoBuilder.AllRecipes)
-            //{
-            //    IconInitializers.CookingIcons(recipe);
-            //    cnt2++;
-            //}
+            ArtisanInfoBuilder.Initialize();
 
 #if DEBUG
             CacheForTesting.DumpHarvestInfoToJson();
 #endif
             SDVCommonLog.Log($"Harvest Database Initialized",
                 LogHelper.DebugOrTrace);
-            //SDVCommonLog.Log($"Harvest icons: {cnt} | Cooking icons: {cnt2}",
-            //    LogHelper.DebugOrTrace);
 
 
         }
