@@ -104,6 +104,8 @@ namespace SDVCommon.GameData
         }
         private static NPC? GetNPCFromSocialPage()
         {
+            //PERF - this takes basically no time
+
             if (Game1.activeClickableMenu is not GameMenu gm)
                 return null;
 
@@ -140,6 +142,7 @@ namespace SDVCommon.GameData
                     // entry.Character is the NPC instance
                     if (entry.Character is NPC npc)
                         return npc;
+
 
                     return null;
                 }

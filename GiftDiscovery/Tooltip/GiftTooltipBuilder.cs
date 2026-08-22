@@ -48,7 +48,7 @@ namespace GiftDiscovery.Tooltip
 
         public static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
         {
-            if (!GiftableObjectList.GiftableIds.Contains(obj.QualifiedItemId))
+            if (!GiftableObjectList.GetAllGiftableIds().Contains(obj.QualifiedItemId))
                 return;
 
             var elements = GetTooltip(obj);
@@ -64,7 +64,7 @@ namespace GiftDiscovery.Tooltip
             int configHash = ModEntry.ModConfig.GetHashCode();
             bool menuChanged = ModEntry.MenuStateChanged;
             int toggleVersion = ModEntry.ToggleVersion;
-            int giftVersion = GiftKnowledgeService.GiftVersion;
+            int giftVersion = TasteLearning.GiftVersion;
             var nearbyNPCSet = NPCLocation.GetNearbyNPCNames(ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
 
             bool needsRebuild =

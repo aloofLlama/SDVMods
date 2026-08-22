@@ -114,14 +114,19 @@ namespace HarvestHelper
             // Only run when the player presses F5
             if (e.Button == SButton.F5)
             {
+                string timer = "Buttom Press F5";  // Logs {name} took {ms} ms
+                SDVCommonServices.PerfBegin(timer);
+
                 HarvestInfoBuilder.Reset();
                 Initializer.InitializeAll(ModHelper);
-                ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+
+                SDVCommonServices.PerfEnd(timer, 0, LogHelper.DebugAlert);
             }
 
             if (e.Button == SButton.F7)
             {
-                SDVCommonLog.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Alert);
+                string timer = "Buttom Press F7";  // Logs {name} took {ms} ms
+                SDVCommonServices.PerfBegin(timer);
 
                 ArtisanInfoBuilder.Initialize();
 
@@ -138,7 +143,7 @@ namespace HarvestHelper
                 //     );
                 // }
 
-                SDVCommonLog.Log($"DONE", LogLevel.Alert);
+                SDVCommonServices.PerfEnd(timer, 0, LogHelper.DebugAlert);
 
             }
 

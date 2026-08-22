@@ -7,6 +7,7 @@ using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Menus;
@@ -47,28 +48,20 @@ namespace GiftDiscovery.Tooltip
 
         public static void DrawTooltip(SpriteBatch b, NPC npc)
         {
-            // Social Page
-            if (Game1.activeClickableMenu is GameMenu gm && gm.currentTab == GameMenu.socialTab)
-            {
-                var elements = GetTooltip(npc);
-                if (elements != null)
-                    TooltipRenderer.DrawBottomRight(b, elements);
-                return;
-            }
 
-            // World hover
-            int range = ModEntry.ModConfig.NearbyRangeTilesNPCTooltip;
-            NPC? nearest = NPCLocation.GetClosestNearbyNPC(range);
+            //if (npc is null)
+            //{
+            //    _cachedNPC = null;
+            //    return;
+            //}
 
-            if (nearest is null)
-            {
-                _cachedNPC = null;
-                return;
-            }
+            var elements = GetTooltip(npc);
 
-            var elements2 = GetTooltip(nearest);
-            if (elements2 != null)
-                TooltipRenderer.DrawBottomRight(b, elements2);
+            if (elements != null)
+                TooltipRenderer.DrawBottomRight(b, elements);
+
+            return;
+
         }
 
         public static List<TooltipElement>? GetTooltip(NPC npc)
@@ -76,7 +69,7 @@ namespace GiftDiscovery.Tooltip
             int configHash = ModEntry.ModConfig.GetHashCode();
             bool menuChanged = ModEntry.MenuStateChanged;
             int toggleVersion = ModEntry.ToggleVersion;
-            int giftVersion = GiftKnowledgeService.GiftVersion;
+            int giftVersion = TasteLearning.GiftVersion;
 
             int range = ModEntry.ModConfig.NearbyRangeTilesNPCTooltip;
 
@@ -95,6 +88,7 @@ namespace GiftDiscovery.Tooltip
 
             // Rebuild
             _cachedTooltip = BuildTooltip(npc);
+
             TooltipRenderer.InvalidateSize(_cachedTooltip);
             _cachedNPC = npc;
             _cachedRange = range;
@@ -112,9 +106,14 @@ namespace GiftDiscovery.Tooltip
             int wrapSize = ModEntry.ModConfig.WrapSizeNPC;
             int maxRows = ModEntry.ModConfig.MaxRowsNPC;
 
+            string timer = "Build NPC Tooltip";  // Logs {name} took {ms} ms
+            SDVCommonServices.PerfBegin(timer);
+
             TooltipBuildHelper.AddIfNotNull(list, NPCHeader.Build(npc));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCTasteSegments.Build(npc));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCLocationSegment.Build(npc));
+
+            SDVCommonServices.PerfEnd(timer, npc.displayName, 10);
 
             return list;
         }

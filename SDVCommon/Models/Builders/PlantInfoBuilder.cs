@@ -37,7 +37,7 @@ namespace SDVCommon.Models.Builders
             /*
             foreach (var plant in PlantDatabase.AllPlants)
             {
-                ModEntry.Instance.Monitor.Log($"Seed: {plant.SeedId}", LogLevel.Warn);
+                ModEntry.Instance.Monitor.Log($"Seed: {plant.SeedId}");
             }
             */
 

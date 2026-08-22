@@ -17,8 +17,7 @@ namespace SDVCommon.GameData
             int total = 0;
 
             SDVCommonLog.Log(
-                $"[PlantedHelper] CountPlanted for itemId={itemId}",
-                LogLevel.Info);
+                $"[PlantedHelper] CountPlanted for itemId={itemId}");
 
             bool IsAccessible(GameLocation loc)
             {
@@ -59,8 +58,7 @@ namespace SDVCommon.GameData
                                 if (canonical == itemId)
                                     total++;
                                 SDVCommonLog.Log(
-                                                        $"[PlantedHelper] MATCH CROP in {location.Name}: harvest={harvestId}",
-                                    LogLevel.Info);
+                                                        $"[PlantedHelper] MATCH CROP in {location.Name}: harvest={harvestId}");
                             }
                         }
                     }
@@ -79,8 +77,7 @@ namespace SDVCommon.GameData
                                 {
                                     total++;
                                     SDVCommonLog.Log(
-                                                                $"[PlantedHelper] MATCH FRUIT TREE in {location.Name}: fruit={canonical}",
-                                        LogLevel.Info);
+                                                                $"[PlantedHelper] MATCH FRUIT TREE in {location.Name}: fruit={canonical}");
                                 }
                             }
                         }
@@ -115,14 +112,12 @@ namespace SDVCommon.GameData
                 //                total++; total++;
 
                 //            SDVCommonLog.Log(
-                //                                                    $"[PlantedHelper] MATCH BUSH in {location.Name}: bushId={bushId} canon={canon}",
-                //                            LogLevel.Info);
+                //                                                    $"[PlantedHelper] MATCH BUSH in {location.Name}: bushId={bushId} canon={canon}");
                 //            }
                 //            else
                 //            {
                 //                SDVCommonLog.Log(
-                //                                            $"[PlantedHelper] NO MATCH BUSH in {location.Name}: bushId={bushId} canon={canon} vs target={itemId}",
-                //                    LogLevel.Info);
+                //                                            $"[PlantedHelper] NO MATCH BUSH in {location.Name}: bushId={bushId} canon={canon} vs target={itemId}");
                 //            }
                 //        }
                 //    }
@@ -131,8 +126,7 @@ namespace SDVCommon.GameData
         }
 
             SDVCommonLog.Log(
-                    $"[PlantedHelper] DONE for itemId={itemId}, total={total}",
-                    LogLevel.Info);
+                    $"[PlantedHelper] DONE for itemId={itemId}, total={total}");
 
             return total;
         }

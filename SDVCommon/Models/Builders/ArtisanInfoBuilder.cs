@@ -86,7 +86,7 @@ namespace SDVCommon.Models.Builders
             int outputCount = ResolveOutputCount(output);
 
 
-            SDVCommonLog.Log($"Artisan Builder: {machineName} | {inputName} x{inputCount}   →   {outputName} x{outputCount}", LogHelper.DebugInfo);
+            //SDVCommonLog.Log($"Artisan Builder: {machineName} | {inputName} x{inputCount}   →   {outputName} x{outputCount}", LogHelper.DebugInfo);
 
 
             return new ArtisanInfo

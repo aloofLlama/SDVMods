@@ -13,6 +13,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using StardewValley.GameData.Characters;
+using System.Diagnostics;
 
 
 namespace GiftDiscovery
@@ -46,7 +47,7 @@ namespace GiftDiscovery
 
 
 
-            GiftKnowledgeService.InitializeGlobal(helper);
+            //GiftKnowledgeService.InitializeGlobal(helper);
 
             // Harmony patch for gift detection of modded items
             var harmony = new Harmony(ModManifest.UniqueID);
@@ -114,6 +115,7 @@ namespace GiftDiscovery
             // NPC proximity tooltip (only if not already showing a tooltip for an NPC in the social menu)
             if (drewNPCMenuTooltip == false)
             {
+
                 NPC? nearest = NPCLocation.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
                 if (nearest != null)
                 {
@@ -138,10 +140,16 @@ namespace GiftDiscovery
             ModEntry.IsInMenuTooltip = false;
 
             // NPC proximity tooltip
+            //PERF
+            //SDVCommonLog.Log($"{DateTime.Now:HH:mm:ss} Proximity Check", LogLevel.Warn);
+
             NPC? nearest = NPCLocation.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
             if (nearest != null)
             {
                 NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
+
+                //SDVCommonLog.Log($"Drew Tooltip for {nearest.displayName} in {elapsedMs}", LogLevel.Info);
+
             }
 
             // Gift item tooltip (only if holding a giftable item)
@@ -166,13 +174,14 @@ namespace GiftDiscovery
 
             if (e.Button == SButton.F6)
             {
-                SDVCommonLog.Log($"[{DateTime.Now:HH:mm:ss}]",LogLevel.Alert);
+                string timer = "Buttom Press F6";  // Logs {name} took {ms} ms
+                SDVCommonServices.PerfBegin(timer);
+
+                //SDVCommonLog.TimestampLog(timer,LogLevel.Alert);
                 GiftableNPC.GetAllGiftableNPCs();
-                SDVCommonLog.Log($"Giftable NPCs: {GiftableNPC.GetAllGiftableNPCs().Count()}",LogHelper.DebugOrTrace);
 
-                SDVCommonLog.Log($"DONE", LogLevel.Alert);
-
-
+                SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
+                SDVCommonLog.Log($"Giftable NPCs: {GiftableNPC.GetAllGiftableNPCs().Count()}");
             }
 #endif
 
@@ -182,11 +191,11 @@ namespace GiftDiscovery
 #if DEBUG
             if (e.Button == SButton.F5)
             {
-                Initializer.ResetAll();
-                GiftKnowledgeService.InitializeGlobal(ModHelper);
-                Initializer.InitializeAll(ModHelper);
-                ModEntry.Instance.Monitor.Log($"[{DateTime.Now:HH:mm:ss}]", LogLevel.Warn);
+                SDVCommonLog.Log($"Start Reinitialize", LogHelper.AlertOrTrace);
 
+                Initializer.ResetAll();
+                //GiftKnowledgeService.InitializeGlobal(ModHelper);
+                Initializer.InitializeAll(ModHelper);
             }
 
 #endif

@@ -2,13 +2,17 @@
 using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
+using GiftDiscovery.Services;
+using SDVCommon;
 using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
+using SDVCommon.Services;
 using SDVData;
+using StardewModdingAPI;
 using StardewValley;
 
 namespace GiftDiscovery.Tooltip.NPCSections
@@ -17,6 +21,10 @@ namespace GiftDiscovery.Tooltip.NPCSections
     {
         public static List<TooltipElement> Build(NPC npc)
         {
+            string timer = "Taste Segments";
+            LogLevel logLevel = LogHelper.DebugOrTrace;
+            SDVCommonServices.PerfBegin(timer);
+
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
             int wrapSize = ModEntry.ModConfig.WrapSizeNPC;
             int maxRows = ModEntry.ModConfig.MaxRowsNPC;
@@ -37,6 +45,8 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 AddTaste(list, npc, "Hates", GiftTaste.Hate, mode, wrapSize, maxRows);
             }
 
+            SDVCommonServices.PerfEnd(timer, 10, logLevel);
+
             return list;
         }
 
@@ -49,10 +59,13 @@ namespace GiftDiscovery.Tooltip.NPCSections
             int wrapSize,
             int maxRows)
         {
+            string timer = "Add taste";  // Logs {name} took {ms} ms
+            SDVCommonServices.PerfBegin(timer);
+
             var knownIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, taste, mode);
 
             var items = knownIds
-                .Where(id => GiftableObjectList.GiftableIds.Contains(id))
+                .Where(id => GiftableObjectList.GetAllGiftableIds().Contains(id))
                 .Select(id => ItemRegistry.Create(id))
                 .Where(item => item is not null)
                 .ToList();
@@ -75,6 +88,9 @@ namespace GiftDiscovery.Tooltip.NPCSections
             TooltipBuildHelper.AddSectionWithSeparator(list, () =>
                 BuildNPCTasteSection(label, items, unknownCount, wrapSize, maxRows)
             );
+
+            SDVCommonServices.PerfEnd(timer, $"{taste}", 10);
+
         }
 
         private static void AddTasteSeparatedLoves(
@@ -85,58 +101,61 @@ namespace GiftDiscovery.Tooltip.NPCSections
             int wrapSize,
             int maxRows)
         {
+
+            string timer = "Add taste separated loves";  // Logs {name} took {ms} ms
+            LogLevel logLevel = LogHelper.InfoOrTrace;
+            SDVCommonServices.PerfBegin(timer);
+
+            //// Knowns: Split into regular + universal
             var knownIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode);
 
-            var filteredIds = knownIds
-                .Where(id => GiftableObjectList.GiftableIds.Contains(id));
-
-            var allItems = filteredIds
-                .Where(id => GiftableObjectList.GiftableIds.Contains(id))
+            var knownItems = knownIds
+                .Where(id => GiftableObjectList.GetAllGiftableIds().Contains(id))
                 .Select(id => ItemRegistry.Create(id))
                 .Where(item => item is not null)
                 .ToList();
 
-            // Split into regular + universal
-            var regular = new List<Item>();
-            var universal = new List<Item>();
+            var knownRegular = new List<Item>();
+            var knownUniversal = new List<Item>();
 
-            foreach (var item in allItems)
+            foreach (var item in knownItems)
             {
-                if (GiftType.IsUniversalLove(item.ItemId))
-                    universal.Add(item);
+                if (GiftType.GetUniversalLoveIds().Contains(item.ItemId))
+                    knownUniversal.Add(item);
                 else
-                    regular.Add(item);
+                    knownRegular.Add(item);
             }
 
-            // Sort each group
-            regular = regular
-                .OrderByDescending(i => Inventory.IsInBackpack(i.ItemId))
-                .ThenBy(i => i.DisplayName)
+            // Sort both lists
+            knownRegular = knownRegular
+                .OrderByDescending(item => Inventory.IsInBackpack(item.ItemId))
+                .ThenBy(item => item.DisplayName)
                 .ToList();
 
-            universal = universal
-                .OrderByDescending(i => Inventory.IsInBackpack(i.ItemId))
-                .ThenBy(i => i.DisplayName)
+            knownUniversal = knownUniversal
+                .OrderByDescending(item => Inventory.IsInBackpack(item.ItemId))
+                .ThenBy(item => item.DisplayName)
                 .ToList();
 
-            // Unknowns: split by universal vs regular
-            int unknownRegular = 0;
-            int unknownUniversal = 0;
+            SDVCommonServices.PerfPing(timer, "Known items", 10, logLevel); // name it for what just finished
 
-            foreach (var qualifiedId in LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode))
-            {
-                var ItemId = IdHelper.ToItemId(qualifiedId);
+            // Unknowns: Count regular + universal
+            var unknownIds = LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode);
 
-                if (GiftType.IsUniversalLove(ItemId))
-                    unknownUniversal++;
-                else
-                    unknownRegular++;
-            }
+            int unknownRegular = unknownIds
+                .Where(id => !GiftType.GetUniversalLoveIds().Contains(id))
+                .Count();
+
+            int unknownUniversal = unknownIds
+                .Where(id => GiftType.GetUniversalLoveIds().Contains(id))
+                .Count();
+
+            SDVCommonServices.PerfPing(timer, "Unknown items", 10, logLevel); // name it for what just finished
 
             var segments = new List<InlineSegment>();
 
             // Regular loves
-            foreach (var info in regular)
+            foreach (var info in knownRegular)
                 segments.Add(BuildItemSegment(info));
 
             if (unknownRegular > 0)
@@ -149,8 +168,8 @@ namespace GiftDiscovery.Tooltip.NPCSections
             }
 
             // Separator
-            if ((regular.Count > 0 || unknownRegular > 0) &&
-                (universal.Count > 0 || unknownUniversal > 0))
+            if ((knownRegular.Count > 0 || unknownRegular > 0) &&
+                (knownUniversal.Count > 0 || unknownUniversal > 0))
             {
                 segments.Add(new InlineSegment
                 {
@@ -160,7 +179,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
             }
 
             // Universal loves
-            foreach (var info in universal)
+            foreach (var info in knownUniversal)
                 segments.Add(BuildItemSegment(info));
 
             if (unknownUniversal > 0)
@@ -199,6 +218,10 @@ namespace GiftDiscovery.Tooltip.NPCSections
                     new TooltipElement { InlineSegments = wrapped }
                 };
             });
+
+            SDVCommonServices.PerfPing(timer, "Build segments", 10); // name it for what just finished
+            SDVCommonServices.PerfEnd(timer, 10);
+
         }
 
 

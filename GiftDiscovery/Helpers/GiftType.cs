@@ -1,6 +1,6 @@
 ﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
-using GiftDiscovery.Models.Builders;
+using SDVCommon;
 using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewValley;
@@ -14,46 +14,72 @@ namespace GiftDiscovery.Helpers
 {
     public class GiftType
     {
-        public static bool IsUniversalLove(string itemId)
+        private static HashSet<string>? _universalLoveIds;
+
+        public static HashSet<string> GetUniversalLoveIds()
         {
-            var item = ItemRegistry.Create(itemId);
+            if (_universalLoveIds == null)
+                _universalLoveIds = BuildUniversalLoves();
 
-            // Count all giftable NPCs
-            int totalGiftable = GiftableNPC.GetAllGiftableNPCs().Count();
-
-            if (totalGiftable == 0)
-                return false;
-
-            // Count how many love this item
-            int loveCount = GetLovedBy(item).Count();
-
-            // Universal love = 80% or more
-            return loveCount >= (int)(0.8 * totalGiftable);
+            return _universalLoveIds!;
         }
 
-        // ---------------------------------------------------------
-        // ITEM → NPC (Loves)
-        // ---------------------------------------------------------
-        public static IEnumerable<NPC> GetLovedBy(Item item)
+        public static void Reset()
         {
-            foreach (var npc in GiftableNPC.GetAllGiftableNPCs())
+            _universalLoveIds = null;
+        }
+
+        public static void Initialize()
+        {
+            GetUniversalLoveIds();
+        }
+
+
+        private static HashSet<string> BuildUniversalLoves()
+        {
+            string timer = "Build Universal Loves";
+            LogLevel logLevel = LogHelper.DebugOrTrace;
+            SDVCommonServices.PerfBegin(timer);
+
+            var result = new HashSet<string>();
+
+            var giftableNPCs = GiftableNPC.GetAllGiftableNPCs();
+            var giftableIds = GiftableObjectList.GetAllGiftableIds();
+
+            int totalGiftable = giftableNPCs.Count;
+            int threshold = (int)(0.85 * totalGiftable);
+            int notLoveThreshold = totalGiftable - threshold;
+
+            int cnt = 0;
+
+            foreach (string qualifiedItemId in giftableIds)
             {
-                GiftTaste? taste = null;
+                int loveCount = 0;
+                int notLoveCount = 0;
 
-                try
+                foreach (var npc in giftableNPCs)
                 {
-                    taste = (GiftTaste)npc.getGiftTasteForThisItem(item);
-                }
-                catch
-                {
-                    SDVCommonLog.Log($"Missing Gift Info: {npc.displayName} | {item.DisplayName}",
-                        LogLevel.Warn);
-                    continue;
+                    var taste = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, npc);
+
+                    if (taste == GiftTaste.Love)
+                        loveCount++;
+                    else
+                        notLoveCount++;
+
+                    if (notLoveCount > notLoveThreshold)
+                        break;
                 }
 
-                if (taste == GiftTaste.Love)
-                    yield return npc;
+                if (loveCount >= threshold)
+                {
+                    cnt++;
+                    result.Add(qualifiedItemId);
+                }
             }
+
+            SDVCommonServices.PerfEnd(timer, $"Universal Loves: {cnt}", 0, logLevel);
+
+            return result;
         }
 
 

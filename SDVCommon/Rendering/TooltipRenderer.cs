@@ -186,7 +186,7 @@ namespace SDVCommon.Rendering
             int width,
             int height)
         {
-            //SDVCommonLog.Log($"NEW DRAW", LogHelper.DebugAlert);
+            //SDVCommonLog.Log($"{DateTime.Now:HH:mm:ss} NEW DRAW", LogHelper.DebugAlert);
 
             // Draw background
             IClickableMenu.drawTextureBox(b, x, y, width, height, Color.White);

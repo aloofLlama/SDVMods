@@ -1,74 +1,158 @@
 ﻿using GiftDiscovery.Models;
-using GiftDiscovery.Helpers;
-using SDVCommon.Models.Wrappers;
+using GiftDiscovery.Services;
+using SDVCommon;
+using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewValley;
+using SObject = StardewValley.Object;
 
 
 namespace GiftDiscovery.GameData
 {
     public static class GiftableObjectList
     {
-        private static bool _isInitialized;
+        private static List<SObject>? _giftableObjects;
+        private static HashSet<string>? _giftableIds;
 
-        public static readonly List<StardewValley.Object> AllGiftable = new();
-        public static readonly HashSet<string> GiftableIds = new();
+        public static List<SObject> GetAllGiftableObjects()
+        {
+            if (_giftableObjects == null)
+                BuildGiftableObjectList();
+
+            return _giftableObjects!;
+        }
+
+        public static HashSet<string> GetAllGiftableIds()
+        {
+            if (_giftableIds == null)
+                BuildGiftableObjectList();
+
+            return _giftableIds!;
+        }
+
+
+        public static void Reset()
+        {
+            _giftableObjects = null;
+            _giftableIds = null;
+        }
 
         public static void Initialize()
         {
-            if (_isInitialized)
-                return;
+            GetAllGiftableObjects();
+            GetAllGiftableIds();
+        }
+
+        private static void BuildGiftableObjectList()
+        {
+            string timer = "Build Giftable Object List";
+            LogLevel logLevel = LogHelper.DebugOrTrace;
+            SDVCommonServices.PerfBegin(timer);
+
+            var giftableNPCs = GiftableNPC.GetAllGiftableNPCs();
+
+            _giftableObjects = new List<SObject>();
+            _giftableIds = new HashSet<string>();
+
+            int cnt = 0;
 
             foreach (var (id, data) in Game1.objectData)
             {
-                var obj = ItemRegistry.Create(id) as StardewValley.Object;
-                if (obj == null)
+                cnt++;
+
+                var obj = ItemRegistry.Create(id) as SObject;
+                if (obj == null || !obj.canBeGivenAsGift())
                     continue;
 
-                if (!obj.canBeGivenAsGift())
+                if (id == "434") // Stardrop exclusion
                     continue;
 
-                // Explicit exclusions
-                if (id == "434") // Stardrop is a game object but not a real item to get
-                    continue;
+                bool hasTaste = false;
+                bool hasLoveOrLike = false;
 
-                bool hasLoveOrLike = GiftableNPC.GetAllGiftableNPCs()
-                    .Any(npc =>
+                foreach (var npc in giftableNPCs)
+                {
+                    GiftTaste t;
+
+                    try
                     {
-                        try
-                        {
-                            GiftTaste t = (GiftTaste)npc.getGiftTasteForThisItem(obj);
-                            return t == GiftTaste.Love || t == GiftTaste.Like;
-                        }
-                        catch
-                        {
-                            return false;
-                        }
-                    });
+                        t = (GiftTaste)npc.getGiftTasteForThisItem(obj);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
 
-                if (!hasLoveOrLike)
+                    hasTaste = true;
+
+                    if (t == GiftTaste.Love || t == GiftTaste.Like)
+                    {
+                        hasLoveOrLike = true;
+                        break; // early exit
+                    }
+                }
+
+                if (!hasTaste || !hasLoveOrLike)
                     continue;
 
-                // Add to list
-                AllGiftable.Add(obj);
-
-                // Add to HashSet
-                GiftableIds.Add(obj.QualifiedItemId);
+                _giftableObjects.Add(obj);
+                _giftableIds.Add(obj.QualifiedItemId);
             }
-        }
-        public static void Reset()
-        {
-            _isInitialized = false;
-            AllGiftable.Clear();
-            GiftableIds.Clear();
+
+            SDVCommonServices.PerfEnd(timer, $"Giftable items: {_giftableIds.Count} / {cnt}", 0, logLevel);
+
         }
 
 
-        public static bool IsGiftableObject(StardewValley.Object obj)
+        private static HashSet<string> BuildUniversalLoves()
         {
-            return GiftableObjectList.AllGiftable
-                .Any(o => o.QualifiedItemId == obj.QualifiedItemId);
+            string timer = "Build Universal Loves";
+            LogLevel logLevel = LogHelper.DebugOrTrace;
+            SDVCommonServices.PerfBegin(timer);
+
+            var result = new HashSet<string>();
+
+            var giftableNPCs = GiftableNPC.GetAllGiftableNPCs();
+            var giftableIds = GetAllGiftableIds();
+
+            int totalGiftable = giftableNPCs.Count;
+            int threshold = (int)(0.85 * totalGiftable);
+            int notLoveThreshold = totalGiftable - threshold;
+
+            int cnt = 0;
+
+            foreach (string qualifiedItemId in giftableIds)
+            {
+                int loveCount = 0;
+                int notLoveCount = 0;
+
+                foreach (var npc in giftableNPCs)
+                {
+                    var taste = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, npc);
+
+                    if (taste == GiftTaste.Love)
+                        loveCount++;
+                    else
+                        notLoveCount++;
+
+                    if (notLoveCount > notLoveThreshold)
+                        break;
+                }
+
+                if (loveCount >= threshold)
+                {
+                    cnt++;
+                    result.Add(qualifiedItemId);
+                }
+            }
+
+            SDVCommonServices.PerfEnd(timer, $"Universal Loves: {cnt}", 0, logLevel);
+
+            return result;
         }
+
 
     }
+
 }
+

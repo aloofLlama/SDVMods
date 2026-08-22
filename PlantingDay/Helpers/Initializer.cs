@@ -39,8 +39,7 @@ namespace PlantingDay.Helpers
             CacheForTesting.DumpPlantInfoToJson();
 #endif
 
-            SDVCommonLog.Log($"Plant Database Initialized",
-                LogHelper.DebugOrTrace);
+            SDVCommonLog.Log($"Plant Database Initialized");
             //SDVCommonLog.Log($"Seed icons: {cnt} | Harvest icons: {cnt2}",
             //    LogHelper.DebugOrTrace);
 

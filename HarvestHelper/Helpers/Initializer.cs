@@ -22,8 +22,7 @@ namespace HarvestHelper.Helpers
 #if DEBUG
             CacheForTesting.DumpHarvestInfoToJson();
 #endif
-            SDVCommonLog.Log($"Harvest Database Initialized",
-                LogHelper.DebugOrTrace);
+            SDVCommonLog.Log($"Harvest Database Initialized");
 
 
         }

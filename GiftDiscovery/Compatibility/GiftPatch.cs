@@ -1,8 +1,9 @@
-﻿using StardewValley;
-using HarmonyLib;
-using StardewModdingAPI;
-using GiftDiscovery.Models;
+﻿using GiftDiscovery.Models;
 using GiftDiscovery.Services;
+using HarmonyLib;
+using SDVCommon.Services;
+using StardewModdingAPI;
+using StardewValley;
 
 namespace GiftDiscovery.Compatibility
 {
@@ -23,12 +24,9 @@ namespace GiftDiscovery.Compatibility
             int tasteValue = __instance.getGiftTasteForThisItem(o);
             GiftTaste taste = (GiftTaste)tasteValue;
 
-            ModEntry.Instance.Monitor.Log(
-                $"Learned taste: {npcName} → {itemName} = {taste} | {qualifiedItemId}",
-                LogLevel.Debug
-                );
+            SDVCommonLog.Log($"Learned taste: {npcName} → {itemName} = {taste} | {qualifiedItemId}", LogHelper.Info);
 
-            GiftKnowledgeService.LearnTaste(qualifiedItemId, npcName, taste);
+            TasteLearning.LearnTaste(qualifiedItemId, npcName, taste);
         }
     }
 }

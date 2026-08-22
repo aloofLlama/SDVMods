@@ -90,10 +90,7 @@ namespace SDVCommon.GameData
         {
             string shopName = IdHelper.RemoveModPrefix(shopId);
 
-            SDVCommonLog.Log(
-                $"Fallback vendor mapping hit for {shopId} -> {shopName}",
-                LogHelper.DebugOrTrace
-            );
+            SDVCommonLog.Log($"Fallback vendor mapping hit for {shopId} -> {shopName}");
 
             return shopName;
         }
