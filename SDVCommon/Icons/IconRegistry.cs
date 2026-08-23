@@ -13,7 +13,6 @@ internal static class IconRegistry
         Providers.Add(new ItemIconProvider());
     }
 
-    //TODO Update this to just qId once confident everything else is caught
     public static Icon? GetIcon(string id)
     {
         // Accepts both qualified and unqualified IDs, as ItemRegistry can resolve either

@@ -1,42 +1,45 @@
 ﻿using SDVData;
 using StardewValley;
 using SDVCommon.Models.Builders;
+using SDVCommon.Helpers;
 
 namespace SDVCommon.GameData
 {
     public static class CookingRecipe
     {
-        public static IEnumerable<CookingInfo> GetKnownRecipesUsing(string ingredientId)
+        public static IEnumerable<CookingInfo> GetKnownRecipesUsing(string ingredientQId)
         {
-            return GetRecipesUsing(ingredientId)
+            return GetRecipesUsing(ingredientQId)
                 .Where(r => IsKnown(r));
         }
 
-        public static IEnumerable<CookingInfo> GetUnknownRecipesUsing(string ingredientId)
+        public static IEnumerable<CookingInfo> GetUnknownRecipesUsing(string ingredientQId)
         {
-            return GetRecipesUsing(ingredientId)
+            return GetRecipesUsing(ingredientQId)
                 .Where(r => !IsKnown(r));
         }
 
-        public static IEnumerable<CookingInfo> GetCookedRecipesUsing(string ingredientId)
+        public static IEnumerable<CookingInfo> GetCookedRecipesUsing(string ingredientQId)
         {
-            return GetRecipesUsing(ingredientId)
+            return GetRecipesUsing(ingredientQId)
                 .Where(r => HasCooked(r));
         }
 
-        public static IEnumerable<CookingInfo> GetUncookedRecipesUsing(string ingredientId)
+        public static IEnumerable<CookingInfo> GetUncookedRecipesUsing(string ingredientQId)
         {
-            return GetRecipesUsing(ingredientId)
+            return GetRecipesUsing(ingredientQId)
                 .Where(r => !HasCooked(r));
         }
 
         /// <summary>
         /// Returns all CookingInfo entries whose ingredients include this ingredient.
         /// </summary>
-        private static IEnumerable<CookingInfo> GetRecipesUsing(string ingredientId)
+        private static IEnumerable<CookingInfo> GetRecipesUsing(string ingredientQId)
         {
+            string unqualifiedIngredientId = IdHelper.ToUnqualifiedItemId(ingredientQId);
+
             return CookingInfoBuilder.AllRecipes
-                .Where(r => r.Ingredients.Any(i => i.IngredientId == ingredientId));
+                .Where(r => r.Ingredients.Any(i => i.IngredientId == unqualifiedIngredientId));
         }
 
         private static bool IsKnown(CookingInfo recipe)
