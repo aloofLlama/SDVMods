@@ -56,15 +56,16 @@ namespace GiftDiscovery.GameData
 
             int cnt = 0;
 
-            foreach (var (id, data) in Game1.objectData)
+            foreach (var (unqualifiedId, data) in Game1.objectData)
             {
                 cnt++;
 
-                var obj = ItemRegistry.Create(id) as SObject;
+                var obj = ItemRegistry.Create(unqualifiedId) as SObject;
+
                 if (obj == null || !obj.canBeGivenAsGift())
                     continue;
 
-                if (id == "434") // Stardrop exclusion
+                if (unqualifiedId == "434") // Stardrop exclusion
                     continue;
 
                 bool hasTaste = false;
@@ -121,14 +122,14 @@ namespace GiftDiscovery.GameData
 
             int cnt = 0;
 
-            foreach (string qualifiedItemId in giftableIds)
+            foreach (string qId in giftableIds)
             {
                 int loveCount = 0;
                 int notLoveCount = 0;
 
                 foreach (var npc in giftableNPCs)
                 {
-                    var taste = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, npc);
+                    var taste = TasteMap.GetTasteForNPCItemPair(qId, npc);
 
                     if (taste == GiftTaste.Love)
                         loveCount++;
@@ -142,7 +143,7 @@ namespace GiftDiscovery.GameData
                 if (loveCount >= threshold)
                 {
                     cnt++;
-                    result.Add(qualifiedItemId);
+                    result.Add(qId);
                 }
             }
 

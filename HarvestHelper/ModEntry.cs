@@ -120,7 +120,7 @@ namespace HarvestHelper
                 HarvestInfoBuilder.Reset();
                 Initializer.InitializeAll(ModHelper);
 
-                SDVCommonServices.PerfEnd(timer, 0, LogHelper.DebugAlert);
+                SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
             }
 
             if (e.Button == SButton.F7)
@@ -143,7 +143,7 @@ namespace HarvestHelper
                 //     );
                 // }
 
-                SDVCommonServices.PerfEnd(timer, 0, LogHelper.DebugAlert);
+                SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
 
             }
 

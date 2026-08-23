@@ -19,10 +19,11 @@ namespace SDVCommon.Helpers
     item's type ID and unqualified item ID, like (O)128 for object ID 128.
     */
 
-    /* Where possible, always use unqualified ID (do not have (O) prefix)
-     * Call them: ItemId in general, or HarvestId, SeedId, etc according to context
+    /* Where possible, always use qualified ID. Call it qId (or qHarvestId, qSeedId, etc).
+     * If unqualified must be used (e.g. interacting with gamedata) use unqualifiedId.
      * 
-     * If qualified ID is needed, always call it qualifiedId (or qualifiedItemId, qualifiedSeedId, etc)
+     * TODO the entire codebase is a mess of naming and which ID is used. Switching to qId for the entire
+     * refactor to fix the mess. Pretty sure id and ItemId are actually the same thing.
      */
 
 

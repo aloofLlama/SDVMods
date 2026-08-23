@@ -1,8 +1,9 @@
-﻿using StardewValley;
+﻿using SDVCommon.Helpers;
+using SDVCommon.Services;
+using StardewValley;
 using StardewValley.Buildings;
-using StardewValley.Objects;
 using StardewValley.Locations;
-using SDVCommon.Helpers;
+using StardewValley.Objects;
 
 
 namespace SDVCommon.GameData
@@ -113,13 +114,13 @@ namespace SDVCommon.GameData
         }
 
 
-        public static bool IsInBackpack(string qualifiedId)
+        public static bool IsInBackpack(string qId)
         {
             foreach (var item in Game1.player.Items)
             {
                 if (item is not null &&
                     item.QualifiedItemId
-                        .Equals(qualifiedId, StringComparison.OrdinalIgnoreCase))
+                        .Equals(qId, StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 

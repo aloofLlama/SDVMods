@@ -13,7 +13,7 @@ namespace SDVCommon
 
     SDVCommonServices.PerfEnd(timer, 0, logLevel);
 
-    SDVCommonServices.PerfPing(timer, "pingName", 0, logLevel); // name it for what just finished
+    SDVCommonServices.PerfPing(timer, $"pingName", 0, logLevel); // name it for what just finished
 
  */
 

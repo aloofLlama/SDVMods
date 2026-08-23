@@ -62,16 +62,16 @@ namespace GiftDiscovery.Tooltip.NPCSections
             string timer = "Add taste";  // Logs {name} took {ms} ms
             SDVCommonServices.PerfBegin(timer);
 
-            var knownIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, taste, mode);
+            var knownQIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, taste, mode);
 
-            var items = knownIds
-                .Where(id => GiftableObjectList.GetAllGiftableIds().Contains(id))
-                .Select(id => ItemRegistry.Create(id))
+            var knownItems = knownQIds
+                .Where(qId => GiftableObjectList.GetAllGiftableIds().Contains(qId))
+                .Select(qId => ItemRegistry.Create(qId))
                 .Where(item => item is not null)
                 .ToList();
 
             // Sort: backpack first, then alphabetical
-            items = items
+            knownItems = knownItems
                 .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
                 .ThenBy(item => item.DisplayName)
                 .ToList();
@@ -82,11 +82,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 .Count(); ;
 
             // Skip if nothing to show
-            if (items.Count == 0 && unknownCount == 0)
+            if (knownItems.Count == 0 && unknownCount == 0)
                 return;
 
             TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-                BuildNPCTasteSection(label, items, unknownCount, wrapSize, maxRows)
+                BuildNPCTasteSection(label, knownItems, unknownCount, wrapSize, maxRows)
             );
 
             SDVCommonServices.PerfEnd(timer, $"{taste}", 10);
@@ -107,11 +107,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
             SDVCommonServices.PerfBegin(timer);
 
             //// Knowns: Split into regular + universal
-            var knownIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode);
+            var knownQIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode);
 
-            var knownItems = knownIds
-                .Where(id => GiftableObjectList.GetAllGiftableIds().Contains(id))
-                .Select(id => ItemRegistry.Create(id))
+            var knownItems = knownQIds
+                .Where(qId => GiftableObjectList.GetAllGiftableIds().Contains(qId))
+                .Select(qId => ItemRegistry.Create(qId))
                 .Where(item => item is not null)
                 .ToList();
 
@@ -120,7 +120,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
             foreach (var item in knownItems)
             {
-                if (GiftType.GetUniversalLoveIds().Contains(item.ItemId))
+                if (GiftType.GetUniversalLoveIds().Contains(item.QualifiedItemId))
                     knownUniversal.Add(item);
                 else
                     knownRegular.Add(item);
@@ -128,25 +128,25 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
             // Sort both lists
             knownRegular = knownRegular
-                .OrderByDescending(item => Inventory.IsInBackpack(item.ItemId))
+                .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
                 .ThenBy(item => item.DisplayName)
                 .ToList();
 
             knownUniversal = knownUniversal
-                .OrderByDescending(item => Inventory.IsInBackpack(item.ItemId))
+                .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
                 .ThenBy(item => item.DisplayName)
                 .ToList();
 
             SDVCommonServices.PerfPing(timer, "Known items", 10, logLevel); // name it for what just finished
 
             // Unknowns: Count regular + universal
-            var unknownIds = LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode);
+            var unknownQIds = LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode);
 
-            int unknownRegular = unknownIds
+            int unknownRegular = unknownQIds
                 .Where(id => !GiftType.GetUniversalLoveIds().Contains(id))
                 .Count();
 
-            int unknownUniversal = unknownIds
+            int unknownUniversal = unknownQIds
                 .Where(id => GiftType.GetUniversalLoveIds().Contains(id))
                 .Count();
 
@@ -234,6 +234,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
         {
             var segments = new List<InlineSegment>();
 
+
             foreach (var obj in items)
                 segments.Add(BuildItemSegment(obj));
 
@@ -272,7 +273,8 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
         private static InlineSegment BuildItemSegment(Item item)
         {
-            bool inBackpack = Inventory.IsInBackpack(item.ItemId);
+            string qId = item.QualifiedItemId;
+            bool inBackpack = Inventory.IsInBackpack(qId);
 
             string name = inBackpack ? item.DisplayName : "";
 
@@ -281,7 +283,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
             return new InlineSegment
             {
-                Icon = IconRegistry.GetIcon(item.ItemId),
+                Icon = IconRegistry.GetIcon(qId),
                 Text = name,
                 TextColor = TooltipColors.Normal,
                 Underline = false

@@ -109,6 +109,9 @@ namespace GiftDiscovery.Tooltip
             string timer = "Build NPC Tooltip";  // Logs {name} took {ms} ms
             SDVCommonServices.PerfBegin(timer);
 
+            //* Keep for debug as it marks the start of a new tooltip
+            //SDVCommonServices.PerfPing(timer, $" {npc.displayName}", 0, LogHelper.AlertOrTrace); // name it for what just finished
+
             TooltipBuildHelper.AddIfNotNull(list, NPCHeader.Build(npc));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCTasteSegments.Build(npc));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCLocationSegment.Build(npc));

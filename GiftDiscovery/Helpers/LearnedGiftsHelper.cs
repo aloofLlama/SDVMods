@@ -98,15 +98,15 @@ namespace GiftDiscovery.Helpers
             //LogLevel logLevel = LogHelper.DebugWarn;
             //SDVCommonServices.PerfBegin(timer);
 
-            foreach (string qualifiedId in GiftableObjectList.GetAllGiftableIds())
+            foreach (string qId in GiftableObjectList.GetAllGiftableIds())
             {
 
-                var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedId, npc);
+                var canonical = TasteMap.GetTasteForNPCItemPair(qId, npc);
                 if (canonical != taste)
                     continue;
 
-                if (IsKnown(qualifiedId, npc, mode))
-                    yield return qualifiedId;
+                if (IsKnown(qId, npc, mode))
+                    yield return qId;
             }
 
             //SDVCommonServices.PerfEnd(timer, npc.displayName, 0, logLevel);
@@ -130,14 +130,14 @@ namespace GiftDiscovery.Helpers
 
             foreach (var obj in GiftableObjectList.GetAllGiftableObjects())
             {
-                string qualifiedItemId = obj.QualifiedItemId;
+                string qId = obj.QualifiedItemId;
                 cnt++;
-                var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, npc);
+                var canonical = TasteMap.GetTasteForNPCItemPair(qId, npc);
                 if (canonical != taste)
                     continue;
 
-                if (IsUnknown(qualifiedItemId, npc, mode))
-                    yield return qualifiedItemId;
+                if (IsUnknown(qId, npc, mode))
+                    yield return qId;
             }
             SDVCommonServices.PerfEnd(timer, 10);
         }
