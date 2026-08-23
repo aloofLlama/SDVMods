@@ -13,19 +13,22 @@ namespace SDVCommon.Models.Builders
 {
     public static class ArtisanInfoBuilder
     {
+        private static bool _isInitialized;
+
         private static readonly Dictionary<string, ArtisanInfo> _artisan = new();
 
         public static IEnumerable<ArtisanInfo> AllArtisanGoods => _artisan.Values;
 
         public static void Initialize()
         {
-            _artisan.Clear();
+            if (_isInitialized)
+                return;
 
             var machines = Game1.content.Load<Dictionary<string, MachineData>>("Data/Machines");
 
             foreach (var pair in machines)
             {
-                string machineId = IdHelper.ToItemId(pair.Key);
+                string machineId = IdHelper.ToUnqualifiedItemId(pair.Key);
                 MachineData data = pair.Value;
 
                 if (data.OutputRules == null)
@@ -44,6 +47,7 @@ namespace SDVCommon.Models.Builders
                 }
             }
 
+            _isInitialized = true;
 
             //foreach (var r in _recipes.Values)
             //{
@@ -60,6 +64,11 @@ namespace SDVCommon.Models.Builders
             //}
 
         }
+        public static void Reset()
+        {
+            _isInitialized = false;
+            _artisan.Clear();
+        }
 
         private static ArtisanInfo Build(
             string machineId,
@@ -73,14 +82,14 @@ namespace SDVCommon.Models.Builders
             var trigger = rule.Triggers?.FirstOrDefault();
 
             string inputQualified = trigger?.RequiredItemId ?? "";
-            string inputId = IdHelper.ToItemId(inputQualified);
+            string inputId = IdHelper.ToUnqualifiedItemId(inputQualified);
 
             string inputName = NameHelper.GetObjectName(inputId);
             int inputCount = trigger?.RequiredCount ?? 0;
 
 
             // Output info
-            string outputId = IdHelper.ToItemId(output.ItemId);
+            string outputId = IdHelper.ToUnqualifiedItemId(output.ItemId);
 
             string outputName = NameHelper.GetObjectName(outputId);
             int outputCount = ResolveOutputCount(output);

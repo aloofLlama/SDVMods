@@ -2,7 +2,7 @@
 using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
 using SDVCommon.Services;
-using SDVCommon.Icons;
+using SDVCommon.GameData.Dictionaries;
 using SDVCommon.Models.Builders;
 using StardewModdingAPI;
 
@@ -18,7 +18,7 @@ namespace PlantingDay.Helpers
 
             MonsterDropBuilder.Initialize();
             PlantInfoBuilder.Initialize();
-            HarvestInfoBuilder.Initialize();
+            Harvest.Initialize();
 
             //int cnt = 0;
             //foreach (var plant in PlantInfoBuilder.AllPlants)
@@ -29,14 +29,14 @@ namespace PlantingDay.Helpers
             //}
 
             //int cnt2 = 0;
-            //foreach (var harvest in HarvestInfoBuilder.AllHarvests)
+            //foreach (var harvest in Harvest.AllHarvests)
             //{
             //    IconInitializers.HarvestIcons(harvest);
             //    cnt2++;
             //}
 
 #if DEBUG
-            CacheForTesting.DumpPlantInfoToJson();
+            //CacheForTesting.DumpPlantInfoToJson();
 #endif
 
             SDVCommonLog.Log($"Plant Database Initialized");
@@ -45,6 +45,12 @@ namespace PlantingDay.Helpers
 
         }
 
+        public static void ResetAll()
+        {
+            PlantInfoBuilder.Reset();
+            Harvest.Reset();
+
+        }
 
     }
 }

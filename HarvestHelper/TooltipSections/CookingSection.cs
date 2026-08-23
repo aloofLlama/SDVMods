@@ -15,12 +15,12 @@ namespace HarvestHelper.TooltipSections
         {
             var list = new List<TooltipElement>();
 
-            string harvestId = harvest.HarvestId;
+            string harvestQId = harvest.HarvestQId;
 
-            var known = CookingRecipe.GetKnownRecipesUsing(harvestId).Count();
-            var unknown = CookingRecipe.GetUnknownRecipesUsing(harvestId).Count();
-            var cooked = CookingRecipe.GetCookedRecipesUsing(harvestId).Count();
-            var uncooked = CookingRecipe.GetUncookedRecipesUsing(harvestId).Count();
+            var known = CookingRecipe.GetKnownRecipesUsing(harvestQId).Count();
+            var unknown = CookingRecipe.GetUnknownRecipesUsing(harvestQId).Count();
+            var cooked = CookingRecipe.GetCookedRecipesUsing(harvestQId).Count();
+            var uncooked = CookingRecipe.GetUncookedRecipesUsing(harvestQId).Count();
 
             int total = known + unknown;
 
@@ -31,8 +31,8 @@ namespace HarvestHelper.TooltipSections
                 new[]
                 {
                     BuildAchievementSegment(cooked, total),
-                    BuildKnownRecipeSegment(harvestId, known, unknown),
-                    BuildFridgeQuantity(harvestId)
+                    BuildKnownRecipeSegment(harvestQId, known, unknown),
+                    BuildFridgeQuantity(harvestQId)
                 },
                 x => x
             );
@@ -53,10 +53,10 @@ namespace HarvestHelper.TooltipSections
         {
             var list = new List<TooltipElement>();
 
-            if (harvest.Harvest == null)
+            if (harvest == null)
                 return list;
 
-            int categoryId = harvest.Harvest.Category;
+            int categoryId = harvest.Category;
 
             string category = $"{categoryId}";
 

@@ -16,6 +16,14 @@ namespace GiftDiscovery.Helpers
     {
         private static HashSet<string>? _universalLoveIds;
 
+        public static bool IsUniversalLove(string qId)
+        {
+            if (_universalLoveIds == null)
+                _universalLoveIds = BuildUniversalLoves();
+
+            return _universalLoveIds.Contains(qId);
+        }
+
         public static HashSet<string> GetUniversalLoveIds()
         {
             if (_universalLoveIds == null)
@@ -43,7 +51,7 @@ namespace GiftDiscovery.Helpers
 
             var result = new HashSet<string>();
 
-            var giftableNPCs = GiftableNPC.GetAllGiftableNPCs();
+            var giftableNPCs = GiftableNPCList.GetAllGiftableNPCs();
             var giftableIds = GiftableObjectList.GetAllGiftableIds();
 
             int totalGiftable = giftableNPCs.Count;

@@ -2,18 +2,14 @@
 using GiftDiscovery.Config;
 using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
-using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
 using HarmonyLib;
 using SDVCommon;
 using SDVCommon.GameData;
-using SDVCommon.Models.Builders;
 using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.GameData.Characters;
-using System.Diagnostics;
 
 
 namespace GiftDiscovery
@@ -46,9 +42,6 @@ namespace GiftDiscovery
             helper.Events.GameLoop.UpdateTicked += OnUpdateTicked;
 
 
-
-            //GiftKnowledgeService.InitializeGlobal(helper);
-
             // Harmony patch for gift detection of modded items
             var harmony = new Harmony(ModManifest.UniqueID);
             harmony.Patch(
@@ -74,6 +67,7 @@ namespace GiftDiscovery
                 return;
 
             var hover = HoveredItem.Get();
+
             if (!hover.HasValue)
                 return;
 
@@ -103,12 +97,16 @@ namespace GiftDiscovery
             {
                 // Social Menu
                 case { NPC: not null }:
-                    NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, hover.NPC!);
-                    drewNPCMenuTooltip = true;
+                    if (GiftableNPCList.IsGiftableNPC(hover.NPC))
+                    {
+                        NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, hover.NPC!);
+                        drewNPCMenuTooltip = true;
+                    }
                     break;
 
                 case { Item: StardewValley.Object obj }:
-                    GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+                    if (GiftableObjectList.IsGiftableObject(obj.QualifiedItemId))
+                        GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
                     break;
             }
 
@@ -139,26 +137,21 @@ namespace GiftDiscovery
 
             ModEntry.IsInMenuTooltip = false;
 
-            // NPC proximity tooltip
-            //PERF
-            //SDVCommonLog.Log($"{DateTime.Now:HH:mm:ss} Proximity Check", LogLevel.Warn);
-
+            // NPC proximity tooltip (only for giftable NPCs)
             NPC? nearest = NPCLocation.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
-            if (nearest != null)
+            if (nearest != null && GiftableNPCList.IsGiftableNPC(nearest))
             {
                 NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
-
-                //SDVCommonLog.Log($"Drew Tooltip for {nearest.displayName} in {elapsedMs}", LogLevel.Info);
 
             }
 
             // Gift item tooltip (only if holding a giftable item)
-            if (Game1.player.CurrentItem is StardewValley.Object obj)
+            if (Game1.player.CurrentItem is StardewValley.Object obj &&
+                GiftableObjectList.IsGiftableObject(obj.QualifiedItemId))
             {
                 GiftTooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
             }
         }
-
 
 
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
@@ -174,32 +167,41 @@ namespace GiftDiscovery
 
             if (e.Button == SButton.F6)
             {
-                string timer = "Buttom Press F6";  // Logs {name} took {ms} ms
+                string timer = "Button Press F6";  // Logs {name} took {ms} ms
                 SDVCommonServices.PerfBegin(timer);
+                SDVCommonLog.TimestampLog($"{timer} start", LogHelper.AlertOrTrace);
 
-                //SDVCommonLog.TimestampLog(timer,LogLevel.Alert);
-                GiftableNPC.GetAllGiftableNPCs();
+                // Put debug content here
+                // *
 
-                SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
-                SDVCommonLog.Log($"Giftable NPCs: {GiftableNPC.GetAllGiftableNPCs().Count()}");
+                GameObject.DumpObjectInfo("(O)74");
+
+                // *
+
+                SDVCommonServices.PerfEnd(timer, 0, LogHelper.DebugOrTrace);
             }
-#endif
-
-
 
             // Reinitialize for debug
-#if DEBUG
             if (e.Button == SButton.F5)
             {
-                SDVCommonLog.Log($"Start Reinitialize", LogHelper.AlertOrTrace);
+                bool GDReinit = false;
 
-                Initializer.ResetAll();
-                //GiftKnowledgeService.InitializeGlobal(ModHelper);
-                Initializer.InitializeAll(ModHelper);
+                if (GDReinit == true)
+                {
+                    string timer = "Reinitialize";  // Logs {name} took {ms} ms
+                    SDVCommonServices.PerfBegin(timer);
+                    SDVCommonLog.TimestampLog($"{timer} start", LogHelper.AlertOrTrace);
+
+                    Initializer.ResetAll();
+                    Initializer.InitializeAll(ModHelper);
+
+                    SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
+                }
             }
 
 #endif
         }
+
 
         public static bool MenuStateChanged { get; private set; }
         private static bool _lastHudVisible;

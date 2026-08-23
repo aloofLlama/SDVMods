@@ -3,11 +3,11 @@ using GiftDiscovery.Models;
 using GiftDiscovery.Helpers;
 using StardewValley;
 
-namespace GiftDiscovery.Models.Builders
+namespace GiftDiscovery.GameData
 {
-    internal class NPCGiftStatusBuilder
+    public  class NPCGiftStatus
     {
-        public static NPCGiftStatus GiftStatus(NPC npc)
+        public static NPCGiftStatusData GiftStatus(NPC npc)
         {
             var name = npc.Name;
 
@@ -29,7 +29,7 @@ namespace GiftDiscovery.Models.Builders
             bool canGiftToday = isAvailable && !MaxGiftsReached(npc);
             bool isMaxHeart = isAvailable && isMet && HeartStatus.IsMaxHearts(npc);
 
-            return new NPCGiftStatus
+            return new NPCGiftStatusData
             {
                 NPC = npc,
                 Name = name,
@@ -47,7 +47,7 @@ namespace GiftDiscovery.Models.Builders
             if (npc == null)
                 return false;
 
-            var c = NPCGiftStatusBuilder.GiftStatus(npc);
+            var c = NPCGiftStatus.GiftStatus(npc);
             return c.IsUnmet;
         }
 

@@ -31,8 +31,8 @@ namespace SDVCommon.Models.Builders
                     // Is the shop entry a seed
                     // -----------------------------
                     bool directMatch =
-                        IdHelper.ToItemId(entry.ItemId)
-                            .Equals(IdHelper.ToItemId(itemId), StringComparison.OrdinalIgnoreCase);
+                        IdHelper.ToUnqualifiedItemId(entry.ItemId)
+                            .Equals(IdHelper.ToUnqualifiedItemId(itemId), StringComparison.OrdinalIgnoreCase);
 
                     bool wildcardMatch =
                         entry.ItemId == "ALL_ITEMS (O)" &&
@@ -85,17 +85,19 @@ namespace SDVCommon.Models.Builders
         // --------------------------------------
         private static int? GetGoldPrice(string itemId, ShopData shop, ShopItemData entry)
         {
-            var item = ItemRegistry.Create(IdHelper.ToItemId(itemId));
-            if (item == null)
+            var obj = GameObject.GetObjectInstance(itemId);
+
+            //var item = ItemRegistry.Create(IdHelper.ToUnqualifiedItemId(itemId));
+            if (obj == null)
                 return null;
 
-            var output = new ItemQueryResult(item);
+            var output = new ItemQueryResult(obj);
 
             float value = ShopBuilder.GetBasePrice(
                 output,
                 shop,
                 entry,
-                item,
+                obj,
                 outOfSeasonPrice: false,
                 useObjectDataPrice: entry.UseObjectDataPrice
             );
@@ -108,7 +110,7 @@ namespace SDVCommon.Models.Builders
                     shop.PriceModifiers,
                     shop.PriceModifierMode,
                     null, null,
-                    item,
+                    obj,
                     null,
                     Utility.CreateDaySaveRandom()
                 );
@@ -122,7 +124,7 @@ namespace SDVCommon.Models.Builders
                     entry.PriceModifiers,
                     entry.PriceModifierMode,
                     null, null,
-                    item,
+                    obj,
                     null,
                     Utility.CreateDaySaveRandom()
                 );

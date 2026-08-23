@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using SDVCommon.Models.Builders;
+using SDVCommon.GameData.Dictionaries;
 
 namespace HarvestHelper.Helpers
 {
@@ -8,7 +8,7 @@ namespace HarvestHelper.Helpers
         public static void DumpHarvestInfoToJson()
         {
             // Serialize ONLY the data portion
-            var dataOnly = HarvestInfoBuilder.AllHarvests
+            var dataOnly = Harvest.GetAllHarvests
                 //.Select(h => h)
                 .ToList();
 

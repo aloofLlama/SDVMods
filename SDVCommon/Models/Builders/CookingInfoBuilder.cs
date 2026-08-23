@@ -9,13 +9,16 @@ namespace SDVCommon.Models.Builders
 {
     public static class CookingInfoBuilder
     {
+        private static bool _isInitialized;
+
         private static readonly Dictionary<string, CookingInfo> _recipes = new();
 
         public static IEnumerable<CookingInfo> AllRecipes => _recipes.Values;
 
         public static void Initialize()
         {
-            _recipes.Clear();
+            if (_isInitialized)
+                return;
 
             foreach (var pair in CraftingRecipe.cookingRecipes)
             {
@@ -26,6 +29,7 @@ namespace SDVCommon.Models.Builders
                 var info = Build(recipe);
                 _recipes[recipeName] = info;
             }
+            _isInitialized = true;
 
             //foreach (var r in _recipes.Values)
             //{
@@ -42,6 +46,11 @@ namespace SDVCommon.Models.Builders
             //}
 
         }
+        public static void Reset()
+        {
+            _isInitialized = false;
+            _recipes.Clear();
+        }
 
         public static CookingInfo? Lookup(string recipeName)
         {
@@ -56,7 +65,7 @@ namespace SDVCommon.Models.Builders
             {
                 RecipeName = recipe.name,
                 OutputDisplayName = recipe.DisplayName,
-                OutputId = IdHelper.ToItemId(recipe.itemToProduce.First()),
+                OutputId = IdHelper.ToUnqualifiedItemId(recipe.itemToProduce.First()),
                 OutputCount = recipe.numberProducedPerCraft,
                 Ingredients = BuildIngredients(recipe)
             };

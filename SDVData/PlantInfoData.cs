@@ -8,7 +8,7 @@
     {
         public string SeedId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
         public string HarvestId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
-        public ItemInfo? Seed { get; set; } = new ItemInfo();
+        public ObjectInfo? Seed { get; set; } = new ObjectInfo();
 
 
         public PlantType PlantType { get; set; }

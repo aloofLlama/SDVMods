@@ -1,6 +1,7 @@
 ﻿using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using SDVCommon;
+using SDVCommon.GameData;
 using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewValley;
@@ -30,6 +31,13 @@ namespace GiftDiscovery.GameData
             return _giftableIds!;
         }
 
+        public static bool IsGiftableObject(string qId)
+        {
+            if (_giftableIds == null)
+                BuildGiftableObjectList();
+
+            return _giftableIds!.Contains(qId);
+        }
 
         public static void Reset()
         {
@@ -49,18 +57,19 @@ namespace GiftDiscovery.GameData
             LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
-            var giftableNPCs = GiftableNPC.GetAllGiftableNPCs();
+            var giftableNPCs = GiftableNPCList.GetAllGiftableNPCs();
 
             _giftableObjects = new List<SObject>();
             _giftableIds = new HashSet<string>();
 
             int cnt = 0;
 
-            foreach (var (unqualifiedId, data) in Game1.objectData)
+            foreach (var (unqualifiedId, objData) in Game1.objectData) // Game1 returns unqualified Id
             {
                 cnt++;
 
-                var obj = ItemRegistry.Create(unqualifiedId) as SObject;
+                var obj = GameObject.GetObjectInstance(unqualifiedId);
+                //var obj = ItemRegistry.Create(unqualifiedId) as SObject;
 
                 if (obj == null || !obj.canBeGivenAsGift())
                     continue;
@@ -113,8 +122,9 @@ namespace GiftDiscovery.GameData
 
             var result = new HashSet<string>();
 
-            var giftableNPCs = GiftableNPC.GetAllGiftableNPCs();
-            var giftableIds = GetAllGiftableIds();
+            var giftableNPCs = GiftableNPCList.
+                GetAllGiftableNPCs();
+            var giftableQIds = GetAllGiftableIds();
 
             int totalGiftable = giftableNPCs.Count;
             int threshold = (int)(0.85 * totalGiftable);
@@ -122,7 +132,7 @@ namespace GiftDiscovery.GameData
 
             int cnt = 0;
 
-            foreach (string qId in giftableIds)
+            foreach (string qId in giftableQIds)
             {
                 int loveCount = 0;
                 int notLoveCount = 0;

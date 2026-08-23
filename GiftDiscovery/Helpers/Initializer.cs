@@ -48,7 +48,7 @@ namespace GiftDiscovery.Helpers
             TasteLearning.Reset();
             TasteMap.Reset();
             GiftType.Reset();
-            GiftableNPC.Reset();
+            GiftableNPCList.Reset();
 
             GiftTooltipBuilder.Reset();
             NPCGiftTooltipBuilder.Reset();

@@ -2,7 +2,7 @@
 using PlantingDay.Helpers;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Models.Wrappers;
-using SDVCommon.Models.Builders;
+using SDVCommon.GameData.Dictionaries;
 using SDVCommon.Helpers;
 
 namespace PlantingDay.ToolTip_Sections
@@ -17,7 +17,7 @@ namespace PlantingDay.ToolTip_Sections
                 return list;
 
             var harvestId = plant.Data.HarvestId;
-            var harvest = HarvestInfoBuilder.LookupFromKey(harvestId);
+            var harvest = Harvest.GetHarvestInfo(harvestId);
 
             if (harvest == null)
                 return list;
@@ -26,7 +26,7 @@ namespace PlantingDay.ToolTip_Sections
 
             list.Add(new TooltipElement
             {
-                Icon = IconRegistry.GetIcon(harvest.HarvestId),
+                Icon = IconRegistry.GetIcon(harvest.HarvestQId),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.BasicPrice),
                     harvestPrice)
             });

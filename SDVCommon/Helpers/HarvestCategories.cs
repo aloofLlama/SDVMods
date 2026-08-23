@@ -11,13 +11,13 @@ namespace SDVCommon.Helpers
 {
     internal class HarvestCategories
     {
-        public static bool IsDesiredCategory(ObjectData obj)
+        public static bool IsDesiredCategory(ObjectData objData)
         {
             // Ignore items with no sell price
-            if (obj.Price <= 0)
+            if (objData.Price <= 0)
                 return false;
 
-            int category = obj.Category;
+            int category = objData.Category;
 
 
             // CATEGORY-BASED MATCHES
@@ -60,16 +60,16 @@ namespace SDVCommon.Helpers
             // CATEGORY 0 SPECIAL CASES
             if (category == 0)
             {
-                if (obj.Type == "Arch" || // Artifacts (Bone Flute, Ancient Doll, Golden Mask, etc.)
-                     obj.Type == "Basic" || //vinegar, pearl, etc
-                     obj.Type == "0" || //SDV Expanded items e.g. trasurechest, grampleton chicken
-                     obj.Type == "Fish" //algae, seaweed, cave jelly, etc (not actual fish, which are category 1
+                if (objData.Type == "Arch" || // Artifacts (Bone Flute, Ancient Doll, Golden Mask, etc.)
+                     objData.Type == "Basic" || //vinegar, pearl, etc
+                     objData.Type == "0" || //SDV Expanded items e.g. trasurechest, grampleton chicken
+                     objData.Type == "Fish" //algae, seaweed, cave jelly, etc (not actual fish, which are category 1
                      )
                     return true;
             }
 
             // acorn, maple seed, coffee, brick floor, torches
-            if (obj.Type == "Crafting")
+            if (objData.Type == "Crafting")
                 return true;
 
 

@@ -10,19 +10,19 @@ namespace HarvestHelper.TooltipSections
 {
     public static class ShipmentSection
     {
-        public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
+        public static List<TooltipElement> Build(HarvestInfo harvest)
         {
             var list = new List<TooltipElement>();
-            string id = harvest.HarvestId;
+            string harvestQId = harvest.HarvestQId;
 
-            bool needsOne = AchievementHelper.NeedsShippedOne(harvest);
-            bool needsPoly = AchievementHelper.NeedsPolyCultureShipped(harvest);
-            bool needsMono = AchievementHelper.NeedsMonoCultureShipped(harvest);
+            bool needsOne = Achievement.NeedsShippedOne(harvest);
+            bool needsPoly = Achievement.NeedsPolyCultureShipped(harvest);
+            bool needsMono = Achievement.NeedsMonoCultureShipped(harvest);
 
             if (!needsOne && !needsPoly && !needsMono)
                 return list;
 
-            Game1.player.basicShipped.TryGetValue(id, out int count);
+            Game1.player.basicShipped.TryGetValue(harvestQId, out int count);
 
             // Build the text items
             var items = new List<string>();

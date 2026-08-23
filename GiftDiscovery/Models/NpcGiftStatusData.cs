@@ -2,7 +2,7 @@
 
 namespace GiftDiscovery.Models
 {
-    public class NPCGiftStatus
+    public class NPCGiftStatusData
     {
         public NPC NPC { get; set; } = null!;
         public string Name { get; set; } = "";

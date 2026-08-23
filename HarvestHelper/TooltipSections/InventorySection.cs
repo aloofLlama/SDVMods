@@ -12,12 +12,12 @@ namespace HarvestHelper.TooltipSections
         public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
-            string harvestId = harvest.HarvestId;
-            int owned = Inventory.CountOwned(IdHelper.ToQualifiedId(harvestId));
+            string harvestQId = harvest.HarvestQId;
+            int owned = Inventory.CountOwned(harvestQId);
 
             list.Add(new TooltipElement
             {
-                Icon = IconRegistry.GetIcon(harvest.HarvestId),
+                Icon = IconRegistry.GetIcon(harvestQId),
                 Text = string.Format(ModEntry.ModHelper.Translation.Get(TooltipKeys.Owned),
                     owned)
             });

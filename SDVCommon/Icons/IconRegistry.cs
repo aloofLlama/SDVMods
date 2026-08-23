@@ -1,5 +1,6 @@
-﻿using SDVCommon.Icons;
-using SDVCommon.Helpers;
+﻿using SDVCommon.Helpers;
+using SDVCommon.Icons;
+using System.Security.Cryptography;
 
 internal static class IconRegistry
 {
@@ -12,25 +13,26 @@ internal static class IconRegistry
         Providers.Add(new ItemIconProvider());
     }
 
+    //TODO Update this to just qId once confident everything else is caught
     public static Icon? GetIcon(string id)
     {
         // Accepts both qualified and unqualified IDs, as ItemRegistry can resolve either
-        id = IdHelper.ToQualifiedId(id);
+        string qId = IdHelper.ToQualifiedId(id);
 
-        if (Cache.TryGetValue(id, out var cached))
+        if (Cache.TryGetValue(qId, out var cached))
             return cached;
 
         foreach (var provider in Providers)
         {
-            if (provider.CanHandle(id))
+            if (provider.CanHandle(qId))
             {
-                var icon = provider.LoadIcon(id);
-                Cache[id] = icon;
+                var icon = provider.LoadIcon(qId);
+                Cache[qId] = icon;
                 return icon;
             }
         }
 
-        Cache[id] = null;
+        Cache[qId] = null;
         return null;
     }
 }

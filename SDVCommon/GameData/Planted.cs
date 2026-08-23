@@ -12,7 +12,7 @@ namespace SDVCommon.GameData
     {
         public static int CountPlanted(string id)
         {
-            string itemId = IdHelper.ToItemId(id);
+            string itemId = IdHelper.ToUnqualifiedItemId(id);
 
             int total = 0;
 
@@ -53,7 +53,7 @@ namespace SDVCommon.GameData
                             if (data != null)
                             {
                                 string harvestId = data.QualifiedItemId; // e.g. "(O)Cornucopia_Shiitake"
-                                string canonical = IdHelper.ToItemId(harvestId);
+                                string canonical = IdHelper.ToUnqualifiedItemId(harvestId);
 
                                 if (canonical == itemId)
                                     total++;
@@ -71,7 +71,7 @@ namespace SDVCommon.GameData
                             if (fruitEntry != null)
                             {
                                 string fruitId = fruitEntry.ItemId;
-                                string canonical = IdHelper.ToItemId(fruitId);
+                                string canonical = IdHelper.ToUnqualifiedItemId(fruitId);
 
                                 if (canonical == itemId)
                                 {

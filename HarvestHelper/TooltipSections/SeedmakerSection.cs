@@ -15,7 +15,7 @@ namespace HarvestHelper.TooltipSections
         public static List<TooltipElement> Build(HarvestInfo harvest, StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
-            string harvestId = harvest.HarvestId;
+            string harvestQId = harvest.HarvestQId;
 
             // TODOAdd about only displaying if seed cost is half harvest price
 
@@ -29,12 +29,12 @@ namespace HarvestHelper.TooltipSections
 
 
             //var seedData = IdHelper.GetSeedDataForHarvest(harvestId);
-            string? seedId = harvest.SeedId;
+            string? seedQId = harvest.SeedQId;
 
-            if (seedId == null)
+            if (seedQId == null)
                 return list;
 
-            var seedObject = GameObject.FromObject(seedId);
+            var seedObject = GameObject.GetObjectInfo(seedQId);
 
             //don't show if seedmaker banned
             if (seedObject?.ContextTags?.Contains("seedmaker_banned") == true)
@@ -46,9 +46,9 @@ namespace HarvestHelper.TooltipSections
             int owned = 0;
 
 
-            if (seedId != null)
+            if (seedQId != null)
             {
-                owned = Inventory.CountOwned(IdHelper.ToQualifiedId(seedId));
+                owned = Inventory.CountOwned(seedQId);
             }
 
             list.Add(new TooltipElement

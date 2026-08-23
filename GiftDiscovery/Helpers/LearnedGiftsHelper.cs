@@ -1,6 +1,5 @@
 ﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
-using GiftDiscovery.Models.Builders;
 using GiftDiscovery.Services;
 using SDVCommon;
 using SDVCommon.Helpers;
@@ -25,10 +24,10 @@ namespace GiftDiscovery.Helpers
             GiftTaste taste,
             TasteSourceMode mode)
         {
-            return GiftableNPC.GetAllGiftableNPCs()
-                .Select(NPCGiftStatusBuilder.GiftStatus)
+            return GiftableNPCList.GetAllGiftableNPCs()
+                .Select(NPCGiftStatus.GiftStatus)
                 //.Where(c => c.IsAvailable) //with this included e.g. Sandy wont show up until met
-                .Where(c =>
+                .Where((c) =>
                 {
                     var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                     if (canonical != taste)
@@ -36,8 +35,8 @@ namespace GiftDiscovery.Helpers
 
                     return IsKnown(qualifiedItemId, c.NPC, mode);
                 })
-                .Select(c => c.NPC)
-                .OrderBy(npc => npc.displayName);
+                .Select((c) => c.NPC)
+                .OrderBy(( npc) => npc.displayName);
         }
 
         // ---------------------------------------------------------
@@ -51,8 +50,8 @@ namespace GiftDiscovery.Helpers
             if (mode == TasteSourceMode.All)
                 yield break;
 
-            foreach (var c in GiftableNPC.GetAllGiftableNPCs()
-                .Select(NPCGiftStatusBuilder.GiftStatus))
+            foreach (var c in GiftableNPCList.GetAllGiftableNPCs()
+                .Select(GameData.NPCGiftStatus.GiftStatus))
             {
                 var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                 if (canonical != taste)
@@ -73,8 +72,8 @@ namespace GiftDiscovery.Helpers
             if (mode == TasteSourceMode.All)
                 yield break;
 
-            foreach (var c in GiftableNPC.GetAllGiftableNPCs()
-                .Select(NPCGiftStatusBuilder.GiftStatus))
+            foreach (var c in GiftableNPCList.GetAllGiftableNPCs()
+                .Select(GameData.NPCGiftStatus.GiftStatus))
             {
                 var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                 if (canonical == null)

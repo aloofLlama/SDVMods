@@ -19,7 +19,7 @@ namespace SDVCommon.Helpers
     item's type ID and unqualified item ID, like (O)128 for object ID 128.
     */
 
-    /* Where possible, always use qualified ID. Call it qId (or qHarvestId, qSeedId, etc).
+    /* Where possible, always use qualified ID. Call it qId (or HarvestQId, SeedQId, etc).
      * If unqualified must be used (e.g. interacting with gamedata) use unqualifiedId.
      * 
      * TODO the entire codebase is a mess of naming and which ID is used. Switching to qId for the entire
@@ -29,24 +29,26 @@ namespace SDVCommon.Helpers
 
     public static class IdHelper
     {
-        //Removes the (O) or (BC) prefix from Ids
-        public static string ToItemId(string? raw)
+        // Removes the (O) or (BC) prefix from Ids
+        // Accepts both qualified and unqualified IDs, as ItemRegistry can resolve either
+        public static string ToUnqualifiedItemId(string? id)
         {
-            if (string.IsNullOrEmpty(raw))
+            if (string.IsNullOrEmpty(id))
                 return string.Empty;
 
             // (O)StringId → StringId
-            if (raw.StartsWith("(O)"))
-                return raw.Substring(3);
+            if (id.StartsWith("(O)"))
+                return id.Substring(3);
 
             // (BC)StringId → StringId
-            if (raw.StartsWith("(BC)"))
-                return raw.Substring(4);
+            if (id.StartsWith("(BC)"))
+                return id.Substring(4);
 
-            return raw;
+            return id;
         }
 
-        //Adds the correct prefix to Ids (usually (O))
+        // Adds the correct prefix to Ids (usually (O))
+        // Accepts both qualified and unqualified IDs
         public static string ToQualifiedId(string id)
         {
             if (string.IsNullOrEmpty(id))
@@ -58,58 +60,61 @@ namespace SDVCommon.Helpers
 
             // Resolve via ItemRegistry
             var data = ItemRegistry.GetData(id);
-            //SDVCommonLog.Log($"ToQualifiedId: {id} → {data?.QualifiedItemId}", LogHelper.DebugInfo);
+            //SDVCommonLog.TempLog($"ToQualifiedId: {id} → {data?.QualifiedItemId}", LogHelper.DebugInfo);
             return data?.QualifiedItemId ?? id;
         }
 
-        public static string GetModPrefix(string itemId)
+        // Returns the mod prefix for an item (e.g. "skellady.SBVCP" for "skellady.SBVCP_SunberrySeeds")
+        public static string GetModPrefix(string qId)
         {
-            if (IdHelper.IsVanillaStardew(itemId))
+            if (IdHelper.IsVanillaStardew(qId))
                 return "StardewValley";
 
+            // TODO check that nature in the valley works with qId
             // Special case: Nature in the Valley uses dot notation
-            if (itemId.StartsWith("NatInValley.", StringComparison.OrdinalIgnoreCase))
+            if (qId.StartsWith("NatInValley.", StringComparison.OrdinalIgnoreCase))
                 return "NatInValley";
 
             // Extract mod prefix
-            if (itemId.Contains('_'))
-                return itemId.Split('_')[0];
+            if (qId.Contains('_'))
+                return qId.Split('_')[0];
 
             // Fallback: treat entire string as prefix
-            return itemId;
+            return qId;
         }
 
-        public static string RemoveModPrefix(string itemId)
+        // Removes the mod prefix for an item (e.g. returns AsterShop for Lumisteria.MtVapius_AsterShop)
+        // Works with any type of id that has the mod prefix qualified, unqualified, shop name, etc.
+        public static string RemoveModPrefix(string id)
         {
-            if (string.IsNullOrWhiteSpace(itemId))
-                return itemId;
+            if (string.IsNullOrWhiteSpace(id))
+                return id;
 
             // General nomenclature is modder.ModName_Name (e.g. skellady.SBVCP_SunberrySeeds or skellady.SBVCP_AriMarket)
-            if (itemId.Contains('_'))
-                return itemId[(itemId.IndexOf('_') + 1)..];
+            if (id.Contains('_'))
+                return id[(id.IndexOf('_') + 1)..];
 
             // No prefix found
-            return itemId;
+            return id;
         }
 
 
 
         //Checks if the ID is one that belongs to the basegame (aka not a mod)
-        public static bool IsVanillaStardew(string itemId)
+        private static bool IsVanillaStardew(string qId)
         {
-            if (string.IsNullOrWhiteSpace(itemId))
+            if (string.IsNullOrWhiteSpace(qId))
                 return false;
 
-            string id = ToItemId(itemId);
+            string unqualifiedId = ToUnqualifiedItemId(qId);
 
             // Numeric IDs → always vanilla
-            if (int.TryParse(id, out _))
+            if (int.TryParse(unqualifiedId, out _))
                 return true;
 
-            // Verified vanilla string IDs
-            if (VanillaStringIds.Contains(id))
+            // Check against list of non-numberic vanilla IDs (e.g. "FarAwayStone", "DeluxeBait", etc.)
+            if (VanillaStringIds.Contains(unqualifiedId))
                 return true;
-
 
             return false;
         }

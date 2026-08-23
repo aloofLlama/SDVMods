@@ -1,5 +1,6 @@
 ﻿using SDVCommon.Compatibility;
 using SDVCommon.Helpers;
+using SDVCommon.Services;
 using SDVData;
 using StardewValley;
 using StardewValley.GameData.Crops;
@@ -10,27 +11,66 @@ namespace SDVCommon.GameData
 {
     public class GameObject
     {
-        public static ItemInfo? FromObject(string objectId)
+        // Accepts both qualified and unqualified IDs
+        public static StardewValley.Object? GetObjectInstance(string id)
         {
-            if (!Game1.objectData.TryGetValue(objectId, out var obj))
+            string unqualifiedId = IdHelper.ToUnqualifiedItemId(id);
+
+            // Ensure the object exists in objectData
+            if (!Game1.objectData.ContainsKey(unqualifiedId))
+                return null;
+
+            // Create a real SObject instance
+            return new StardewValley.Object(unqualifiedId, 1);
+        }
+
+        public static ObjectInfo? GetObjectInfo(string qId)
+        {
+            string unqualifiedId = IdHelper.ToUnqualifiedItemId(qId);
+            var obj = GetObjectInstance(qId);
+
+            if (!Game1.objectData.TryGetValue(unqualifiedId, out var objData) ||
+                obj == null)
             {
                     return null;
             }
+            
 
-            var objInstance = new StardewValley.Object(objectId, 1);
-
-            return new ItemInfo
+            return new ObjectInfo
             {
-                Id = objectId,
-                DisplayName = objInstance.DisplayName,
-                //Description = obj.Description,
-                //Price = obj.Price,
-                Category = obj.Category,
-                //Edibility = obj.Edibility,
-                Type = obj.Type,
-                ContextTags = obj.ContextTags?.ToList()
+                QId = qId,
+                DisplayName = obj.DisplayName,
+                //Description = objData.Description,
+                Price = objData.Price,
+                Category = objData.Category,
+                Edibility = objData.Edibility,
+                Type = objData.Type,
+                ContextTags = objData.ContextTags?.ToList()
             };
         }
+
+#if DEBUG
+        // Used for debugging purposes. Displays all the ObjectInfo data for a qId
+        public static void DumpObjectInfo(string qId)
+        {
+            var objInfo = GameObject.GetObjectInfo(qId);
+
+            if (objInfo != null)
+            {
+                SDVCommonLog.Log(   // is flagged as #if DEBUG
+                    $"QId: {objInfo.QId}\n" +
+                    $"DisplayName: {objInfo.DisplayName}\n" +
+                    $"Price: {objInfo.Price}\n" +
+                    $"Category: {objInfo.Category}\n" +
+                    $"Edibility: {objInfo.Edibility}\n" +
+                    $"Type: {objInfo.Type}\n" +
+                    $"Tags: {string.Join(", ", objInfo.ContextTags ?? new List<string>())}",
+                    LogHelper.InfoOrTrace);
+            }
+            else
+                SDVCommonLog.TempLog("null", LogHelper.InfoOrTrace);
+        }
+#endif
 
     }
 }

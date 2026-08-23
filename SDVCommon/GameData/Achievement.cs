@@ -1,10 +1,11 @@
-﻿using SDVData;
+﻿using SDVCommon.Helpers;
+using SDVData;
 using StardewValley;
 
 
 namespace SDVCommon.GameData
 {
-    public static class AchievementHelper
+    public static class Achievement
     {
         //Determines whether the player has completed an achievement
 
@@ -18,7 +19,9 @@ namespace SDVCommon.GameData
             if (!harvest.ShipOne)
                 return false; // not eligible
 
-            if (Game1.player.basicShipped.TryGetValue(harvest.HarvestId, out int count))
+            string unqualifiedHarvestId = IdHelper.ToUnqualifiedItemId(harvest.HarvestQId);
+            
+            if (Game1.player.basicShipped.TryGetValue(unqualifiedHarvestId, out int count))
                 return count == 0;
 
             return true; // never shipped
@@ -42,7 +45,9 @@ namespace SDVCommon.GameData
             if (!harvest.ShipPolyCulture)
                 return false; // not eligible
 
-            if (Game1.player.basicShipped.TryGetValue(harvest.HarvestId, out int count))
+            string unqualifiedHarvestId = IdHelper.ToUnqualifiedItemId(harvest.HarvestQId);
+
+            if (Game1.player.basicShipped.TryGetValue(unqualifiedHarvestId, out int count))
                 return count < 15;
 
             return true; // never shipped

@@ -12,7 +12,6 @@ using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using StardewValley.Objects;
 
 
 namespace HarvestHelper
@@ -23,9 +22,6 @@ namespace HarvestHelper
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
 
-        private StardewValley.Object? _cachedObj;
-        private List<TooltipElement>? _cachedTooltip;
-
         public override void Entry(IModHelper helper)
         {
             Instance = this;
@@ -33,10 +29,10 @@ namespace HarvestHelper
             ModEntry.ModMonitor = base.Monitor;
 
             SDVCommonServices.Initialize(helper, Monitor);
+            //ModConfig = helper.ReadConfig<ModConfig>();
 
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
-
             helper.Events.Input.ButtonPressed += OnButtonPressed;
 
             // Initialize shared gift knowledge
@@ -51,13 +47,16 @@ namespace HarvestHelper
 
         }
 
+        private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
+        {
+            //GMCMIntegration.Register(ModHelper, ModManifest);
+        }
 
 
         private void OnSaveLoaded(object? sender, SaveLoadedEventArgs e)
         {
             Initializer.InitializeAll(ModHelper);
         }
-
 
 
         [EventPriority(EventPriority.Low - 1)]
@@ -72,56 +71,41 @@ namespace HarvestHelper
             if (hover.Item is not StardewValley.Object obj)
                 return;
 
-            //skip recipes and big crafting
-            if (obj.IsRecipe ||
-                obj.Category == StardewValley.Object.BigCraftableCategory ||
-                obj is Furniture ||
-                obj is Wallpaper)
-                return;
+            TooltipBuilder.DrawTooltip(e.SpriteBatch, obj);
+
+            ////skip recipes and big crafting
+            //if (obj.IsRecipe ||
+            //    obj.Category == StardewValley.Object.BigCraftableCategory ||
+            //    obj is Furniture ||
+            //    obj is Wallpaper)
+            //    return;
 
             // Only rebuild when hovered item changes
-            if (!ReferenceEquals(_cachedObj, obj))
-            {
-                _cachedObj = obj;
+            //if (!ReferenceEquals(_cachedObj, obj))
+            //{
+            //    _cachedObj = obj;
 
-                string itemId = obj.ItemId;
+            //    string qId = obj.QualifiedItemId;
 
-                var harvest = HarvestInfoBuilder.LookupFromKey(itemId);
+            //    var harvest = Harvest.LookupFromKey(qId);
 
-                if (harvest is null)
-                {
-                    _cachedTooltip = null;
-                    return;
-                }
+            //    if (harvest is null)
+            //    {
+            //        _cachedTooltip = null;
+            //        return;
+            //    }
 
-                if (!Game1.objectData.TryGetValue(itemId, out var data))
-                {
-                    _cachedTooltip = null;
-                    return;
-                }
-
-                _cachedTooltip = TooltipBuilder.BuildTooltip(harvest, obj);
-            }
+            //    _cachedTooltip = TooltipBuilder.BuildTooltip(harvest, obj);
+            //}
             //Temp move above cursor to work with both HH and PD same time on seed items that are both
             //TooltipRenderer.DrawLeftOfCursor(e.SpriteBatch, elements);
-            if (_cachedTooltip != null)
-                TooltipRenderer.DrawLeftandAboveCursor(e.SpriteBatch, _cachedTooltip);
+            //if (_cachedTooltip != null)
+            //    TooltipRenderer.DrawLeftandAboveCursor(e.SpriteBatch, _cachedTooltip);
         }
 
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
 #if DEBUG
-            // Only run when the player presses F5
-            if (e.Button == SButton.F5)
-            {
-                string timer = "Buttom Press F5";  // Logs {name} took {ms} ms
-                SDVCommonServices.PerfBegin(timer);
-
-                HarvestInfoBuilder.Reset();
-                Initializer.InitializeAll(ModHelper);
-
-                SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
-            }
 
             if (e.Button == SButton.F7)
             {
@@ -146,6 +130,26 @@ namespace HarvestHelper
                 SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
 
             }
+
+            // Reinitialize for debug
+            if (e.Button == SButton.F5)
+            {
+                bool HHReinit = true;
+
+                if (HHReinit == true)
+                {
+                    string timer = "Reinitialize";  // Logs {name} took {ms} ms
+                    SDVCommonServices.PerfBegin(timer);
+                    SDVCommonLog.TimestampLog($"{timer} start", LogHelper.AlertOrTrace);
+
+                    Initializer.ResetAll();
+                    Initializer.InitializeAll(ModHelper);
+
+                    SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
+
+                }
+            }
+
 
             //KEEP Debug to output desired database variable from a list
             //foreach (var plant in PlantInfoBuilder.AllPlants)

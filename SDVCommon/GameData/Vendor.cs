@@ -86,6 +86,8 @@ namespace SDVCommon.GameData
             };
         }
 
+        // Removes the mod prefix from the shopId and logs a fallback mapping hit.
+        // Used for unknown vendors that don't have a specific mapping.
         private static string FallbackVendorName(string shopId)
         {
             string shopName = IdHelper.RemoveModPrefix(shopId);
@@ -153,11 +155,13 @@ namespace SDVCommon.GameData
             if (!entry.PerItemCondition.Contains("ITEM_CONTEXT_TAG", StringComparison.OrdinalIgnoreCase))
                 return false;
 
-            Item item = ItemRegistry.Create(IdHelper.ToItemId(itemId));
-            if (item == null)
+            var obj = GameObject.GetObjectInstance(itemId);
+
+            //Item item = ItemRegistry.Create(IdHelper.ToUnqualifiedItemId(itemId));
+            if (obj == null)
                 return false;
 
-            var tags = item.GetContextTags();
+            var tags = obj.GetContextTags();
 
             var rules = entry.PerItemCondition
                 .Split(',')
@@ -206,8 +210,8 @@ namespace SDVCommon.GameData
                     if (part.Contains("ITEM_ID Target"))
                     {
                         var target = part.Split(' ', StringSplitOptions.RemoveEmptyEntries).Last();
-                        if (IdHelper.ToItemId(itemId)
-                                .Equals(IdHelper.ToItemId(target), StringComparison.OrdinalIgnoreCase))
+                        if (IdHelper.ToUnqualifiedItemId(itemId)
+                                .Equals(IdHelper.ToUnqualifiedItemId(target), StringComparison.OrdinalIgnoreCase))
                             return true;
                     }
                 }
@@ -241,8 +245,8 @@ namespace SDVCommon.GameData
             foreach (var p in parts)
             {
                 string candidate = p.Trim();
-                if (IdHelper.ToItemId(candidate)
-                        .Equals(IdHelper.ToItemId(itemId), StringComparison.OrdinalIgnoreCase))
+                if (IdHelper.ToUnqualifiedItemId(candidate)
+                        .Equals(IdHelper.ToUnqualifiedItemId(itemId), StringComparison.OrdinalIgnoreCase))
                     return true;
             }
 

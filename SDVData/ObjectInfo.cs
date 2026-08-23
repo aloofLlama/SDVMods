@@ -1,8 +1,11 @@
 ﻿namespace SDVData
 {
-    public class ItemInfo
+    // Object info from the game
+    // See: https://stardewvalleywiki.com/Modding:Objects
+    // The game key's on unqualified Ids, but we use qualified Ids otherwise the info returns other item type results
+    public class ObjectInfo
     {
-        public string Id { get; set; } = ""; //unqualified ID (do not have (O) prefix)
+        public string QId { get; set; } = "";
         public string DisplayName { get; set; } = "";
         public string Description { get; set; } = "";
         public string Type { get; set; } = ""; // e.g. Crafting, Fish, Cooking, Seeds, Ring 

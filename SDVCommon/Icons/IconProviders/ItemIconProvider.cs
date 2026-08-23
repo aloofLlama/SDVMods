@@ -1,9 +1,10 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SDVCommon.GameData;
 using SDVCommon.Icons;
 using StardewValley;
-using StardewValley.Objects;
 using StardewValley.ItemTypeDefinitions;
+using StardewValley.Objects;
 
 public class ItemIconProvider : IIconProvider
 {
@@ -40,9 +41,11 @@ public class ItemIconProvider : IIconProvider
     {
         try
         {
-            Item? item = ItemRegistry.Create(id);
+            var obj = GameObject.GetObjectInstance(id);
 
-            if (item is ColoredObject colored)
+            //Item? item = ItemRegistry.Create(id);
+
+            if (obj is ColoredObject colored)
                 return colored.color.Value;
 
             return Color.White;

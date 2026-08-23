@@ -48,13 +48,6 @@ namespace GiftDiscovery.Tooltip
 
         public static void DrawTooltip(SpriteBatch b, NPC npc)
         {
-
-            //if (npc is null)
-            //{
-            //    _cachedNPC = null;
-            //    return;
-            //}
-
             var elements = GetTooltip(npc);
 
             if (elements != null)

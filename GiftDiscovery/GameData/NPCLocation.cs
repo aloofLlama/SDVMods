@@ -1,5 +1,4 @@
 ﻿using GiftDiscovery.Compatibility;
-using GiftDiscovery.Models.Builders;
 using Microsoft.Xna.Framework;
 using SDVCommon.Services;
 using StardewValley;
@@ -24,7 +23,7 @@ namespace GiftDiscovery.GameData
             var playerTile = Game1.player.Tile;
             var location = Game1.currentLocation;
 
-            return GiftableNPC.GetAllGiftableNPCs()
+            return GiftableNPCList.GetAllGiftableNPCs()
                 .Where(npc =>
                     npc.currentLocation == location &&
                     Vector2.Distance(npc.Tile, playerTile) <= range)
@@ -55,7 +54,7 @@ namespace GiftDiscovery.GameData
             NPC? closest = null;
             float bestDist = float.MaxValue;
 
-            foreach (var npc in GiftableNPC.GetAllGiftableNPCs())
+            foreach (var npc in GiftableNPCList.GetAllGiftableNPCs())
             {
                 // filter by location
                 if (npc.currentLocation != Game1.currentLocation)

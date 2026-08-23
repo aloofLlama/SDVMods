@@ -4,6 +4,8 @@ using SDVCommon.GameData;
 using SDVCommon.Helpers;
 using SDVCommon.Services;
 using SDVCommon.Models.Builders;
+using SDVCommon.GameData.Dictionaries;
+using HarvestHelper.Services;
 using StardewModdingAPI;
 
 namespace HarvestHelper.Helpers
@@ -14,18 +16,30 @@ namespace HarvestHelper.Helpers
         {
             //TooltipIcons.Initialize();
             ModSourceHelper.Initialize(helper);
-            GameDataHelper.BuildHarvestToSeedMap(); //must be before harvestinfobuilder
-            HarvestInfoBuilder.Initialize();
+            SeedHarvestMap.Initialize();
+
+            Harvest.Initialize();
             CookingInfoBuilder.Initialize();
             ArtisanInfoBuilder.Initialize();
 
+            TooltipBuilder.Initialize();
+
 #if DEBUG
-            CacheForTesting.DumpHarvestInfoToJson();
+            // TODO: disabled during the ID fixing, needs fixed
+            //CacheForTesting.DumpHarvestInfoToJson();
 #endif
             SDVCommonLog.Log($"Harvest Database Initialized");
 
 
         }
+        public static void ResetAll()
+        {
+            SeedHarvestMap.Reset();
+            Harvest.Reset();
+            CookingInfoBuilder.Reset();
+            ArtisanInfoBuilder.Reset();
 
+            TooltipBuilder.Reset();
+        }
     }
 }

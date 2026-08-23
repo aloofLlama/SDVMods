@@ -19,7 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)gamedata\ArtisanRules.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\NPCGameData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTOREconomicsHelper.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTORGameDataHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameData\SeedHarvestMap.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ModSourceHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)helpers\NameHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)icons\IconExtensions.cs" />
@@ -44,7 +44,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)GameData\CookingRecipe.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\CookingInfoBuilder.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)OBSGift\GiftKnowledgeServiceOLD.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Models\Builders\HarvestInfoBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)GameData\Dictionaries\Harvest.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\HoveredItem.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\Tooltip\TooltipBuildHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Icons\IconRegistry.cs" />
@@ -61,6 +61,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)services\ReferenceEqualityComparer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)GameData\Dictionaries\" />
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\Tooltip\" />
     <Folder Include="$(MSBuildThisFileDirectory)Models\Builders\" />
     <Folder Include="$(MSBuildThisFileDirectory)Models\Tooltip\" />

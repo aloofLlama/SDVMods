@@ -14,9 +14,9 @@ namespace SDVCommon.Compatibility
             _helper = helper;
         }
 
-        public static string GetModSource(string itemId)
+        public static string GetModSource(string qId)
         {
-            string prefix = IdHelper.GetModPrefix(itemId);
+            string prefix = IdHelper.GetModPrefix(qId);
 
             if (DataOverrides.ModSource.TryGetValue(prefix, out string? overrideName)
                 && overrideName is not null)

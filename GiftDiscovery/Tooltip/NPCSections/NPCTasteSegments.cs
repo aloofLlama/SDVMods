@@ -11,9 +11,9 @@ using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Services;
-using SDVData;
 using StardewModdingAPI;
 using StardewValley;
+using SObject = StardewValley.Object;
 
 namespace GiftDiscovery.Tooltip.NPCSections
 {
@@ -65,15 +65,16 @@ namespace GiftDiscovery.Tooltip.NPCSections
             var knownQIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, taste, mode);
 
             var knownItems = knownQIds
-                .Where(qId => GiftableObjectList.GetAllGiftableIds().Contains(qId))
-                .Select(qId => ItemRegistry.Create(qId))
-                .Where(item => item is not null)
+                .Where(qId => GiftableObjectList.IsGiftableObject(qId))
+                .Select(qId => GameObject.GetObjectInstance(qId))
+                .Where(obj => obj is not null)
+                .Cast<SObject>()
                 .ToList();
 
             // Sort: backpack first, then alphabetical
             knownItems = knownItems
-                .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
-                .ThenBy(item => item.DisplayName)
+                .OrderByDescending(obj => Inventory.IsInBackpack(obj.QualifiedItemId))
+                .ThenBy(obj => obj.DisplayName)
                 .ToList();
 
             // Unknown count
@@ -110,20 +111,21 @@ namespace GiftDiscovery.Tooltip.NPCSections
             var knownQIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode);
 
             var knownItems = knownQIds
-                .Where(qId => GiftableObjectList.GetAllGiftableIds().Contains(qId))
-                .Select(qId => ItemRegistry.Create(qId))
-                .Where(item => item is not null)
+                .Where(qId => GiftableObjectList.IsGiftableObject(qId))
+                .Select(qId => GameObject.GetObjectInstance(qId))
+                .Where(obj => obj is not null)
+                .Cast<SObject>()
                 .ToList();
 
             var knownRegular = new List<Item>();
             var knownUniversal = new List<Item>();
 
-            foreach (var item in knownItems)
+            foreach (var obj in knownItems)
             {
-                if (GiftType.GetUniversalLoveIds().Contains(item.QualifiedItemId))
-                    knownUniversal.Add(item);
+                if (GiftType.IsUniversalLove(obj.QualifiedItemId))
+                    knownUniversal.Add(obj);
                 else
-                    knownRegular.Add(item);
+                    knownRegular.Add(obj);
             }
 
             // Sort both lists
@@ -143,11 +145,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
             var unknownQIds = LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode);
 
             int unknownRegular = unknownQIds
-                .Where(id => !GiftType.GetUniversalLoveIds().Contains(id))
+                .Where(qId => !GiftType.IsUniversalLove(qId))
                 .Count();
 
             int unknownUniversal = unknownQIds
-                .Where(id => GiftType.GetUniversalLoveIds().Contains(id))
+                .Where(qId => GiftType.IsUniversalLove(qId))
                 .Count();
 
             SDVCommonServices.PerfPing(timer, "Unknown items", 10, logLevel); // name it for what just finished
@@ -227,7 +229,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
         private static List<TooltipElement> BuildNPCTasteSection(
             string label,
-            List<Item> items,
+            List<SObject> objects,
             int unknownCount,
             int wrapSize,
             int maxRows)
@@ -235,7 +237,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
             var segments = new List<InlineSegment>();
 
 
-            foreach (var obj in items)
+            foreach (var obj in objects)
                 segments.Add(BuildItemSegment(obj));
 
             // Unknown count

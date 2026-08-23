@@ -14,10 +14,10 @@ namespace SDVCommon.Helpers
             if (string.IsNullOrEmpty(itemId))
                 return string.Empty;
 
-            var itemInfo = GameObject.FromObject(itemId);
+            var objInfo = GameObject.GetObjectInfo(itemId);
 
-            if (itemInfo != null)
-                return itemInfo.DisplayName;
+            if (objInfo != null)
+                return objInfo.DisplayName;
 
             return itemId;
 

@@ -4,24 +4,31 @@ namespace SDVCommon.Services
 {
     /* LOG TEMPLATES
      * 
-     * Debug and Release
-
-        SDVCommonLog.Log($"", LogHelper.DebugOrTrace);
+     * Debug which changes to trace upon release
+        SDVCommonLog.Log($"", LogHelper.AlertOrTrace);
 
         SDVCommonLog.Log($"", LogHelper.WarnOrTrace);
 
-     * Debug Only
+        SDVCommonLog.Log($"", LogHelper.InfoOrTrace);
 
-        //Purple
-        SDVCommonLog.Log($"", LogHelper.DebugAlert);
+        SDVCommonLog.Log($"", LogHelper.DebugOrTrace);
 
-        //yellow
+
+     * Same for Debug and Release
+
+        // yellow
         SDVCommonLog.Log($"", LogHelper.Warn);
 
-
+        // white
         SDVCommonLog.Log($"", LogHelper.Info);
 
+        // grey
         SDVCommonLog.Log($"", LogHelper.Debug);
+
+    * Helpful logging functions
+    
+        //Displays all the ObjectInfo data for a qId
+        GameObject.DumpObjectInfo("(O)74");
 
     */
 
@@ -32,19 +39,19 @@ namespace SDVCommon.Services
             SDVCommonServices.Monitor?.Log(message, LogHelper.DebugOrTrace);
         }
 
-        public static void Log(string message, LogLevel level = LogLevel.Debug)
+        public static void Log(string message, LogLevel level)
         {
             SDVCommonServices.Monitor?.Log(message, level);
         }
 
         // Same as Log except it is easier to find and remove when finished.
-        public static void TempLog(string message, LogLevel level = LogLevel.Debug)
+        public static void TempLog(string message, LogLevel level)
         {
             SDVCommonServices.Monitor?.Log(message, level);
         }
 
 
-        public static void TimestampLog(string message, LogLevel level = LogLevel.Debug)
+        public static void TimestampLog(string message, LogLevel level)
         {
             string ts = DateTime.Now.ToString("HH:mm:ss.fff"); // includes milliseconds
             SDVCommonServices.Monitor?.Log($"[{ts}] {message}", level);

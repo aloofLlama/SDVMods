@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace SDVData
 {
     public class HarvestInfo
     {
-        public string HarvestId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
+        public string HarvestQId { get; set; } = "";
         public string DisplayName { get; set; } = "";
-        public string? SeedId { get; set; } = ""; //unqualified ID (do not have (O) prefix)
-        public ItemInfo? Harvest { get; set; } = new ItemInfo();
+        public string? SeedQId { get; set; } = "";
+        public int Category { get; set; } //e.g. seeds, vegetable,fruit
+
+        //public ObjectInfo? Harvest { get; set; } = new ObjectInfo();
         public string ModSource { get; set; } = ""; 
 
 

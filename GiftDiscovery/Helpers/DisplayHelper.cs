@@ -1,6 +1,5 @@
 ﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
-using GiftDiscovery.Models.Builders;
 using Microsoft.Xna.Framework;
 using SDVCommon.Helpers.Tooltip;
 using SDVData;
@@ -19,7 +18,7 @@ namespace GiftDiscovery.Helpers
 
         public static Color GetNPCNameColor(NPC npc)
         {
-            NPCGiftStatus status = NPCGiftStatusBuilder.GiftStatus(npc);
+            NPCGiftStatusData status = NPCGiftStatus.GiftStatus(npc);
 
             if (ModEntry.ModConfig.DeemphasizeAlreadyGifted &&
                 !status.CanGiftToday)
