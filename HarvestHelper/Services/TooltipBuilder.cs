@@ -2,11 +2,13 @@
 using HarvestHelper.TooltipSections;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SDVCommon.GameData;
+using SDVCommon.GameData.Dictionaries;
 using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
-using SDVCommon.GameData.Dictionaries;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
+using SDVCommon.Services;
 using SObject = StardewValley.Object;
 
 namespace HarvestHelper.Services
@@ -17,6 +19,8 @@ namespace HarvestHelper.Services
 
         private static List<TooltipElement>? _cachedTooltip;
         private static string? _cachedHarvestQId;
+        private static int? _cachedHarvestQuality;
+
 
         public static void Initialize()
         {
@@ -31,6 +35,7 @@ namespace HarvestHelper.Services
         {
             _cachedTooltip = null;
             _cachedHarvestQId = null;
+            _cachedHarvestQuality = null;
         }
 
 
@@ -46,10 +51,12 @@ namespace HarvestHelper.Services
         public static List<TooltipElement>? GetTooltip(SObject obj)
         {
             string qId = obj.QualifiedItemId;
+            int quality = obj.Quality;
 
             bool needsRebuild =
                 _cachedTooltip == null ||
-                qId != _cachedHarvestQId;
+                qId != _cachedHarvestQId ||
+                quality != _cachedHarvestQuality;
 
             if (!needsRebuild)
                 return _cachedTooltip;
@@ -57,6 +64,7 @@ namespace HarvestHelper.Services
             _cachedTooltip = BuildTooltip(obj);
             TooltipRenderer.InvalidateSize(_cachedTooltip);
             _cachedHarvestQId = qId;
+            _cachedHarvestQuality = quality;
 
             return _cachedTooltip;
         }
@@ -68,9 +76,6 @@ namespace HarvestHelper.Services
             string qId = obj.QualifiedItemId;
             var harvest = Harvest.GetHarvestInfo(qId);
 
-            //string tempuQid = obj.ItemId;
-            //var harvest = Harvest.LookupFromKey(tempuQid);
-
             if (harvest == null)
                 return list;
 
@@ -79,7 +84,7 @@ namespace HarvestHelper.Services
             TooltipBuildHelper.AddSectionWithSeparator(list, () => GiftLovesSection.Build(obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => ShipmentSection.Build(harvest));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.BuildSpecific(harvest));
-            TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.BuildGeneric(harvest));
+             TooltipBuildHelper.AddSectionWithSeparator(list, () => CookingSection.BuildGeneric(harvest, obj));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => SeedmakerSection.Build(harvest, obj));
             return list;
         }

@@ -104,8 +104,6 @@ namespace SDVCommon.GameData
         }
         private static NPC? GetNPCFromSocialPage()
         {
-            //PERF - this takes basically no time
-
             if (Game1.activeClickableMenu is not GameMenu gm)
                 return null;
 

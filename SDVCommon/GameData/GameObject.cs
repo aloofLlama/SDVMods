@@ -1,10 +1,12 @@
 ﻿using SDVCommon.Compatibility;
+using SDVCommon.GameData.Dictionaries;
 using SDVCommon.Helpers;
 using SDVCommon.Services;
 using SDVData;
 using StardewValley;
 using StardewValley.GameData.Crops;
 using StardewValley.GameData.Objects;
+using System.Runtime.InteropServices;
 
 
 namespace SDVCommon.GameData
@@ -12,7 +14,7 @@ namespace SDVCommon.GameData
     public class GameObject
     {
         // Accepts both qualified and unqualified IDs
-        public static StardewValley.Object? GetObjectInstance(string id)
+        public static StardewValley.Object? GetObjectInstance(string id, int quality = 0)
         {
             string unqualifiedId = IdHelper.ToUnqualifiedItemId(id);
 
@@ -21,7 +23,7 @@ namespace SDVCommon.GameData
                 return null;
 
             // Create a real SObject instance
-            return new StardewValley.Object(unqualifiedId, 1);
+            return new StardewValley.Object(unqualifiedId, 1, false, -1, quality);
         }
 
         public static ObjectInfo? GetObjectInfo(string qId)
@@ -49,6 +51,14 @@ namespace SDVCommon.GameData
             };
         }
 
+        // Quality is 0 for normal, 1 for silver, 2 for gold, 4 for iridium
+        public static int GetSellPrice(string qId, int quality = 0)
+        {
+            var obj = GameObject.GetObjectInstance(qId, quality);
+            return obj?.sellToStorePrice() ?? 0;
+        }
+
+
 #if DEBUG
         // Used for debugging purposes. Displays all the ObjectInfo data for a qId
         public static void DumpObjectInfo(string qId)
@@ -68,7 +78,7 @@ namespace SDVCommon.GameData
                     LogHelper.InfoOrTrace);
             }
             else
-                SDVCommonLog.TempLog("null", LogHelper.InfoOrTrace);
+                SDVCommonLog.Log("null", LogHelper.InfoOrTrace); // is flagged as #if DEBUG
         }
 #endif
 

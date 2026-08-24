@@ -3,7 +3,9 @@ using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
+using SDVCommon.Services;
 using SDVData;
+using StardewValley.SpecialOrders.Objectives;
 
 
 namespace HarvestHelper.TooltipSections
@@ -49,7 +51,7 @@ namespace HarvestHelper.TooltipSections
         }
 
         //Cooking section using the ingredient category (e.g. Any egg)
-        public static List<TooltipElement> BuildGeneric(HarvestInfo harvest)
+        public static List<TooltipElement> BuildGeneric(HarvestInfo harvest, StardewValley.Object obj)
         {
             var list = new List<TooltipElement>();
 
@@ -57,8 +59,12 @@ namespace HarvestHelper.TooltipSections
                 return list;
 
             int categoryId = harvest.Category;
-
             string category = $"{categoryId}";
+            int harvestPrice = obj.sellToStorePrice();
+
+            // Only show generic if the price is below the price thresholds
+            if (harvestPrice > EconomicsHelper.GetCookingByCategoryThresholdPrice(harvest.Category))
+                return list;
 
             var known = CookingRecipe.GetKnownRecipesUsing(category).Count();
             var unknown = CookingRecipe.GetUnknownRecipesUsing(category).Count();

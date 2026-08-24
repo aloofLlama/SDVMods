@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using HarvestHelper.Compatibility;
+using HarvestHelper.Config;
 using HarvestHelper.Helpers;
 using HarvestHelper.Services;
 using SDVCommon;
@@ -21,6 +22,8 @@ namespace HarvestHelper
         public static ModEntry Instance { get; private set; } = null!;
         public static IModHelper ModHelper { get; private set; } = null!;
         public static IMonitor ModMonitor { get; private set; } = null!;
+        public static ModConfig ModConfig { get; internal set; } = null!;
+
 
         public override void Entry(IModHelper helper)
         {
@@ -29,8 +32,9 @@ namespace HarvestHelper
             ModEntry.ModMonitor = base.Monitor;
 
             SDVCommonServices.Initialize(helper, Monitor);
-            //ModConfig = helper.ReadConfig<ModConfig>();
+            ModConfig = helper.ReadConfig<ModConfig>();
 
+            helper.Events.GameLoop.GameLaunched += OnGameLaunched;
             helper.Events.GameLoop.SaveLoaded += OnSaveLoaded;
             helper.Events.Display.RenderedActiveMenu += OnRenderedActiveMenu;
             helper.Events.Input.ButtonPressed += OnButtonPressed;
@@ -49,7 +53,7 @@ namespace HarvestHelper
 
         private void OnGameLaunched(object? sender, GameLaunchedEventArgs e)
         {
-            //GMCMIntegration.Register(ModHelper, ModManifest);
+            GMCMIntegration.Register(ModHelper, ModManifest);
         }
 
 

@@ -22,7 +22,7 @@ namespace PlantingDay.ToolTip_Sections
             if (harvest == null)
                 return list;
 
-            int harvestPrice = EconomicsHelper.GetHarvestSellPriceFromSeed(plant.Data.SeedId);
+            int harvestPrice = REFACTOREconomicsHelper.GetHarvestSellPriceFromSeed(plant.Data.SeedId);
 
             list.Add(new TooltipElement
             {

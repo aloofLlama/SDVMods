@@ -47,9 +47,6 @@ namespace GiftDiscovery.GameData
 
         public static NPC? GetClosestNearbyNPC(int rangeTiles)
         {
-            //PERF - this runs a lot
-            //SDVCommonLog.Log($"{DateTime.Now:HH:mm:ss} Get Nearby NPC", LogLevel.Warn);
-
             Vector2 playerTile = Game1.player.Tile;
             NPC? closest = null;
             float bestDist = float.MaxValue;
@@ -69,8 +66,6 @@ namespace GiftDiscovery.GameData
                     closest = npc;
                 }
             }
-
-            //SDVCommonLog.Log($"{DateTime.Now:HH:mm:ss} Nearby Done {closest}", LogLevel.Info);
 
             return closest;
         }

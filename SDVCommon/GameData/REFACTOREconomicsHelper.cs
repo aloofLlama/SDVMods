@@ -3,7 +3,7 @@ using SDVCommon.GameData;
 
 namespace SDVCommon.Helpers
 {
-    public static class EconomicsHelper
+    public static class REFACTOREconomicsHelper
     {
         public static int GetHarvestSellPriceFromSeed(string seedQId)
         {
@@ -16,6 +16,7 @@ namespace SDVCommon.Helpers
 
             return harvest?.sellToStorePrice() ?? 0;
         }
+
 
     }
 }
