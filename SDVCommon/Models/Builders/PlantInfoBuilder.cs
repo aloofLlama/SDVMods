@@ -64,7 +64,7 @@ namespace SDVCommon.Models.Builders
                 var data = new PlantInfoData
                 {
                     SeedId = seedId,
-                    HarvestId = cropData.HarvestItemId ?? "",
+                    HarvestId = IdHelper.ToQualifiedId(cropData.HarvestItemId ?? ""),
                     PlantType = PlantType.Crop,
 
                     Seasons = cropData.Seasons?
