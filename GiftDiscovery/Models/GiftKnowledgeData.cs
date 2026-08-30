@@ -2,7 +2,7 @@
 {
     public class GiftKnowledgeData
     {
-        // ItemId → NPCName → GiftTaste
+        // QualifiedItemId → NPCName → GiftTaste
         public Dictionary<string, Dictionary<string, string>> KnownTastes { get; set; }
             = new();
     }

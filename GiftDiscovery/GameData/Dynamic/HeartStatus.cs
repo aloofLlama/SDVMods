@@ -1,27 +1,18 @@
 ﻿using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GiftDiscovery.Helpers
+namespace GiftDiscovery.GameData.Dynamic
 {
     internal class HeartStatus
     {
-        public static bool IsMaxHearts(NPC npc)
+        internal static bool IsMaxHearts(NPC npc)
         {
-            // get friendship entry
-            if (!Game1.player.friendshipData.TryGetValue(npc.Name, out Friendship f))
-                return false;
-
+            int currentHearts = GetCurrentHearts(npc);
             int maxHearts = GetMaxHearts(npc);
-            int maxPoints = maxHearts * 250;
 
-            return f.Points >= maxPoints;
+            return currentHearts >= maxHearts;
         }
 
-        public static int GetCurrentHearts(NPC npc)
+        internal static int GetCurrentHearts(NPC npc)
         {
             if (!Game1.player.friendshipData.TryGetValue(npc.Name, out Friendship f))
                 return 0;
@@ -29,7 +20,7 @@ namespace GiftDiscovery.Helpers
             return f.Points / 250;
         }
 
-        public static int GetMaxHearts(NPC npc)
+        internal static int GetMaxHearts(NPC npc)
         {
             // cannot socialize → 0
             if (!npc.CanSocialize)

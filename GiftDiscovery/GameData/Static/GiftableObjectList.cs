@@ -12,7 +12,7 @@ namespace GiftDiscovery.GameData.Static
     internal static class GiftableObjectList
     {
         private static List<SObject>? _giftableObjects;
-        private static HashSet<string>? _giftableIds;
+        private static HashSet<string>? _giftableQIds;
         private static bool _isInitialized;
 
         internal static List<SObject> GetAllGiftableObjects()
@@ -24,13 +24,13 @@ namespace GiftDiscovery.GameData.Static
         internal static HashSet<string> GetAllGiftableIds()
         {
             EnsureInitialized();
-            return _giftableIds!;
+            return _giftableQIds!;
         }
 
         internal static bool IsGiftableObject(string qId)
         {
             EnsureInitialized();
-            return _giftableIds!.Contains(qId);
+            return _giftableQIds!.Contains(qId);
         }
 
         //------------------------------------------------
@@ -50,7 +50,7 @@ namespace GiftDiscovery.GameData.Static
         internal static void Reset()
         {
             _giftableObjects = null;
-            _giftableIds = null;
+            _giftableQIds = null;
             _isInitialized = false;
         }
 
@@ -60,13 +60,12 @@ namespace GiftDiscovery.GameData.Static
         private static void Build()
         {
             string timer = "Build Giftable Object List";
-            LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
             var giftableNPCs = NPCGiftStatus.GetAllGiftableNPCs();
 
             _giftableObjects = new List<SObject>();
-            _giftableIds = new HashSet<string>();
+            _giftableQIds = new HashSet<string>();
 
             int cnt = 0;
 
@@ -111,10 +110,10 @@ namespace GiftDiscovery.GameData.Static
                     continue;
 
                 _giftableObjects.Add(obj);
-                _giftableIds.Add(obj.QualifiedItemId);
+                _giftableQIds.Add(obj.QualifiedItemId);
             }
 
-            SDVCommonServices.PerfEnd(timer, $"Giftable items: {_giftableIds.Count} / {cnt}", 0, logLevel);
+            SDVCommonServices.PerfEnd(timer, $"Giftable items: {_giftableQIds.Count} / {cnt}", 0);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GiftDiscovery.Helpers;
+﻿using GiftDiscovery.GameData.Dynamic;
+using GiftDiscovery.Helpers;
 using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;

@@ -1,25 +1,18 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.GameData.Static;
 using GiftDiscovery.ModData;
-using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
 using SDVCommon;
 using SDVCommon.Compatibility;
-using SDVCommon.Icons;
-using SDVCommon.Models.Builders;
 using SDVCommon.Services;
 using StardewModdingAPI;
-using StardewValley;
-using StardewValley.Characters;
-using System.Diagnostics;
 
 namespace GiftDiscovery.Helpers
 {
-    public static class Initializer
+    internal static class Initializer
     {
-
-        public static void InitializeAll(IModHelper helper)
+        internal static void InitializeAll(IModHelper helper)
         {
             string timer = "Gift Discovery Initialize";
             LogLevel logLevel = LogHelper.InfoOrTrace;
@@ -47,7 +40,7 @@ namespace GiftDiscovery.Helpers
 
         }
 
-        public static void ResetAll()
+        internal static void ResetAll()
         {
             GiftableObjectList.Reset();
             NPCGiftStatus.Reset();

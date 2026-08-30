@@ -2,7 +2,6 @@
 using GiftDiscovery.Models;
 using Microsoft.Xna.Framework;
 using SDVCommon.Helpers.Tooltip;
-using SDVData;
 using StardewValley;
 
 

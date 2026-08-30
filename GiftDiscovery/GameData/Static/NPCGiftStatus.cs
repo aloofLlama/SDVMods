@@ -1,5 +1,5 @@
 ﻿using GiftDiscovery.Compatibility;
-using GiftDiscovery.Helpers;
+using GiftDiscovery.GameData.Dynamic;
 using GiftDiscovery.Models;
 using SDVCommon;
 using SDVCommon.Services;

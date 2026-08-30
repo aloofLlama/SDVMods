@@ -11,12 +11,12 @@ namespace GiftDiscovery.ModData
         private static Dictionary<string, Dictionary<string, GiftTaste>>? _tasteMap;
         private static bool _isInitialized;
 
-        public static GiftTaste? GetTasteForNPCItemPair(string qualifiedItemId, NPC npc)
+        public static GiftTaste? GetTasteForNPCItemPair(string qId, NPC npc)
         {
             EnsureInitialized();
 
             if (_tasteMap!.TryGetValue(npc.Name, out var npcMap) &&
-                npcMap.TryGetValue(qualifiedItemId, out var taste))
+                npcMap.TryGetValue(qId, out var taste))
             {
                 return taste;
             }

@@ -3,25 +3,18 @@ using GiftDiscovery.ModData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using SDVCommon;
-using SDVCommon.Helpers;
-using SDVCommon.Services;
-using StardewModdingAPI;
 using StardewValley;
-using System.Timers;
 
 namespace GiftDiscovery.Helpers
 {
     internal static class LearnedGiftsHelper
     {
-
-
-
         // ---------------------------------------------------------
         // ITEM → NPC (Known)
         // ---------------------------------------------------------
         // Tip: Use TasteSourceMode 'All' to get the full list of NPCs
-        public static IEnumerable<NPC> GetKnownFor(
-            string qualifiedItemId,
+        internal static IEnumerable<NPC> GetKnownFor(
+            string qId,
             GiftTaste taste,
             TasteSourceMode mode)
         {
@@ -30,11 +23,11 @@ namespace GiftDiscovery.Helpers
                 //.Where(c => c.IsAvailable) //with this included e.g. Sandy wont show up until met
                 .Where((c) =>
                 {
-                    var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
+                    var canonical = TasteMap.GetTasteForNPCItemPair(qId, c.NPC);
                     if (canonical != taste)
                         return false;
 
-                    return IsKnown(qualifiedItemId, c.NPC, mode);
+                    return IsKnown(qId, c.NPC, mode);
                 })
                 .Select((c) => c.NPC)
                 .OrderBy(( npc) => npc.displayName);
@@ -43,8 +36,8 @@ namespace GiftDiscovery.Helpers
         // ---------------------------------------------------------
         // ITEM → NPC (Unknown)
         // ---------------------------------------------------------
-        public static IEnumerable<NPC> GetUnknownFor(
-            string qualifiedItemId,
+        internal static IEnumerable<NPC> GetUnknownFor(
+            string qId,
             GiftTaste taste,
             TasteSourceMode mode)
         {
@@ -54,11 +47,11 @@ namespace GiftDiscovery.Helpers
             foreach (var c in NPCGiftStatus.GetAllGiftableNPCs()
                 .Select(NPCGiftStatus.GetNPCGiftStatus))
             {
-                var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
+                var canonical = TasteMap.GetTasteForNPCItemPair(qId, c.NPC);
                 if (canonical != taste)
                     continue;
 
-                if (IsUnknown(qualifiedItemId, c.NPC, mode))
+                if (IsUnknown(qId, c.NPC, mode))
                     yield return c.NPC;
             }
         }
@@ -66,8 +59,8 @@ namespace GiftDiscovery.Helpers
         // ---------------------------------------------------------
         // ITEM → NPC (Undiscovered, all tastes)
         // ---------------------------------------------------------
-        public static IEnumerable<NPC> GetUndiscoveredBy(
-            string qualifiedItemId,
+        internal static IEnumerable<NPC> GetUndiscoveredBy(
+            string qId,
             TasteSourceMode mode)
         {
             if (mode == TasteSourceMode.All)
@@ -76,11 +69,11 @@ namespace GiftDiscovery.Helpers
             foreach (var c in NPCGiftStatus.GetAllGiftableNPCs()
                 .Select(NPCGiftStatus.GetNPCGiftStatus))
             {
-                var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
+                var canonical = TasteMap.GetTasteForNPCItemPair(qId, c.NPC);
                 if (canonical == null)
                     continue;
 
-                if (IsUnknown(qualifiedItemId, c.NPC, mode))
+                if (IsUnknown(qId, c.NPC, mode))
                     yield return c.NPC;
             }
         }
@@ -89,15 +82,11 @@ namespace GiftDiscovery.Helpers
         // ---------------------------------------------------------
         // NPC → ITEM (Known)
         // ---------------------------------------------------------
-        public static IEnumerable<string> GetKnownGiftsForNPC(
+        internal static IEnumerable<string> GetKnownGiftsForNPC(
             NPC npc,
             GiftTaste taste,
             TasteSourceMode mode)
         {
-            //string timer = "Get Known Gifts for NPC";  // Logs {name} took {ms} ms
-            //LogLevel logLevel = LogHelper.DebugWarn;
-            //SDVCommonServices.PerfBegin(timer);
-
             foreach (string qId in GiftableObjectList.GetAllGiftableIds())
             {
 
@@ -109,14 +98,12 @@ namespace GiftDiscovery.Helpers
                     yield return qId;
             }
 
-            //SDVCommonServices.PerfEnd(timer, npc.displayName, 0, logLevel);
-
         }
 
         // ---------------------------------------------------------
         // NPC → ITEM (Unknown)
         // ---------------------------------------------------------
-        public static IEnumerable<string> GetUnknownGiftsForNPC(
+        internal static IEnumerable<string> GetUnknownGiftsForNPC(
             NPC npc,
             GiftTaste taste,
             TasteSourceMode mode)
@@ -145,20 +132,20 @@ namespace GiftDiscovery.Helpers
         // ---------------------------------------------------------
         // Has the player discovered ALL Loves + Likes for this item?
         // ---------------------------------------------------------
-        public static bool HasDiscoveredAllLovesLikesforItem(
-            string qualifiedItemId,
+        internal static bool HasDiscoveredAllLovesLikesforItem(
+            string qId,
             TasteSourceMode mode)
         {
             if (mode == TasteSourceMode.All)
                 return true;
 
             int canonicalTotal =
-                GetKnownFor(qualifiedItemId, GiftTaste.Love, TasteSourceMode.All).Count()
-                + GetKnownFor(qualifiedItemId, GiftTaste.Like, TasteSourceMode.All).Count();
+                GetKnownFor(qId, GiftTaste.Love, TasteSourceMode.All).Count()
+                + GetKnownFor(qId, GiftTaste.Like, TasteSourceMode.All).Count();
 
             int discoveredTotal =
-                GetKnownFor(qualifiedItemId, GiftTaste.Love, mode).Count()
-                + GetKnownFor(qualifiedItemId, GiftTaste.Like, mode).Count();
+                GetKnownFor(qId, GiftTaste.Love, mode).Count()
+                + GetKnownFor(qId, GiftTaste.Like, mode).Count();
 
             return discoveredTotal >= canonicalTotal;
 
@@ -167,12 +154,11 @@ namespace GiftDiscovery.Helpers
         // ---------------------------------------------------------
         // Has the player discovered ALL Loves + Likes for this NPC?
         // ---------------------------------------------------------
-        public static bool HasDiscoveredAllLovesLikesForNPC(
+        internal static bool HasDiscoveredAllLovesLikesForNPC(
             NPC npc,
             TasteSourceMode mode)
         {
             string timer = "Has Discovered All Loves Likes for NPC";
-            LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
             if (mode == TasteSourceMode.All)
@@ -188,7 +174,7 @@ namespace GiftDiscovery.Helpers
                 LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode).Count()
                 + LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Like, mode).Count();
 
-            SDVCommonServices.PerfEnd(timer, 10, logLevel);
+            SDVCommonServices.PerfEnd(timer, 10);
 
             return discoveredTotal >= canonicalTotal;
         }
@@ -196,27 +182,20 @@ namespace GiftDiscovery.Helpers
         // ---------------------------------------------------------
         // MODE-FILTERED KNOWN / UNKNOWN
         // ---------------------------------------------------------
-        private static bool IsKnown(string itemId, NPC npc, TasteSourceMode mode)
+        private static bool IsKnown(string qId, NPC npc, TasteSourceMode mode)
         {
-            switch (mode)
+            return mode switch
             {
-                case TasteSourceMode.All:
-                    return TasteMap.GetTasteForNPCItemPair(itemId, npc) != null;
-
-                case TasteSourceMode.Global:
-                    return TasteLearning.IsKnownGlobal(itemId, npc);
-
-                case TasteSourceMode.Local:
-                    return TasteLearning.IsKnownLocal(itemId, npc);
-
-                default:
-                    return false;
-            }
+                TasteSourceMode.All => TasteMap.GetTasteForNPCItemPair(qId, npc) != null,
+                TasteSourceMode.Global => TasteLearning.IsKnownGlobal(qId, npc),
+                TasteSourceMode.Local => TasteLearning.IsKnownLocal(qId, npc),
+                _ => false,
+            };
         }
 
-        private static bool IsUnknown(string itemId, NPC npc, TasteSourceMode mode)
+        private static bool IsUnknown(string qId, NPC npc, TasteSourceMode mode)
         {
-            return !IsKnown(itemId, npc, mode);
+            return !IsKnown(qId, npc, mode);
         }
 
     }

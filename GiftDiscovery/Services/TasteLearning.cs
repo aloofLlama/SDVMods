@@ -21,15 +21,15 @@ namespace GiftDiscovery.Services
         private static IModHelper _helper = null!;
         public static int GiftVersion = 0; //used for cache update
 
-        public static bool IsKnownGlobal(string itemId, NPC npc)
+        public static bool IsKnownGlobal(string qId, NPC npc)
         {
-            return _globalData.KnownTastes.TryGetValue(itemId, out var npcDict)
+            return _globalData.KnownTastes.TryGetValue(qId, out var npcDict)
                 && npcDict.ContainsKey(npc.Name);
         }
 
-        public static bool IsKnownLocal(string itemId, NPC npc)
+        public static bool IsKnownLocal(string qId, NPC npc)
         {
-            return _localData.KnownTastes.TryGetValue(itemId, out var npcDict)
+            return _localData.KnownTastes.TryGetValue(qId, out var npcDict)
                 && npcDict.ContainsKey(npc.Name);
         }
 
@@ -76,18 +76,18 @@ namespace GiftDiscovery.Services
 
         }
 
-        public static void LearnTaste(string qualifiedItemId, string npcName, GiftTaste taste)
+        public static void LearnTaste(string qId, string npcName, GiftTaste taste)
         {
-            if (!_globalData.KnownTastes.TryGetValue(qualifiedItemId, out var npcDict))
+            if (!_globalData.KnownTastes.TryGetValue(qId, out var npcDict))
             {
                 npcDict = new Dictionary<string, string>();
-                _globalData.KnownTastes[qualifiedItemId] = npcDict;
+                _globalData.KnownTastes[qId] = npcDict;
             }
 
-            if (!_localData.KnownTastes.TryGetValue(qualifiedItemId, out var localNPCDict))
+            if (!_localData.KnownTastes.TryGetValue(qId, out var localNPCDict))
             {
                 localNPCDict = new Dictionary<string, string>();
-                _localData.KnownTastes[qualifiedItemId] = localNPCDict;
+                _localData.KnownTastes[qId] = localNPCDict;
             }
             localNPCDict[npcName] = taste.ToString();
 
