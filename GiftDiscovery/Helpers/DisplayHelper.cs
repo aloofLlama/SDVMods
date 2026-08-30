@@ -18,7 +18,7 @@ namespace GiftDiscovery.Helpers
 
         public static Color GetNPCNameColor(NPC npc)
         {
-            NPCGiftStatusData status = NPCGiftStatus.GiftStatus(npc);
+            NPCGiftStatusData status = NPCGiftStatus.GetNPCGiftStatus(npc);
 
             if (ModEntry.ModConfig.DeemphasizeAlreadyGifted &&
                 !status.CanGiftToday)

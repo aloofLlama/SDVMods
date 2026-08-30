@@ -2,21 +2,17 @@
 
 namespace GiftDiscovery.Models
 {
-    public class NPCGiftStatusData
+    internal class NPCGiftStatusData
     {
-        public NPC NPC { get; set; } = null!;
-        public string Name { get; set; } = "";
+        internal NPC NPC { get; set; } = null!;
+        internal string Name { get; set; } = "";
 
-        public bool IsGiftable { get; set; }
-        public bool IsAvailable { get; set; }
-        public bool IsUnavailable => IsGiftable && !IsAvailable;
+        internal bool IsAvailable { get; set; }
+        internal bool IsMet { get; set; }
+        internal bool IsUnmet => IsAvailable && !IsMet;
 
-        public bool IsMet { get; set; }
-        public bool IsUnmet => IsAvailable && !IsMet;
-
-        public bool CanGiftToday { get; set; }
-        public bool IsMaxHeart { get; set; }
+        internal bool CanGiftToday { get; set; }
+        internal bool IsMaxHeart { get; set; }
     }
-
 
 }

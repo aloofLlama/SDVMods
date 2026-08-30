@@ -1,5 +1,4 @@
 ﻿using GiftDiscovery.Models;
-using GiftDiscovery.Services;
 using SDVCommon;
 using SDVCommon.GameData;
 using SDVCommon.Services;
@@ -10,54 +9,61 @@ using SObject = StardewValley.Object;
 
 namespace GiftDiscovery.GameData
 {
-    public static class GiftableObjectList
+    internal static class GiftableObjectList
     {
         private static List<SObject>? _giftableObjects;
         private static HashSet<string>? _giftableIds;
+        private static bool _isInitialized;
 
-        public static List<SObject> GetAllGiftableObjects()
+        internal static List<SObject> GetAllGiftableObjects()
         {
-            if (_giftableObjects == null)
-                BuildGiftableObjectList();
-
+            EnsureInitialized();
             return _giftableObjects!;
         }
 
-        public static HashSet<string> GetAllGiftableIds()
+        internal static HashSet<string> GetAllGiftableIds()
         {
-            if (_giftableIds == null)
-                BuildGiftableObjectList();
-
+            EnsureInitialized();
             return _giftableIds!;
         }
 
-        public static bool IsGiftableObject(string qId)
+        internal static bool IsGiftableObject(string qId)
         {
-            if (_giftableIds == null)
-                BuildGiftableObjectList();
-
+            EnsureInitialized();
             return _giftableIds!.Contains(qId);
         }
 
-        public static void Reset()
+        //------------------------------------------------
+        // Data lifecycle methods
+        //------------------------------------------------
+        private static void EnsureInitialized()
+        {
+            if (!_isInitialized)
+                Initialize();
+        }
+
+        internal static void Initialize()
+        {
+            Build();
+            _isInitialized = true;
+        }
+        internal static void Reset()
         {
             _giftableObjects = null;
             _giftableIds = null;
+            _isInitialized = false;
         }
 
-        public static void Initialize()
-        {
-            GetAllGiftableObjects();
-            GetAllGiftableIds();
-        }
-
-        private static void BuildGiftableObjectList()
+        //------------------------------------------------
+        // Builder
+        //------------------------------------------------
+        private static void Build()
         {
             string timer = "Build Giftable Object List";
             LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
-            var giftableNPCs = GiftableNPCList.GetAllGiftableNPCs();
+            var giftableNPCs = NPCGiftStatus.GetAllGiftableNPCs();
 
             _giftableObjects = new List<SObject>();
             _giftableIds = new HashSet<string>();
@@ -69,7 +75,6 @@ namespace GiftDiscovery.GameData
                 cnt++;
 
                 var obj = GameObject.GetObjectInstance(unqualifiedId);
-                //var obj = ItemRegistry.Create(unqualifiedId) as SObject;
 
                 if (obj == null || !obj.canBeGivenAsGift())
                     continue;
@@ -98,7 +103,7 @@ namespace GiftDiscovery.GameData
                     if (t == GiftTaste.Love || t == GiftTaste.Like)
                     {
                         hasLoveOrLike = true;
-                        break; // early exit
+                        break;
                     }
                 }
 
@@ -110,60 +115,7 @@ namespace GiftDiscovery.GameData
             }
 
             SDVCommonServices.PerfEnd(timer, $"Giftable items: {_giftableIds.Count} / {cnt}", 0, logLevel);
-
         }
-
-
-        private static HashSet<string> BuildUniversalLoves()
-        {
-            string timer = "Build Universal Loves";
-            LogLevel logLevel = LogHelper.DebugOrTrace;
-            SDVCommonServices.PerfBegin(timer);
-
-            var result = new HashSet<string>();
-
-            var giftableNPCs = GiftableNPCList.
-                GetAllGiftableNPCs();
-            var giftableQIds = GetAllGiftableIds();
-
-            int totalGiftable = giftableNPCs.Count;
-            int threshold = (int)(0.85 * totalGiftable);
-            int notLoveThreshold = totalGiftable - threshold;
-
-            int cnt = 0;
-
-            foreach (string qId in giftableQIds)
-            {
-                int loveCount = 0;
-                int notLoveCount = 0;
-
-                foreach (var npc in giftableNPCs)
-                {
-                    var taste = TasteMap.GetTasteForNPCItemPair(qId, npc);
-
-                    if (taste == GiftTaste.Love)
-                        loveCount++;
-                    else
-                        notLoveCount++;
-
-                    if (notLoveCount > notLoveThreshold)
-                        break;
-                }
-
-                if (loveCount >= threshold)
-                {
-                    cnt++;
-                    result.Add(qId);
-                }
-            }
-
-            SDVCommonServices.PerfEnd(timer, $"Universal Loves: {cnt}", 0, logLevel);
-
-            return result;
-        }
-
-
     }
-
 }
 

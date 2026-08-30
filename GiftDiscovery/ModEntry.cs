@@ -97,7 +97,7 @@ namespace GiftDiscovery
             {
                 // Social Menu
                 case { NPC: not null }:
-                    if (GiftableNPCList.IsGiftableNPC(hover.NPC))
+                    if (NPCGiftStatus.IsGiftableNPC(hover.NPC))
                     {
                         NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, hover.NPC!);
                         drewNPCMenuTooltip = true;
@@ -139,7 +139,7 @@ namespace GiftDiscovery
 
             // NPC proximity tooltip (only for giftable NPCs)
             NPC? nearest = NPCLocation.GetClosestNearbyNPC(ModEntry.ModConfig.NearbyRangeTilesNPCTooltip);
-            if (nearest != null && GiftableNPCList.IsGiftableNPC(nearest))
+            if (nearest != null && NPCGiftStatus.IsGiftableNPC(nearest))
             {
                 NPCGiftTooltipBuilder.DrawTooltip(e.SpriteBatch, nearest);
 

@@ -23,7 +23,7 @@ namespace GiftDiscovery.GameData
             var playerTile = Game1.player.Tile;
             var location = Game1.currentLocation;
 
-            return GiftableNPCList.GetAllGiftableNPCs()
+            return NPCGiftStatus.GetAllGiftableNPCs()
                 .Where(npc =>
                     npc.currentLocation == location &&
                     Vector2.Distance(npc.Tile, playerTile) <= range)
@@ -51,7 +51,7 @@ namespace GiftDiscovery.GameData
             NPC? closest = null;
             float bestDist = float.MaxValue;
 
-            foreach (var npc in GiftableNPCList.GetAllGiftableNPCs())
+            foreach (var npc in NPCGiftStatus.GetAllGiftableNPCs())
             {
                 // filter by location
                 if (npc.currentLocation != Game1.currentLocation)

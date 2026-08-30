@@ -24,8 +24,8 @@ namespace GiftDiscovery.Helpers
             GiftTaste taste,
             TasteSourceMode mode)
         {
-            return GiftableNPCList.GetAllGiftableNPCs()
-                .Select(NPCGiftStatus.GiftStatus)
+            return NPCGiftStatus.GetAllGiftableNPCs()
+                .Select(NPCGiftStatus.GetNPCGiftStatus)
                 //.Where(c => c.IsAvailable) //with this included e.g. Sandy wont show up until met
                 .Where((c) =>
                 {
@@ -50,8 +50,8 @@ namespace GiftDiscovery.Helpers
             if (mode == TasteSourceMode.All)
                 yield break;
 
-            foreach (var c in GiftableNPCList.GetAllGiftableNPCs()
-                .Select(GameData.NPCGiftStatus.GiftStatus))
+            foreach (var c in NPCGiftStatus.GetAllGiftableNPCs()
+                .Select(GameData.NPCGiftStatus.GetNPCGiftStatus))
             {
                 var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                 if (canonical != taste)
@@ -72,8 +72,8 @@ namespace GiftDiscovery.Helpers
             if (mode == TasteSourceMode.All)
                 yield break;
 
-            foreach (var c in GiftableNPCList.GetAllGiftableNPCs()
-                .Select(GameData.NPCGiftStatus.GiftStatus))
+            foreach (var c in NPCGiftStatus.GetAllGiftableNPCs()
+                .Select(GameData.NPCGiftStatus.GetNPCGiftStatus))
             {
                 var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                 if (canonical == null)

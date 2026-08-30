@@ -1,6 +1,7 @@
 ﻿using GiftDiscovery;
 using GiftDiscovery.GameData;
 using GiftDiscovery.Helpers;
+using GiftDiscovery.ModData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using SDVCommon;
@@ -122,7 +123,7 @@ namespace GiftDiscovery.Tooltip.NPCSections
 
             foreach (var obj in knownItems)
             {
-                if (GiftType.IsUniversalLove(obj.QualifiedItemId))
+                if (UniversalLoveList.IsUniversalLove(obj.QualifiedItemId))
                     knownUniversal.Add(obj);
                 else
                     knownRegular.Add(obj);
@@ -145,11 +146,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
             var unknownQIds = LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode);
 
             int unknownRegular = unknownQIds
-                .Where(qId => !GiftType.IsUniversalLove(qId))
+                .Where(qId => !UniversalLoveList.IsUniversalLove(qId))
                 .Count();
 
             int unknownUniversal = unknownQIds
-                .Where(qId => GiftType.IsUniversalLove(qId))
+                .Where(qId => UniversalLoveList.IsUniversalLove(qId))
                 .Count();
 
             SDVCommonServices.PerfPing(timer, "Unknown items", 10, logLevel); // name it for what just finished

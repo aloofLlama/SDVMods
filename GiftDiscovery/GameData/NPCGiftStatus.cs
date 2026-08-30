@@ -1,54 +1,108 @@
 ﻿using GiftDiscovery.Compatibility;
-using GiftDiscovery.Models;
 using GiftDiscovery.Helpers;
+using GiftDiscovery.Models;
+using SDVCommon;
+using SDVCommon.Services;
+using StardewModdingAPI;
 using StardewValley;
 
 namespace GiftDiscovery.GameData
 {
-    public  class NPCGiftStatus
+    internal static class NPCGiftStatus
     {
-        public static NPCGiftStatusData GiftStatus(NPC npc)
+        private static bool _isInitialized;
+        private static Dictionary<string, NPCGiftStatusData>? _npcGiftStatus;
+        private static HashSet<NPC>? _giftableNPCs;
+
+        internal static NPCGiftStatusData GetNPCGiftStatus(NPC npc)
         {
-            var name = npc.Name;
-
-            //bool isOverrideBlocked = ModCompat.GiftOverrides.NonGiftableNPCs.Contains(name);
-            //bool hasGiftTastes = Game1.NPCGiftTastes.ContainsKey(name);
-
-            //bool isGiftable = hasGiftTastes && !isOverrideBlocked;
-
-            bool isAvailable =
-                //isGiftable &&
-                npc.CanSocialize &&
-                npc.CanReceiveGifts() &&
-                npc.currentLocation != null;
-
-            bool isMet =
-                isAvailable &&
-                Game1.player.friendshipData.ContainsKey(name);
-
-            bool canGiftToday = isAvailable && !MaxGiftsReached(npc);
-            bool isMaxHeart = isAvailable && isMet && HeartStatus.IsMaxHearts(npc);
-
-            return new NPCGiftStatusData
-            {
-                NPC = npc,
-                Name = name,
-                //IsGiftable = isGiftable,
-                IsAvailable = isAvailable,
-                IsMet = isMet,
-                CanGiftToday = canGiftToday,
-                IsMaxHeart = isMaxHeart
-            };
+            EnsureInitialized();
+            return _npcGiftStatus![npc.Name];
         }
 
-        public static bool IsUnmetNPC(string npcName)
+        internal static HashSet<NPC> GetAllGiftableNPCs()
         {
-            var npc = Utility.getAllCharacters().FirstOrDefault(n => n.Name == npcName);
-            if (npc == null)
-                return false;
+            EnsureInitialized();
+            return _giftableNPCs!;
+        }
 
-            var c = NPCGiftStatus.GiftStatus(npc);
-            return c.IsUnmet;
+        internal static bool IsGiftableNPC(NPC npc)
+        {
+            EnsureInitialized();
+            return _giftableNPCs!.Contains(npc);
+        }
+
+        //------------------------------------------------
+        // Data lifecycle methods
+        //------------------------------------------------
+        private static void EnsureInitialized()
+        {
+            if (!_isInitialized)
+                Initialize();
+        }
+
+        internal static void Initialize()
+        {
+            Build();
+            _isInitialized = true;
+        }
+        internal static void Reset()
+        {
+            _npcGiftStatus = null;
+            _giftableNPCs = null;
+            _isInitialized = false;
+        }
+
+        //------------------------------------------------
+        // Builder
+        //------------------------------------------------
+        private static void Build()
+        {
+            string timer = "Build Giftable NPC List";
+            LogLevel logLevel = LogHelper.DebugOrTrace;
+            SDVCommonServices.PerfBegin(timer);
+
+            _npcGiftStatus = new Dictionary<string, NPCGiftStatusData>();
+            _giftableNPCs = new HashSet<NPC>();
+
+            foreach (var npc in Utility.getAllCharacters().OfType<NPC>())
+            {
+                string name = npc.Name;
+
+                if (!Game1.NPCGiftTastes.ContainsKey(name))
+                    continue;
+
+                if (ModCompat.GiftOverrides.NonGiftableNPCs.Contains(name))
+                    continue;
+
+                _giftableNPCs.Add(npc);
+
+                // Build the gift status data for this NPC
+                bool isAvailable =
+                    npc.CanSocialize &&
+                    npc.CanReceiveGifts() &&
+                    npc.currentLocation != null;
+
+                bool isMet =
+                    isAvailable &&
+                    Game1.player.friendshipData.ContainsKey(name);
+
+                bool canGiftToday = isAvailable && !MaxGiftsReached(npc);
+                bool isMaxHeart = isAvailable && isMet && HeartStatus.IsMaxHearts(npc);
+
+                _npcGiftStatus[name] = new NPCGiftStatusData
+                {
+                    NPC = npc,
+                    Name = name,
+                    IsAvailable = isAvailable,
+                    IsMet = isMet,
+                    CanGiftToday = canGiftToday,
+                    IsMaxHeart = isMaxHeart
+                };
+
+            }
+
+            SDVCommonServices.PerfEnd(timer, $"Giftable NPCs: {_giftableNPCs.Count}", 0, logLevel);
         }
 
         private static bool MaxGiftsReached(NPC npc)
@@ -73,8 +127,5 @@ namespace GiftDiscovery.GameData
 
             return false;
         }
-
-
-
     }
 }

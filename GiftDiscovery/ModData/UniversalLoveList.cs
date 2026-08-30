@@ -3,55 +3,59 @@ using GiftDiscovery.Models;
 using SDVCommon;
 using SDVCommon.Services;
 using StardewModdingAPI;
-using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace GiftDiscovery.Helpers
+namespace GiftDiscovery.ModData
 {
-    public class GiftType
+    internal static class UniversalLoveList
     {
         private static HashSet<string>? _universalLoveIds;
+        private static bool _isInitialized;
 
-        public static bool IsUniversalLove(string qId)
+        internal static HashSet<string> GetAllUniversalLoves()
         {
-            if (_universalLoveIds == null)
-                _universalLoveIds = BuildUniversalLoves();
-
-            return _universalLoveIds.Contains(qId);
-        }
-
-        public static HashSet<string> GetUniversalLoveIds()
-        {
-            if (_universalLoveIds == null)
-                _universalLoveIds = BuildUniversalLoves();
-
+            EnsureInitialized();
             return _universalLoveIds!;
         }
 
-        public static void Reset()
+        internal static bool IsUniversalLove(string qId)
+        {
+            EnsureInitialized();
+            return _universalLoveIds!.Contains(qId);
+        }
+
+        //------------------------------------------------
+        // Data lifecycle methods
+        //------------------------------------------------
+        private static void EnsureInitialized()
+        {
+            if (!_isInitialized)
+                Initialize();
+        }
+
+        internal static void Initialize()
+        {
+            Build();
+            _isInitialized = true;
+        }
+
+        internal static void Reset()
         {
             _universalLoveIds = null;
+            _isInitialized = false;
         }
 
-        public static void Initialize()
-        {
-            GetUniversalLoveIds();
-        }
-
-
-        private static HashSet<string> BuildUniversalLoves()
+        //------------------------------------------------
+        // Builder
+        //------------------------------------------------
+        private static void Build()
         {
             string timer = "Build Universal Loves";
             LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
-            var result = new HashSet<string>();
+            _universalLoveIds = new HashSet<string>();
 
-            var giftableNPCs = GiftableNPCList.GetAllGiftableNPCs();
+            var giftableNPCs = NPCGiftStatus.GetAllGiftableNPCs();
             var giftableIds = GiftableObjectList.GetAllGiftableIds();
 
             int totalGiftable = giftableNPCs.Count;
@@ -81,15 +85,13 @@ namespace GiftDiscovery.Helpers
                 if (loveCount >= threshold)
                 {
                     cnt++;
-                    result.Add(qualifiedItemId);
+                    _universalLoveIds.Add(qualifiedItemId);
                 }
             }
 
             SDVCommonServices.PerfEnd(timer, $"Universal Loves: {cnt}", 0, logLevel);
 
-            return result;
         }
-
-
     }
 }
+

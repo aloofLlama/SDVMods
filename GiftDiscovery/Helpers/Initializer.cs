@@ -1,5 +1,6 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.GameData;
+using GiftDiscovery.ModData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using GiftDiscovery.Tooltip;
@@ -32,7 +33,7 @@ namespace GiftDiscovery.Helpers
 
             TasteLearning.Initialize(helper);
             TasteMap.Initialize(helper);
-            GiftType.Initialize();
+            UniversalLoveList.Initialize();
 
             GiftTooltipBuilder.Initialize();
             NPCGiftTooltipBuilder.Initialize();
@@ -44,11 +45,11 @@ namespace GiftDiscovery.Helpers
         public static void ResetAll()
         {
             GiftableObjectList.Reset();
+            NPCGiftStatus.Reset();
 
             TasteLearning.Reset();
             TasteMap.Reset();
-            GiftType.Reset();
-            GiftableNPCList.Reset();
+            UniversalLoveList.Reset();
 
             GiftTooltipBuilder.Reset();
             NPCGiftTooltipBuilder.Reset();

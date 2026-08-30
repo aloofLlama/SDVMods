@@ -111,14 +111,14 @@ namespace GiftDiscovery.Tooltip
 
             IEnumerable<NPCGiftStatusData> Known(GiftTaste t) =>
                 LearnedGiftsHelper.GetKnownFor(id, t, mode)
-                    .Select(npc => NPCGiftStatus.GiftStatus(npc));
+                    .Select(npc => NPCGiftStatus.GetNPCGiftStatus(npc));
 
             int UnknownCount(GiftTaste t) =>
                 LearnedGiftsHelper.GetUnknownFor(id, t, mode).Count();
 
             int UnmetCount() =>
-                GiftableNPCList.GetAllGiftableNPCs()
-                    .Select(NPCGiftStatus.GiftStatus)
+                NPCGiftStatus.GetAllGiftableNPCs()
+                    .Select(NPCGiftStatus.GetNPCGiftStatus)
                     .Count(c => c.IsUnmet);
 
             // ---------------------------------------------------------
@@ -166,7 +166,7 @@ namespace GiftDiscovery.Tooltip
             {
                 // Unknown NPCs (all 5 tastes)
                 var unknownNPCs = LearnedGiftsHelper.GetUndiscoveredBy(id, mode)
-                    .Select(npc => NPCGiftStatus.GiftStatus(npc))
+                    .Select(npc => NPCGiftStatus.GetNPCGiftStatus(npc))
                     .Where(c => c.IsAvailable && c.IsMet)
                     .ToList();
 
@@ -307,11 +307,15 @@ namespace GiftDiscovery.Tooltip
             bool isNearby =
                 ModEntry.ModConfig.EmphasizeNearbyNPCs &&
                 NPCLocation.IsNPCNearby(npc, ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
+            
+            bool canGiftToday = NPCGiftStatus.GetNPCGiftStatus(npc).CanGiftToday;
+
             bool isBold = false;
+
 
             if (isNearby)
             {
-                if (ModEntry.ModConfig.DeemphasizeAlreadyGifted && !GameData.NPCGiftStatus.GiftStatus(npc).CanGiftToday)
+                if (ModEntry.ModConfig.DeemphasizeAlreadyGifted && !canGiftToday)
                     isBold = false;
                 else
                     isBold = true;

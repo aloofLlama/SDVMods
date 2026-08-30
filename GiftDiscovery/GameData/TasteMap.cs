@@ -27,7 +27,7 @@ namespace GiftDiscovery.GameData
             LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
-            foreach (var npc in GiftableNPCList.GetAllGiftableNPCs())
+            foreach (var npc in NPCGiftStatus.GetAllGiftableNPCs())
             {
                 GetTasteMap(npc);
             }
