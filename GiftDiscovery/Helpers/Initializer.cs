@@ -1,5 +1,5 @@
 ﻿using GiftDiscovery.Compatibility;
-using GiftDiscovery.GameData;
+using GiftDiscovery.GameData.Static;
 using GiftDiscovery.ModData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
@@ -29,11 +29,16 @@ namespace GiftDiscovery.Helpers
             APIManager.LoadApis(helper);
             ModSourceHelper.Initialize(helper);
 
-            GiftableObjectList.Initialize();
+            //Gamedata static
+            GiftableObjectList.Initialize(); //updated
+            NPCGiftStatus.Initialize(); //updated
 
+            //Moddata
+            TasteMap.Initialize(); //updated
+            UniversalLoveList.Initialize(); //updated
+
+            //
             TasteLearning.Initialize(helper);
-            TasteMap.Initialize(helper);
-            UniversalLoveList.Initialize();
 
             GiftTooltipBuilder.Initialize();
             NPCGiftTooltipBuilder.Initialize();

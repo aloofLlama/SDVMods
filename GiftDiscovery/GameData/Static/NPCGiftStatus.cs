@@ -6,13 +6,13 @@ using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewValley;
 
-namespace GiftDiscovery.GameData
+namespace GiftDiscovery.GameData.Static
 {
     internal static class NPCGiftStatus
     {
-        private static bool _isInitialized;
         private static Dictionary<string, NPCGiftStatusData>? _npcGiftStatus;
         private static HashSet<NPC>? _giftableNPCs;
+        private static bool _isInitialized;
 
         internal static NPCGiftStatusData GetNPCGiftStatus(NPC npc)
         {

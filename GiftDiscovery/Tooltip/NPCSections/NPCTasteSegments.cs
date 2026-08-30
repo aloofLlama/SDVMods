@@ -1,5 +1,5 @@
 ﻿using GiftDiscovery;
-using GiftDiscovery.GameData;
+using GiftDiscovery.GameData.Static;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.ModData;
 using GiftDiscovery.Models;

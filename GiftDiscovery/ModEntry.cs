@@ -1,6 +1,7 @@
 ﻿using GiftDiscovery.Compatibility;
 using GiftDiscovery.Config;
-using GiftDiscovery.GameData;
+using GiftDiscovery.GameData.Dynamic;
+using GiftDiscovery.GameData.Static;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Tooltip;
 using HarmonyLib;

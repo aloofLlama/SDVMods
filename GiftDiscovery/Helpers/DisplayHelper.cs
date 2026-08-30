@@ -1,4 +1,4 @@
-﻿using GiftDiscovery.GameData;
+﻿using GiftDiscovery.GameData.Static;
 using GiftDiscovery.Models;
 using Microsoft.Xna.Framework;
 using SDVCommon.Helpers.Tooltip;

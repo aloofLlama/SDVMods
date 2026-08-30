@@ -1,4 +1,5 @@
-﻿using GiftDiscovery.GameData;
+﻿using GiftDiscovery.GameData.Dynamic;
+using GiftDiscovery.GameData.Static;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;

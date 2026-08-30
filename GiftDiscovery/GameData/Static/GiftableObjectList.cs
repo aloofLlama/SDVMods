@@ -7,7 +7,7 @@ using StardewValley;
 using SObject = StardewValley.Object;
 
 
-namespace GiftDiscovery.GameData
+namespace GiftDiscovery.GameData.Static
 {
     internal static class GiftableObjectList
     {

@@ -1,12 +1,12 @@
 ﻿using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
-using GiftDiscovery.GameData;
 using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GiftDiscovery.GameData.Dynamic;
 
 namespace GiftDiscovery.Tooltip.NPCSections
 {

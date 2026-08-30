@@ -1,4 +1,4 @@
-﻿using GiftDiscovery.GameData;
+﻿using GiftDiscovery.GameData.Static;
 using GiftDiscovery.Models;
 using SDVCommon;
 using SDVCommon.Services;

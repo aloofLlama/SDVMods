@@ -27,6 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="GameData\Dynamic\" />
 	  <Folder Include="Models\Builders\" />
 	</ItemGroup>
 

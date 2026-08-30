@@ -1,4 +1,5 @@
-﻿using GiftDiscovery.GameData;
+﻿using GiftDiscovery.GameData.Static;
+using GiftDiscovery.ModData;
 using GiftDiscovery.Models;
 using GiftDiscovery.Services;
 using SDVCommon;
@@ -51,7 +52,7 @@ namespace GiftDiscovery.Helpers
                 yield break;
 
             foreach (var c in NPCGiftStatus.GetAllGiftableNPCs()
-                .Select(GameData.NPCGiftStatus.GetNPCGiftStatus))
+                .Select(NPCGiftStatus.GetNPCGiftStatus))
             {
                 var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                 if (canonical != taste)
@@ -73,7 +74,7 @@ namespace GiftDiscovery.Helpers
                 yield break;
 
             foreach (var c in NPCGiftStatus.GetAllGiftableNPCs()
-                .Select(GameData.NPCGiftStatus.GetNPCGiftStatus))
+                .Select(NPCGiftStatus.GetNPCGiftStatus))
             {
                 var canonical = TasteMap.GetTasteForNPCItemPair(qualifiedItemId, c.NPC);
                 if (canonical == null)
