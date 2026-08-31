@@ -7,19 +7,29 @@ using StardewValley;
 namespace GiftDiscovery.Services
 {
     // Learn and save gift tastes
-    // Load learned gift tastes for use
+    // Load learned gift tastes
+    // Provides methods to return whether a taste is known for a given item and NPC
+    // Actual gift/npc/taste data is stored in TasteMap, this class only tracks what the player has learned
     internal class TasteLearning
     {
+        private class GiftTasteResult
+        {
+            // QualifiedItemId → NPCName → GiftTaste
+            internal Dictionary<string, Dictionary<string, string>> KnownTastes { get; set; }
+                = new();
+        }
+
         // Global is available for all farm files
         private const string GlobalDataKey = "GiftKnowledge";
-        private static GiftKnowledgeData _globalData = null!;
+        private static GiftTasteResult _globalData = null!;
 
         // Local is specific to each farm file
         private const string LocalDataKey = "LocalGiftKnowledge";
-        private static GiftKnowledgeData _localData = null!;
+        private static GiftTasteResult _localData = null!;
 
         private static IModHelper _helper = null!;
-        public static int GiftVersion = 0; //used for cache update
+        public static int GiftVersion = 0; //used to invalidate cached tooltip data when a new taste is learned
+
 
         public static bool IsKnownGlobal(string qId, NPC npc)
         {
@@ -33,55 +43,15 @@ namespace GiftDiscovery.Services
                 && npcDict.ContainsKey(npc.Name);
         }
 
-
-        public static void Initialize(IModHelper helper)
-        {
-            InitializeGlobal(helper);
-            InitializeLocal(helper);
-        }
-
-        public static void Reset()
-        {
-            _globalData = null!;
-            _localData = null!;
-            GiftVersion++;
-        }
-
-
-        private static void InitializeGlobal(IModHelper helper)
-        {
-            _helper = helper;
-
-            string timer = "Initializing Global Data";
-            SDVCommonServices.PerfBegin(timer);
-
-            _globalData = helper.Data.ReadGlobalData<GiftKnowledgeData>(GlobalDataKey)
-                    ?? new GiftKnowledgeData();
-
-            SDVCommonServices.PerfEnd(timer, 10);
-
-        }
-
-        private static void InitializeLocal(IModHelper helper)
-        {
-            _helper = helper;
-
-            string timer = "Initializing Local Data";
-            SDVCommonServices.PerfBegin(timer);
-
-            _localData = helper.Data.ReadSaveData<GiftKnowledgeData>(LocalDataKey)
-                    ?? new GiftKnowledgeData();
-
-            SDVCommonServices.PerfEnd(timer, 10);
-
-        }
-
+        //------------------------------------------------
+        // Learn and save taste
+        //------------------------------------------------
         public static void LearnTaste(string qId, string npcName, GiftTaste taste)
         {
-            if (!_globalData.KnownTastes.TryGetValue(qId, out var npcDict))
+            if (!_globalData.KnownTastes.TryGetValue(qId, out var globalNPCDict))
             {
-                npcDict = new Dictionary<string, string>();
-                _globalData.KnownTastes[qId] = npcDict;
+                globalNPCDict = new Dictionary<string, string>();
+                _globalData.KnownTastes[qId] = globalNPCDict;
             }
 
             if (!_localData.KnownTastes.TryGetValue(qId, out var localNPCDict))
@@ -89,11 +59,11 @@ namespace GiftDiscovery.Services
                 localNPCDict = new Dictionary<string, string>();
                 _localData.KnownTastes[qId] = localNPCDict;
             }
+
+            globalNPCDict[npcName] = taste.ToString();
             localNPCDict[npcName] = taste.ToString();
 
-            npcDict[npcName] = taste.ToString();
-
-            Save(); //saves both global and local data
+            Save();
             GiftVersion++;
 
         }
@@ -104,5 +74,46 @@ namespace GiftDiscovery.Services
             _helper.Data.WriteSaveData(LocalDataKey, _localData);
         }
 
+
+        //------------------------------------------------
+        // Data lifecycle methods
+        //------------------------------------------------
+
+        internal static void Initialize(IModHelper helper)
+        {
+            _helper = helper;
+            InitializeGlobal();
+            InitializeLocal();
+        }
+
+        internal static void Reset()
+        {
+            _globalData = null!;
+            _localData = null!;
+            GiftVersion++;
+        }
+
+
+        private static void InitializeGlobal()
+        {
+            string timer = "Initializing Global Data";
+            SDVCommonServices.PerfBegin(timer);
+
+            _globalData = _helper.Data.ReadGlobalData<GiftTasteResult>(GlobalDataKey)
+                    ?? new GiftTasteResult();
+
+            SDVCommonServices.PerfEnd(timer, 10);
+        }
+
+        private static void InitializeLocal()
+        {
+            string timer = "Initializing Local Data";
+            SDVCommonServices.PerfBegin(timer);
+
+            _localData = _helper.Data.ReadSaveData<GiftTasteResult>(LocalDataKey)
+                    ?? new GiftTasteResult();
+
+            SDVCommonServices.PerfEnd(timer, 10);
+        }
     }
 }

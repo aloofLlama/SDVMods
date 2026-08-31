@@ -10,23 +10,23 @@ namespace GiftDiscovery.Compatibility
     public static class GiftPatch
     {
         public static void Postfix(
-            NPC __instance,
+            NPC _instance,
             StardewValley.Object o
         )
         {
             if (o is null)
                 return;
 
-            string npcName = __instance.Name;
-            string qualifiedItemId = o.QualifiedItemId;
+            string npcName = _instance.Name;
+            string qId = o.QualifiedItemId;
             string itemName = o.DisplayName;
 
-            int tasteValue = __instance.getGiftTasteForThisItem(o);
+            int tasteValue = _instance.getGiftTasteForThisItem(o);
             GiftTaste taste = (GiftTaste)tasteValue;
 
-            SDVCommonLog.Log($"Learned taste: {npcName} → {itemName} = {taste} | {qualifiedItemId}", LogHelper.Info);
+            SDVCommonLog.Log($"Learned taste: {npcName} → {itemName} = {taste} | {qId}", LogHelper.Info);
 
-            TasteLearning.LearnTaste(qualifiedItemId, npcName, taste);
+            TasteLearning.LearnTaste(qId, npcName, taste);
         }
     }
 }
