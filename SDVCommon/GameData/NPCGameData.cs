@@ -7,13 +7,13 @@ namespace SDVCommon.GameData
 {
     public static class NPCGameData
     {
-        public static Icon GetPortraitIcon(NPC npc)
+        public static Icon GetPortraitIcon(NPC npc, float scale)
         {
             int portraitSize = 64;
             Texture2D tex = npc.Portrait; 
-            Rectangle src = new Rectangle(0, 0, portraitSize, portraitSize);
+            Rectangle src = new(0, 0, portraitSize, portraitSize);
 
-            return new Icon(tex, src, portraitSize);
+            return new Icon(tex, src, portraitSize, scale);
         }
     }
 }

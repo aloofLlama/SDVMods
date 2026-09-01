@@ -187,10 +187,6 @@ namespace GiftDiscovery
             // Reinitialize for debug
             if (e.Button == SButton.F5)
             {
-                bool GDReinit = false;
-
-                if (GDReinit == true)
-                {
                     string timer = "Reinitialize";  // Logs {name} took {ms} ms
                     SDVCommonServices.PerfBegin(timer);
                     SDVCommonLog.TimestampLog($"{timer} start", LogHelper.AlertOrTrace);
@@ -199,7 +195,6 @@ namespace GiftDiscovery
                     Initializer.InitializeAll(ModHelper);
 
                     SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
-                }
             }
 
 #endif

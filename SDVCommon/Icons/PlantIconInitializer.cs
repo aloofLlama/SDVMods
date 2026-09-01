@@ -1,5 +1,8 @@
 ﻿using SDVCommon.Helpers;
 using SDVCommon.Models.Wrappers;
+using SDVCommon.Icons;
+using SDVCommon.Icons.iconproviders;
+
 
 namespace SDVCommon.Icons
 {

@@ -1,11 +1,12 @@
-﻿using SDVCommon;
+﻿using HarvestHelper.Services;
+using SDVCommon;
 using SDVCommon.Compatibility;
 using SDVCommon.GameData;
-using SDVCommon.Helpers;
-using SDVCommon.Services;
-using SDVCommon.Models.Builders;
 using SDVCommon.GameData.Dictionaries;
-using HarvestHelper.Services;
+using SDVCommon.Helpers;
+using SDVCommon.Icons;
+using SDVCommon.Models.Builders;
+using SDVCommon.Services;
 using StardewModdingAPI;
 
 namespace HarvestHelper.Helpers
@@ -39,7 +40,9 @@ namespace HarvestHelper.Helpers
             CookingInfoBuilder.Reset();
             ArtisanInfoBuilder.Reset();
 
-            TooltipBuilder.Reset();
+            TooltipBuilder.Reset(); 
+            IconRegistry.Reset();
+
         }
     }
 }

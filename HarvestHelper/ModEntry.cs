@@ -138,10 +138,6 @@ namespace HarvestHelper
             // Reinitialize for debug
             if (e.Button == SButton.F5)
             {
-                bool HHReinit = true;
-
-                if (HHReinit == true)
-                {
                     string timer = "Reinitialize";  // Logs {name} took {ms} ms
                     SDVCommonServices.PerfBegin(timer);
                     SDVCommonLog.TimestampLog($"{timer} start", LogHelper.AlertOrTrace);
@@ -151,7 +147,6 @@ namespace HarvestHelper
 
                     SDVCommonServices.PerfEnd(timer, 0, LogHelper.AlertOrTrace);
 
-                }
             }
 
 

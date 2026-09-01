@@ -1,10 +1,7 @@
-﻿using GiftDiscovery.Compatibility;
+﻿using GiftDiscovery.GameData.Static;
 using Microsoft.Xna.Framework;
-using SDVCommon.Services;
 using StardewValley;
 using StardewValley.TokenizableStrings;
-using StardewModdingAPI;
-using GiftDiscovery.GameData.Static;
 
 
 namespace GiftDiscovery.GameData.Dynamic

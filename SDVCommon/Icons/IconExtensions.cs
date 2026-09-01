@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using SDVCommon.Icons.iconproviders;
 
 namespace SDVCommon.Icons
 {

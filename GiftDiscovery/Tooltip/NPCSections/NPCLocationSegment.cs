@@ -1,12 +1,6 @@
-﻿using SDVCommon.Helpers.Tooltip;
+﻿using GiftDiscovery.GameData.Dynamic;
 using SDVCommon.Models.Tooltip;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GiftDiscovery.GameData.Dynamic;
 
 namespace GiftDiscovery.Tooltip.NPCSections
 {
@@ -19,29 +13,16 @@ namespace GiftDiscovery.Tooltip.NPCSections
             if (!ModEntry.IsInMenuTooltip || !ModEntry.ModConfig.ShowLocation)
                 return new List<TooltipElement>();
 
-            string name =NPCLocation.GetNPCLocation(npc);
+            string name = NPCLocation.GetNPCLocation(npc);
 
-            var segments = new List<InlineSegment>
-            {
-                //new InlineSegment
-                //{
-                //    Text = "Location: ",
-                //    Bold = true
-                //},
-                new InlineSegment
-                {
-                    Text = name,
+            return new List<TooltipElement> {
+                new() {
+                    InlineSegments = new List<InlineSegment> {
+                        new() { Text = name }
+                    }
                 }
             };
 
-            return new List<TooltipElement>
-                {
-                    new TooltipElement
-                    {
-                        InlineSegments = segments
-                    }
-                };
-            }
-
+        }
     }
 }

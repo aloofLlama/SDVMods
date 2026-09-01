@@ -1,9 +1,8 @@
 ﻿using HarvestHelper.Helpers;
-using SDVCommon.Icons;
-using SDVCommon.Models.Wrappers;
-using SDVCommon.Models.Tooltip;
 using SDVCommon.Helpers.Tooltip;
-using SDVCommon.OBSGift;
+using SDVCommon.Icons;
+using SDVCommon.Icons.iconproviders;
+using SDVCommon.Models.Tooltip;
 
 
 namespace HarvestHelper.TooltipSections

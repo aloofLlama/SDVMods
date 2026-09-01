@@ -4,17 +4,15 @@ using SDVCommon.Helpers;
 using SDVCommon.Services;
 using SDVData;
 using StardewValley;
-using StardewValley.GameData.Crops;
-using StardewValley.GameData.Objects;
-using System.Runtime.InteropServices;
+using SObject = StardewValley.Object;
 
 
 namespace SDVCommon.GameData
 {
     public class GameObject
     {
-        // Accepts both qualified and unqualified IDs
-        public static StardewValley.Object? GetObjectInstance(string id, int quality = 0)
+        // Create a real SObject instance from a qualified or unqualified ID.
+        public static SObject? GetObjectInstance(string id, int quality = 0)
         {
             string unqualifiedId = IdHelper.ToUnqualifiedItemId(id);
 
@@ -23,8 +21,17 @@ namespace SDVCommon.GameData
                 return null;
 
             // Create a real SObject instance
-            return new StardewValley.Object(unqualifiedId, 1, false, -1, quality);
+            return new SObject(unqualifiedId, 1, false, -1, quality);
         }
+
+        // Create a list of real SObject instance from a list of qualified or unqualified ID.
+        public static IEnumerable<SObject> GetObjects(IEnumerable<string> ids)
+        {
+            return ids
+                .Select(GetObjectInstance)
+                .OfType<SObject>();
+        }
+
 
         public static ObjectInfo? GetObjectInfo(string qId)
         {

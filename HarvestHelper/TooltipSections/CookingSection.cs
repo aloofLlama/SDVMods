@@ -2,10 +2,9 @@
 using SDVCommon.GameData;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
+using SDVCommon.Icons.iconproviders;
 using SDVCommon.Models.Tooltip;
-using SDVCommon.Services;
 using SDVData;
-using StardewValley.SpecialOrders.Objectives;
 
 
 namespace HarvestHelper.TooltipSections

@@ -1,4 +1,5 @@
-﻿using GiftDiscovery.Tooltip.NPCSections;
+﻿using GiftDiscovery.Models;
+using GiftDiscovery.Tooltip.NPCSections;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
 using SDVCommon.Helpers.Tooltip;
@@ -38,7 +39,7 @@ namespace GiftDiscovery.Tooltip
         // Draw, Get, and Build methods
         //------------------------------------------------
 
-        public static void DrawTooltip(SpriteBatch b, NPC npc)
+        internal static void DrawTooltip(SpriteBatch b, NPC npc)
         {
             var elements = GetTooltip(npc);
             if (elements != null)
@@ -47,7 +48,7 @@ namespace GiftDiscovery.Tooltip
             return;
         }
 
-        public static List<TooltipElement>? GetTooltip(NPC npc)
+        private static List<TooltipElement>? GetTooltip(NPC npc)
         {
             // Menu / config changes set TooltipInvalidated at their respective events.
             // Item or nearby NPC changes are checked here
@@ -70,14 +71,14 @@ namespace GiftDiscovery.Tooltip
         private static List<TooltipElement> BuildTooltip(NPC npc)
         {
             var list = new List<TooltipElement>();
-            int wrapSize = ModEntry.ModConfig.WrapSizeNPC;
-            int maxRows = ModEntry.ModConfig.MaxRowsNPC;
 
             string timer = "Build NPC Tooltip";  // Logs {name} took {ms} ms
             SDVCommonServices.PerfBegin(timer);
 
             //* Keep for debug as it marks the start of a new tooltip
             //SDVCommonServices.PerfPing(timer, $" {npc.displayName}", 0, LogHelper.AlertOrTrace); // name it for what just finished
+
+            NPCTooltipSettings.Refresh();
 
             TooltipBuildHelper.AddIfNotNull(list, NPCHeader.Build(npc));
             TooltipBuildHelper.AddSectionWithSeparator(list, () => NPCTasteSegments.Build(npc));
@@ -88,4 +89,19 @@ namespace GiftDiscovery.Tooltip
             return list;
         }
     }
+
+    internal static class NPCTooltipSettings
+    {
+        public static TasteSourceMode Mode;
+        public static int WrapSizeNPC;
+        public static int MaxRowsNPC;
+
+        public static void Refresh()
+        {
+            Mode = ModEntry.ModConfig.TasteSourceMode;
+            WrapSizeNPC = ModEntry.ModConfig.WrapSizeNPC;
+            MaxRowsNPC = ModEntry.ModConfig.MaxRowsNPC;
+        }
+    }
+
 }

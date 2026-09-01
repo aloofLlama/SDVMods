@@ -1,9 +1,9 @@
-﻿
-using PlantingDay.Helpers;
-using SDVCommon.Models.Tooltip;
-using SDVCommon.Models.Wrappers;
+﻿using PlantingDay.Helpers;
 using SDVCommon.GameData.Dictionaries;
 using SDVCommon.Helpers;
+using SDVCommon.Icons;
+using SDVCommon.Models.Tooltip;
+using SDVCommon.Models.Wrappers;
 
 namespace PlantingDay.ToolTip_Sections
 {

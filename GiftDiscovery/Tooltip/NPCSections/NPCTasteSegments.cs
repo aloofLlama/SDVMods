@@ -1,18 +1,11 @@
-﻿using GiftDiscovery;
-using GiftDiscovery.GameData.Static;
-using GiftDiscovery.Helpers;
+﻿using GiftDiscovery.Helpers;
 using GiftDiscovery.ModData;
 using GiftDiscovery.Models;
-using GiftDiscovery.Services;
 using SDVCommon;
 using SDVCommon.GameData;
-using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Icons;
-using SDVCommon.Models.Builders;
 using SDVCommon.Models.Tooltip;
-using SDVCommon.Services;
-using StardewModdingAPI;
 using StardewValley;
 using SObject = StardewValley.Object;
 
@@ -20,33 +13,33 @@ namespace GiftDiscovery.Tooltip.NPCSections
 {
     internal class NPCTasteSegments
     {
-        public static List<TooltipElement> Build(NPC npc)
+        internal static List<TooltipElement> Build(NPC npc)
         {
             string timer = "Taste Segments";
-            LogLevel logLevel = LogHelper.DebugOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
-            int wrapSize = ModEntry.ModConfig.WrapSizeNPC;
-            int maxRows = ModEntry.ModConfig.MaxRowsNPC;
 
             var list = new List<TooltipElement>();
 
+            // Loves
             if (ModEntry.ModConfig.SeparateUniversalLoves)
-                AddTasteSeparatedLoves(list, npc, "Loves", mode, wrapSize, maxRows);
+                AddTasteWithSeparatedLoves(list, npc, "Loves");
             else
-                AddTaste(list, npc, "Loves", GiftTaste.Love, mode, wrapSize, maxRows);
+                AddTaste(list, npc, "Loves", GiftTaste.Love);
 
-            AddTaste(list, npc, "Likes", GiftTaste.Like, mode, wrapSize, maxRows);
+            // Likes
+            AddTaste(list, npc, "Likes", GiftTaste.Like);
 
+            // Neutral, Dislikes, Hates
             if (!LearnedGiftsHelper.HasDiscoveredAllLovesLikesForNPC(npc, mode))
             {
-                AddTaste(list, npc, "Neutral", GiftTaste.Neutral, mode, wrapSize, maxRows);
-                AddTaste(list, npc, "Dislikes", GiftTaste.Dislike, mode, wrapSize, maxRows);
-                AddTaste(list, npc, "Hates", GiftTaste.Hate, mode, wrapSize, maxRows);
+                AddTaste(list, npc, "Neutral", GiftTaste.Neutral);
+                AddTaste(list, npc, "Dislikes", GiftTaste.Dislike);
+                AddTaste(list, npc, "Hates", GiftTaste.Hate);
             }
 
-            SDVCommonServices.PerfEnd(timer, 10, logLevel);
+            SDVCommonServices.PerfEnd(timer, 10);
 
             return list;
         }
@@ -55,73 +48,55 @@ namespace GiftDiscovery.Tooltip.NPCSections
             List<TooltipElement> list,
             NPC npc,
             string label,
-            GiftTaste taste,
-            TasteSourceMode mode,
-            int wrapSize,
-            int maxRows)
+            GiftTaste taste)
         {
             string timer = "Add taste";  // Logs {name} took {ms} ms
             SDVCommonServices.PerfBegin(timer);
 
+            TasteSourceMode mode = NPCTooltipSettings.Mode;
+
             var knownQIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, taste, mode);
+            var knownObjects = GameObject.GetObjects(knownQIds).ToList();
 
-            var knownItems = knownQIds
-                .Where(qId => GiftableObjectList.IsGiftableObject(qId))
-                .Select(qId => GameObject.GetObjectInstance(qId))
-                .Where(obj => obj is not null)
-                .Cast<SObject>()
-                .ToList();
-
-            // Sort: backpack first, then alphabetical
-            knownItems = knownItems
-                .OrderByDescending(obj => Inventory.IsInBackpack(obj.QualifiedItemId))
-                .ThenBy(obj => obj.DisplayName)
-                .ToList();
+            // Sort
+            knownObjects = SortObjectsForTooltip(knownObjects);
 
             // Unknown count
             int unknownCount = LearnedGiftsHelper
                 .GetUnknownGiftsForNPC(npc, taste, mode)
-                .Count(); ;
+                .Count();
 
             // Skip if nothing to show
-            if (knownItems.Count == 0 && unknownCount == 0)
+            if (knownObjects.Count == 0 && unknownCount == 0)
                 return;
 
+            // Build segments
+            var segments = AssembleKnownAndUnknown(knownObjects, unknownCount);
+
             TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-                BuildNPCTasteSection(label, knownItems, unknownCount, wrapSize, maxRows)
-            );
+                AssembleTasteSection(label, segments));
 
             SDVCommonServices.PerfEnd(timer, $"{taste}", 10);
-
         }
 
-        private static void AddTasteSeparatedLoves(
+        private static void AddTasteWithSeparatedLoves(
             List<TooltipElement> list,
             NPC npc,
-            string label,
-            TasteSourceMode mode,
-            int wrapSize,
-            int maxRows)
+            string label)
         {
-
             string timer = "Add taste separated loves";  // Logs {name} took {ms} ms
-            LogLevel logLevel = LogHelper.InfoOrTrace;
             SDVCommonServices.PerfBegin(timer);
 
-            //// Knowns: Split into regular + universal
+            TasteSourceMode mode = NPCTooltipSettings.Mode;
+
+            // Knowns: Split into regular + universal
             var knownQIds = LearnedGiftsHelper.GetKnownGiftsForNPC(npc, GiftTaste.Love, mode);
+            var knownObjects = GameObject.GetObjects(knownQIds).ToList();
 
-            var knownItems = knownQIds
-                .Where(qId => GiftableObjectList.IsGiftableObject(qId))
-                .Select(qId => GameObject.GetObjectInstance(qId))
-                .Where(obj => obj is not null)
-                .Cast<SObject>()
-                .ToList();
+            var knownRegular = new List<SObject>();
+            var knownUniversal = new List<SObject>();
 
-            var knownRegular = new List<Item>();
-            var knownUniversal = new List<Item>();
-
-            foreach (var obj in knownItems)
+            foreach (var obj in knownObjects)
             {
                 if (UniversalLoveList.IsUniversalLove(obj.QualifiedItemId))
                     knownUniversal.Add(obj);
@@ -130,19 +105,12 @@ namespace GiftDiscovery.Tooltip.NPCSections
             }
 
             // Sort both lists
-            knownRegular = knownRegular
-                .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
-                .ThenBy(item => item.DisplayName)
-                .ToList();
+            knownRegular = SortObjectsForTooltip(knownRegular);
+            knownUniversal = SortObjectsForTooltip(knownUniversal);
 
-            knownUniversal = knownUniversal
-                .OrderByDescending(item => Inventory.IsInBackpack(item.QualifiedItemId))
-                .ThenBy(item => item.DisplayName)
-                .ToList();
+            SDVCommonServices.PerfPing(timer, "Known items", 10); // name it for what just finished
 
-            SDVCommonServices.PerfPing(timer, "Known items", 10, logLevel); // name it for what just finished
-
-            // Unknowns: Count regular + universal
+            // Unknown count both lists
             var unknownQIds = LearnedGiftsHelper.GetUnknownGiftsForNPC(npc, GiftTaste.Love, mode);
 
             int unknownRegular = unknownQIds
@@ -153,95 +121,55 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 .Where(qId => UniversalLoveList.IsUniversalLove(qId))
                 .Count();
 
-            SDVCommonServices.PerfPing(timer, "Unknown items", 10, logLevel); // name it for what just finished
+            SDVCommonServices.PerfPing(timer, "Unknown items", 10); // name it for what just finished
 
-            var segments = new List<InlineSegment>();
-
+            // Assemble both with divider between
             // Regular loves
-            foreach (var info in knownRegular)
-                segments.Add(BuildItemSegment(info));
+            var segments = AssembleKnownAndUnknown(knownRegular, unknownRegular);
 
-            if (unknownRegular > 0)
-            {
-                segments.Add(new InlineSegment
-                {
-                    Text = $"({unknownRegular})",
-                    TextColor = TooltipColors.Muted
-                });
-            }
-
-            // Separator
+            // Divider
             if ((knownRegular.Count > 0 || unknownRegular > 0) &&
                 (knownUniversal.Count > 0 || unknownUniversal > 0))
             {
                 segments.Add(new InlineSegment
                 {
                     Text = " | ",
-                    //Bold = true,
                 });
             }
 
             // Universal loves
-            foreach (var info in knownUniversal)
-                segments.Add(BuildItemSegment(info));
-
-            if (unknownUniversal > 0)
-            {
-                segments.Add(new InlineSegment
-                {
-                    Text = $"({unknownUniversal})",
-                    TextColor = TooltipColors.Muted
-                });
-            }
+            segments.AddRange(AssembleKnownAndUnknown(knownUniversal, unknownUniversal));
 
             // Skip if nothing to show
             if (segments.Count == 0)
                 return;
 
             TooltipBuildHelper.AddSectionWithSeparator(list, () =>
-            {
-                var labelSegment = new InlineSegment
-                {
-                    Text = label + ": ",
-                    Bold = true,
-                    TextColor = TooltipColors.Normal
-                };
-
-                var wrapped = TooltipBuildHelper.BuildWrappedSegmentBlock(
-                    startSegments: new List<InlineSegment> { labelSegment },
-                    collapsibleSegments: segments,
-                    endSegments: new List<InlineSegment>(),
-                    wrapSize: wrapSize,
-                    maxRows: maxRows,
-                    useCommas: false
-                );
-
-                return new List<TooltipElement>
-                {
-                    new TooltipElement { InlineSegments = wrapped }
-                };
-            });
+                AssembleTasteSection(label, segments));
 
             SDVCommonServices.PerfPing(timer, "Build segments", 10); // name it for what just finished
             SDVCommonServices.PerfEnd(timer, 10);
-
         }
 
+        private static List<SObject> SortObjectsForTooltip(IEnumerable<SObject> objects)
+        {
+            return objects
+                .OrderByDescending(obj => Inventory.IsInBackpack(obj.QualifiedItemId))
+                .ThenBy(obj => obj.DisplayName)
+                .ToList();
+        }
 
-        private static List<TooltipElement> BuildNPCTasteSection(
-            string label,
-            List<SObject> objects,
-            int unknownCount,
-            int wrapSize,
-            int maxRows)
+        private static List<InlineSegment> AssembleKnownAndUnknown(
+            IEnumerable<SObject> knownObjects,
+            int unknownCount)
         {
             var segments = new List<InlineSegment>();
 
+            // Convert each object into a segment
+            foreach (var obj in knownObjects)
+                segments.Add(BuildOneObjectSegment(obj));
 
-            foreach (var obj in objects)
-                segments.Add(BuildItemSegment(obj));
-
-            // Unknown count
+            // Add "(X)" unknown count
             if (unknownCount > 0)
             {
                 segments.Add(new InlineSegment
@@ -250,8 +178,36 @@ namespace GiftDiscovery.Tooltip.NPCSections
                     TextColor = TooltipColors.Muted
                 });
             }
+            return segments;
+        }
 
-            // Label segment
+        private static InlineSegment BuildOneObjectSegment(SObject obj)
+        {
+            string qId = obj.QualifiedItemId;
+            bool inBackpack = Inventory.IsInBackpack(qId);
+
+            // Display name only if in backpack
+            string name = inBackpack ? obj.DisplayName : "";
+
+            if (!string.IsNullOrEmpty(name))
+                name += ", ";
+
+            return new InlineSegment
+            {
+                Icon = IconRegistry.GetIcon(qId),
+                Text = name,
+                TextColor = TooltipColors.Normal,
+                Underline = false
+            };
+        }
+
+        private static List<TooltipElement> AssembleTasteSection(
+            string label,
+            List<InlineSegment> segments)
+        {
+            int wrapSize = NPCTooltipSettings.WrapSizeNPC;
+            int maxRows = NPCTooltipSettings.MaxRowsNPC;
+
             var labelSegment = new InlineSegment
             {
                 Text = label + ": ",
@@ -268,30 +224,11 @@ namespace GiftDiscovery.Tooltip.NPCSections
                 useCommas: false
             );
 
-            return new List<TooltipElement>
-                {
-                    new TooltipElement { InlineSegments = wrapped }
-                };
-        }
-
-        private static InlineSegment BuildItemSegment(Item item)
-        {
-            string qId = item.QualifiedItemId;
-            bool inBackpack = Inventory.IsInBackpack(qId);
-
-            string name = inBackpack ? item.DisplayName : "";
-
-            if (!string.IsNullOrEmpty(name))
-                name += ",";
-
-            return new InlineSegment
-            {
-                Icon = IconRegistry.GetIcon(qId),
-                Text = name,
-                TextColor = TooltipColors.Normal,
-                Underline = false
+            return new List<TooltipElement> {
+                new() { InlineSegments = wrapped }
             };
         }
+
 
     }
 }

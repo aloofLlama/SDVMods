@@ -1,8 +1,8 @@
 ﻿using HarvestHelper.Helpers;
-using SDVCommon.Helpers;
 using SDVCommon.GameData;
-using SDVData;
+using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
+using SDVData;
 
 
 namespace HarvestHelper.TooltipSections

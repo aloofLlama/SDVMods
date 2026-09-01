@@ -1,9 +1,10 @@
 ﻿using PlantingDay.Compatibility;
 using SDVCommon.Compatibility;
-using SDVCommon.Helpers;
-using SDVCommon.Services;
 using SDVCommon.GameData.Dictionaries;
+using SDVCommon.Helpers;
+using SDVCommon.Icons;
 using SDVCommon.Models.Builders;
+using SDVCommon.Services;
 using StardewModdingAPI;
 
 namespace PlantingDay.Helpers
@@ -49,7 +50,7 @@ namespace PlantingDay.Helpers
         {
             PlantInfoBuilder.Reset();
             Harvest.Reset();
-
+            IconRegistry.Reset();
         }
 
     }

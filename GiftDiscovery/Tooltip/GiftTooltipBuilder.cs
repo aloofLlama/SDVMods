@@ -6,10 +6,10 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon.Compatibility;
 using SDVCommon.Helpers.Tooltip;
+using SDVCommon.Icons;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
 using StardewValley;
-using System.Security.Cryptography;
 
 
 namespace GiftDiscovery.Tooltip
@@ -48,7 +48,7 @@ namespace GiftDiscovery.Tooltip
         // Draw, Get, and Build methods
         //------------------------------------------------
 
-        public static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
+        internal static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
         {
             var elements = GetTooltip(obj);
             if (elements is null || elements.Count == 0)
@@ -57,7 +57,7 @@ namespace GiftDiscovery.Tooltip
             TooltipRenderer.DrawBottomLeft(b, elements);
         }
 
-        public static List<TooltipElement>? GetTooltip(StardewValley.Object obj)
+        private static List<TooltipElement>? GetTooltip(StardewValley.Object obj)
         {
             // Menu / config changes set TooltipInvalidated at their respective events.
             // Item or nearby NPC changes are checked here
@@ -81,7 +81,7 @@ namespace GiftDiscovery.Tooltip
         }
 
 
-        public static List<TooltipElement> BuildTooltip(
+        private static List<TooltipElement> BuildTooltip(
             StardewValley.Object obj)
         {
             int wrapSize = ModEntry.ModConfig.WrapSizeGift;
