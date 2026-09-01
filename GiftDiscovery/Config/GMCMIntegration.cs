@@ -6,6 +6,21 @@ namespace GiftDiscovery.Config
 {
     internal static class GMCMIntegration
     {
+        private static int _lastConfigHash;
+
+        public static bool ConfigChanged()
+        {
+            int currentHash = ModEntry.ModConfig.GetHashCode();
+
+            if (currentHash != _lastConfigHash)
+            {
+                _lastConfigHash = currentHash;
+                return true;
+            }
+
+            return false;
+        }
+
         public static void Register(IModHelper helper, IManifest manifest)
         {
             var gmcm = helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
@@ -29,7 +44,6 @@ namespace GiftDiscovery.Config
             gmcm.AddSectionTitle(
                 ModEntry.Instance.ModManifest,
                 () => "General"
-                //() => ""
                 );
 
 
@@ -206,7 +220,6 @@ namespace GiftDiscovery.Config
             gmcm.AddSectionTitle(
                 ModEntry.Instance.ModManifest,
                 () => "NPC Tooltip"
-                //() => ""
             );
 
 
@@ -256,7 +269,6 @@ namespace GiftDiscovery.Config
                 getValue: () => ModEntry.ModConfig.SeparateUniversalLoves,
                 setValue: value => ModEntry.ModConfig.SeparateUniversalLoves = value
             );
-
 
         }
     }

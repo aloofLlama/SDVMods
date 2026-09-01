@@ -1,10 +1,5 @@
 ﻿using GiftDiscovery.Models;
 using StardewModdingAPI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GiftDiscovery.Config
 {
@@ -52,8 +47,6 @@ namespace GiftDiscovery.Config
         public int MaxRowsNPC { get; set; } = 8; //How many rows to show
         public bool ShowLocation { get; set; } = true;
         public bool SeparateUniversalLoves { get; set; } = true;
-
-
 
     }
 }

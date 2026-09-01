@@ -1,96 +1,70 @@
-﻿using GiftDiscovery.GameData;
-using GiftDiscovery.Services;
-using GiftDiscovery.Tooltip.NPCSections;
+﻿using GiftDiscovery.Tooltip.NPCSections;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon;
-using SDVCommon.Helpers;
 using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
-using SDVCommon.Services;
-using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Menus;
-using System.Diagnostics;
 
 namespace GiftDiscovery.Tooltip
 {
     public static class NPCGiftTooltipBuilder
     {
-        private static bool _isInitialized;
+        internal static bool TooltipInvalidated { get; set; }
 
-        private static List<TooltipElement>? _cachedTooltip;
+        private static List<TooltipElement>? _tooltip;
         private static NPC? _cachedNPC;
-        private static int _cachedRange;
-        private static int _cachedConfigHash;
-        private static bool _cachedMenuChanged;
-        private static int _cachedToggleVersion;
-        private static int _cachedGiftVersion;
 
-        public static void Initialize()
-        {
-            if (_isInitialized)
-                return;
-
-            Reset();
-            _isInitialized = true;
-        }
+        //------------------------------------------------
+        // Data lifecycle methods
+        //------------------------------------------------
 
         public static void Reset()
         {
-            _cachedTooltip = null;
+            _tooltip = null;
             _cachedNPC = null;
-            _cachedRange = 0;
-            _cachedMenuChanged = false;
-            _cachedToggleVersion = -1;
-            _cachedGiftVersion = -1;
+            TooltipInvalidated = false;
         }
+        // Reset or update the relevent cached data
+        internal static void RefreshCache(NPC npc)
+        {
+            if (_tooltip is not null)
+                TooltipRenderer.InvalidateSize(_tooltip);
+            _cachedNPC = npc;
+            TooltipInvalidated = false;
+        }
+
+        //------------------------------------------------
+        // Draw, Get, and Build methods
+        //------------------------------------------------
 
         public static void DrawTooltip(SpriteBatch b, NPC npc)
         {
             var elements = GetTooltip(npc);
-
             if (elements != null)
                 TooltipRenderer.DrawBottomRight(b, elements);
 
             return;
-
         }
 
         public static List<TooltipElement>? GetTooltip(NPC npc)
         {
-            int configHash = ModEntry.ModConfig.GetHashCode();
-            bool menuChanged = ModEntry.MenuStateChanged;
-            int toggleVersion = ModEntry.ToggleVersion;
-            int giftVersion = TasteLearning.GiftVersion;
+            // Menu / config changes set TooltipInvalidated at their respective events.
+            // Item or nearby NPC changes are checked here
+            if (npc != _cachedNPC ||
+                _tooltip == null)
+            {
+                TooltipInvalidated = true;
+            }
 
-            int range = ModEntry.ModConfig.NearbyRangeTilesNPCTooltip;
-
-            bool needsRebuild =
-                _cachedTooltip == null ||
-                _cachedNPC != npc ||
-                _cachedRange != range ||
-                configHash != _cachedConfigHash ||
-                menuChanged != _cachedMenuChanged ||
-                toggleVersion != _cachedToggleVersion ||
-                giftVersion != _cachedGiftVersion;
-
-
-            if (!needsRebuild)
-                return _cachedTooltip;
+            if (!TooltipInvalidated)
+                return _tooltip;
 
             // Rebuild
-            _cachedTooltip = BuildTooltip(npc);
+            _tooltip = BuildTooltip(npc);
+            RefreshCache(npc);
 
-            TooltipRenderer.InvalidateSize(_cachedTooltip);
-            _cachedNPC = npc;
-            _cachedRange = range;
-            _cachedConfigHash = configHash;
-            _cachedMenuChanged = menuChanged;
-            _cachedToggleVersion = toggleVersion;
-            _cachedGiftVersion = giftVersion;
-
-            return _cachedTooltip;
+            return _tooltip;
         }
 
         private static List<TooltipElement> BuildTooltip(NPC npc)

@@ -14,7 +14,7 @@ namespace PlantingDay.Helpers
         {
             //TooltipIcons.Initialize();
             APIManager.LoadApis(helper);
-            ModSourceHelper.Initialize(helper);
+            ModSource.Initialize(helper);
 
             MonsterDropBuilder.Initialize();
             PlantInfoBuilder.Initialize();

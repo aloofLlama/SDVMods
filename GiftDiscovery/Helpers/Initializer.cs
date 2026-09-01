@@ -20,7 +20,7 @@ namespace GiftDiscovery.Helpers
             SDVCommonServices.PerfBegin(timer);
 
             APIManager.LoadApis(helper);
-            ModSourceHelper.Initialize(helper);
+            ModSource.Initialize(helper);
 
             //Gamedata static
             GiftableObjectList.Initialize(); //updated
@@ -32,9 +32,6 @@ namespace GiftDiscovery.Helpers
 
             //
             TasteLearning.Initialize(helper);
-
-            GiftTooltipBuilder.Initialize();
-            NPCGiftTooltipBuilder.Initialize();
 
             SDVCommonServices.PerfEnd(timer, 0, logLevel);
 

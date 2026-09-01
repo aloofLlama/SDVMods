@@ -165,7 +165,7 @@ namespace SDVCommon.GameData.Dictionaries
                 DisplayName = objInfo.DisplayName,
                 SeedQId = seedQId,
                 Category = objInfo.Category,
-                ModSource = ModSourceHelper.GetModSource(harvestQId),
+                ModSource = ModSource.GetModSource(harvestQId),
                 //Harvest = objInfo,
                 ShipOne = shipOne,
                 ShipMonoCulture = shipMono,

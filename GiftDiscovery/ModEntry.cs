@@ -7,6 +7,7 @@ using GiftDiscovery.Tooltip;
 using HarmonyLib;
 using SDVCommon;
 using SDVCommon.GameData;
+using SDVCommon.GameData.Dynamic;
 using SDVCommon.Services;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -154,13 +155,14 @@ namespace GiftDiscovery
             }
         }
 
-
         private void OnButtonPressed(object? sender, StardewModdingAPI.Events.ButtonPressedEventArgs e)
         {
             if (e.Button == ModConfig.ToggleTooltipKey)
             {
                 _showTooltip = !_showTooltip;
-                ModEntry.IncrementToggleVersion();
+                GiftTooltipBuilder.TooltipInvalidated = true;
+                NPCGiftTooltipBuilder.TooltipInvalidated = true;
+
             }
 
 #if DEBUG
@@ -204,30 +206,16 @@ namespace GiftDiscovery
         }
 
 
-        public static bool MenuStateChanged { get; private set; }
-        private static bool _lastHudVisible;
-        private static bool _lastMenuVisible;
-
         private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
         {
-            bool hud = Game1.displayHUD;
-            bool menu = Game1.activeClickableMenu != null;
+            if (MenuMonitor.MenuStateChanged() == true ||
+                GMCMIntegration.ConfigChanged() == true)
+            {
+                GiftTooltipBuilder.TooltipInvalidated = true;
+                NPCGiftTooltipBuilder.TooltipInvalidated = true;
+            }
 
-            MenuStateChanged = hud != _lastHudVisible || menu != _lastMenuVisible;
-
-            _lastHudVisible = hud;
-            _lastMenuVisible = menu;
         }
-
-
-        private static int _toggleVersion = 0;
-        public static int ToggleVersion => _toggleVersion;
-        public static void IncrementToggleVersion()
-        {
-            _toggleVersion++;
-        }
-
-
 
     }
 }

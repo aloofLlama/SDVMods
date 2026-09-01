@@ -54,6 +54,8 @@ namespace GiftDiscovery.ModData
             string timer = "Build Taste Maps";
             SDVCommonServices.PerfBegin(timer);
 
+            _tasteMap = new Dictionary<string, Dictionary<string, GiftTaste>>();
+
             foreach (var npc in NPCGiftStatus.GetAllGiftableNPCs())
             {
                 var map = BuildIndividualTasteMap(npc);
@@ -67,10 +69,10 @@ namespace GiftDiscovery.ModData
 
         private static Dictionary<string, GiftTaste> BuildIndividualTasteMap(NPC npc)
         {
-            var map = new Dictionary<string, GiftTaste>();
-
             string timer = "Taste Map";  // Logs {name} took {ms} ms
             SDVCommonServices.PerfBegin(timer);
+
+            var map = new Dictionary<string, GiftTaste>();
 
             foreach (var obj in GiftableObjectList.GetAllGiftableObjects())
             {

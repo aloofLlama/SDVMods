@@ -1,5 +1,6 @@
 ﻿using GiftDiscovery.GameData;
 using GiftDiscovery.Models;
+using GiftDiscovery.Tooltip;
 using SDVCommon;
 using StardewModdingAPI;
 using StardewValley;
@@ -12,23 +13,22 @@ namespace GiftDiscovery.Services
     // Actual gift/npc/taste data is stored in TasteMap, this class only tracks what the player has learned
     internal class TasteLearning
     {
-        private class GiftTasteResult
+        private class GiftKnowledgeData
         {
             // QualifiedItemId → NPCName → GiftTaste
-            internal Dictionary<string, Dictionary<string, string>> KnownTastes { get; set; }
+            public Dictionary<string, Dictionary<string, string>> KnownTastes { get; set; }
                 = new();
         }
 
         // Global is available for all farm files
         private const string GlobalDataKey = "GiftKnowledge";
-        private static GiftTasteResult _globalData = null!;
+        private static GiftKnowledgeData _globalData = null!;
 
         // Local is specific to each farm file
         private const string LocalDataKey = "LocalGiftKnowledge";
-        private static GiftTasteResult _localData = null!;
+        private static GiftKnowledgeData _localData = null!;
 
         private static IModHelper _helper = null!;
-        public static int GiftVersion = 0; //used to invalidate cached tooltip data when a new taste is learned
 
 
         public static bool IsKnownGlobal(string qId, NPC npc)
@@ -64,8 +64,8 @@ namespace GiftDiscovery.Services
             localNPCDict[npcName] = taste.ToString();
 
             Save();
-            GiftVersion++;
-
+            GiftTooltipBuilder.TooltipInvalidated = true;
+            NPCGiftTooltipBuilder.TooltipInvalidated = true;
         }
 
         private static void Save()
@@ -88,32 +88,31 @@ namespace GiftDiscovery.Services
 
         internal static void Reset()
         {
-            _globalData = null!;
-            _localData = null!;
-            GiftVersion++;
+            _globalData = new GiftKnowledgeData();
+            _localData = new GiftKnowledgeData();
         }
 
 
         private static void InitializeGlobal()
         {
-            string timer = "Initializing Global Data";
+            string timer = "Initialize Global Data";
             SDVCommonServices.PerfBegin(timer);
 
-            _globalData = _helper.Data.ReadGlobalData<GiftTasteResult>(GlobalDataKey)
-                    ?? new GiftTasteResult();
+            _globalData = _helper.Data.ReadGlobalData<GiftKnowledgeData>(GlobalDataKey)
+                    ?? new GiftKnowledgeData();
 
-            SDVCommonServices.PerfEnd(timer, 10);
+            SDVCommonServices.PerfEnd(timer, 0);
         }
 
         private static void InitializeLocal()
         {
-            string timer = "Initializing Local Data";
+            string timer = "Initialize Local Data";
             SDVCommonServices.PerfBegin(timer);
 
-            _localData = _helper.Data.ReadSaveData<GiftTasteResult>(LocalDataKey)
-                    ?? new GiftTasteResult();
+            _localData = _helper.Data.ReadSaveData<GiftKnowledgeData>(LocalDataKey)
+                    ?? new GiftKnowledgeData();
 
-            SDVCommonServices.PerfEnd(timer, 10);
+            SDVCommonServices.PerfEnd(timer, 0);
         }
     }
 }

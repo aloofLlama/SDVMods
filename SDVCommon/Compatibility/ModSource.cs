@@ -4,7 +4,7 @@ using StardewModdingAPI;
 
 namespace SDVCommon.Compatibility
 {
-    public static class ModSourceHelper
+    public static class ModSource
     {
 
         private static IModHelper _helper = null!;

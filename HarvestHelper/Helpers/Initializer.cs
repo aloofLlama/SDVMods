@@ -15,7 +15,7 @@ namespace HarvestHelper.Helpers
         public static void InitializeAll(IModHelper helper)
         {
             //TooltipIcons.Initialize();
-            ModSourceHelper.Initialize(helper);
+            ModSource.Initialize(helper);
             SeedHarvestMap.Initialize();
 
             Harvest.Initialize();

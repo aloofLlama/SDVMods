@@ -2,7 +2,6 @@
 using GiftDiscovery.GameData.Static;
 using GiftDiscovery.Helpers;
 using GiftDiscovery.Models;
-using GiftDiscovery.Services;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SDVCommon.Compatibility;
@@ -10,40 +9,44 @@ using SDVCommon.Helpers.Tooltip;
 using SDVCommon.Models.Tooltip;
 using SDVCommon.Rendering;
 using StardewValley;
+using System.Security.Cryptography;
 
 
 namespace GiftDiscovery.Tooltip
 {
     public static class GiftTooltipBuilder
     {
-        private static bool _isInitialized;
+        internal static bool TooltipInvalidated { get; set; }
 
-        private static List<TooltipElement>? _cachedTooltip;
+        private static List<TooltipElement>? _tooltip;
         private static string? _cachedGiftQId;
-        private static int _cachedConfigHash;
         private static HashSet<string> _cachedNearbyNPCSet = new();
-        private static bool _cachedMenuChanged;
-        private static int _cachedToggleVersion;
-        private static int _cachedGiftVersion;
 
-        public static void Initialize()
+        //------------------------------------------------
+        // Data lifecycle methods
+        //------------------------------------------------
+        internal static void Reset()
         {
-            if (_isInitialized)
-                return;
-
-            Reset();
-            _isInitialized = true;
-        }
-
-        public static void Reset()
-        {
-            _cachedTooltip = null;
+            if (_tooltip is not null)
+                TooltipRenderer.InvalidateSize(_tooltip);
+            _tooltip = null;
             _cachedGiftQId = null;
             _cachedNearbyNPCSet.Clear();
-            _cachedMenuChanged = false;
-            _cachedToggleVersion = -1;
-            _cachedGiftVersion = -1;
+            TooltipInvalidated = false;
         }
+        // Reset or update the relevent cached data
+        internal static void RefreshCache(string qId, HashSet<string> nearbyNPCSet)
+        {
+            if (_tooltip is not null)
+                TooltipRenderer.InvalidateSize(_tooltip);
+            _cachedGiftQId = qId;
+            _cachedNearbyNPCSet = nearbyNPCSet.ToHashSet();
+            TooltipInvalidated = false;
+        }
+
+        //------------------------------------------------
+        // Draw, Get, and Build methods
+        //------------------------------------------------
 
         public static void DrawTooltip(SpriteBatch b, StardewValley.Object obj)
         {
@@ -56,35 +59,25 @@ namespace GiftDiscovery.Tooltip
 
         public static List<TooltipElement>? GetTooltip(StardewValley.Object obj)
         {
-            string qId = obj.QualifiedItemId;
-            int configHash = ModEntry.ModConfig.GetHashCode();
-            bool menuChanged = ModEntry.MenuStateChanged;
-            int toggleVersion = ModEntry.ToggleVersion;
-            int giftVersion = TasteLearning.GiftVersion;
+            // Menu / config changes set TooltipInvalidated at their respective events.
+            // Item or nearby NPC changes are checked here
+            string qId = obj.QualifiedItemId; 
             var nearbyNPCSet = NPCLocation.GetNearbyNPCNames(ModEntry.ModConfig.NearbyRangeTilesGiftTooltip);
 
-            bool needsRebuild =
-                _cachedTooltip == null ||
-                qId != _cachedGiftQId ||
-                configHash != _cachedConfigHash ||
-                menuChanged != _cachedMenuChanged ||
+            if (qId != _cachedGiftQId ||
                 !nearbyNPCSet.SetEquals(_cachedNearbyNPCSet) ||
-                toggleVersion != _cachedToggleVersion ||
-                giftVersion != _cachedGiftVersion;
+                _tooltip == null )
+            {
+                TooltipInvalidated = true;
+            }
 
-            if (!needsRebuild)
-                return _cachedTooltip;
+            if (!TooltipInvalidated)
+                return _tooltip;
 
-            _cachedTooltip = BuildTooltip(obj);
-            TooltipRenderer.InvalidateSize(_cachedTooltip);
-            _cachedGiftQId = qId;
-            _cachedConfigHash = configHash;
-            _cachedMenuChanged = menuChanged;
-            _cachedNearbyNPCSet = nearbyNPCSet.ToHashSet();
-            _cachedToggleVersion = toggleVersion;
-            _cachedGiftVersion = giftVersion;
+            _tooltip = BuildTooltip(obj);
+            RefreshCache(qId, nearbyNPCSet.ToHashSet());
 
-            return _cachedTooltip;
+            return _tooltip;
         }
 
 
@@ -94,16 +87,15 @@ namespace GiftDiscovery.Tooltip
             int wrapSize = ModEntry.ModConfig.WrapSizeGift;
             int maxRows = ModEntry.ModConfig.MaxRowsGift;
 
-            var list = new List<TooltipElement>();
-
-                list.Add(new TooltipElement
-                {
+            var list = new List<TooltipElement>
+            {
+                new() {
                     Icon = IconRegistry.GetIcon(obj.ItemId),
                     Text = obj.DisplayName
-                });
+                }
+            };
 
             TasteSourceMode mode = ModEntry.ModConfig.TasteSourceMode;
-
 
             // ---------------------------------------------------------
             // Taste grouping
@@ -186,7 +178,7 @@ namespace GiftDiscovery.Tooltip
             // ---------------------------------------------------------
             if (ModEntry.ModConfig.ShowModSource)
             {
-                var modSource = ModSourceHelper.GetModSource(obj.ItemId);
+                var modSource = ModSource.GetModSource(obj.ItemId);
 
                 if (!string.IsNullOrEmpty(modSource))
                 {

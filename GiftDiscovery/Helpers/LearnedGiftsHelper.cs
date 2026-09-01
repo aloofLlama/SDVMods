@@ -57,7 +57,7 @@ namespace GiftDiscovery.Helpers
         }
 
         // ---------------------------------------------------------
-        // ITEM → NPC (Undiscovered, all tastes)
+        // ITEM → NPC (Undiscovered = unknown for all tastes)
         // ---------------------------------------------------------
         internal static IEnumerable<NPC> GetUndiscoveredBy(
             string qId,

@@ -17,10 +17,11 @@
     <Compile Include="$(MSBuildThisFileDirectory)Compatibility\SpaceCoreCompat.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\Achievement.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)gamedata\ArtisanRules.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)gamedata\dynamic\MenuMonitor.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\NPCGameData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\REFACTOREconomicsHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)GameData\SeedHarvestMap.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ModSourceHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Compatibility\ModSource.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)helpers\NameHelper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)icons\IconExtensions.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)icons\iconproviders\ItemIconProvider.cs" />
@@ -62,6 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="$(MSBuildThisFileDirectory)GameData\Dictionaries\" />
+    <Folder Include="$(MSBuildThisFileDirectory)GameData\Dynamic\" />
     <Folder Include="$(MSBuildThisFileDirectory)Helpers\Tooltip\" />
     <Folder Include="$(MSBuildThisFileDirectory)Models\Builders\" />
     <Folder Include="$(MSBuildThisFileDirectory)Models\Tooltip\" />
